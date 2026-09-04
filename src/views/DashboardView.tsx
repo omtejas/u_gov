@@ -54,8 +54,13 @@ export const DashboardView: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           {/* Identity info */}
           <div className="flex items-start sm:items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-xl font-black text-amber-300 shadow-inner">
-              {displayName.slice(0, 1)}
+            <div className="relative">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-xl font-black text-amber-300 shadow-inner">
+                {displayName.slice(0, 1)}
+              </div>
+              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#0b1f3a] border border-blue-400/40 p-0.5 overflow-hidden shadow-sm">
+                <img src="/logo.png" alt="U-GOV" className="w-full h-full object-contain" />
+              </div>
             </div>
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">

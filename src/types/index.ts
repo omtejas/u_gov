@@ -293,3 +293,35 @@ export interface CivicGrievance {
   upvotes: number;
   description: string;
 }
+
+export interface IntegrationProvider {
+  providerCode: string;
+  displayName: string;
+  environment: "SANDBOX" | "STAGING" | "PRODUCTION";
+  supportedServices: string[];
+  status: "AVAILABLE" | "DEGRADED" | "MAINTENANCE" | "UNAVAILABLE";
+  version: string;
+  disclaimer: string;
+}
+
+export interface ApplicationIntegrationTelemetry {
+  application: {
+    id: string;
+    applicationNumber: string;
+    status: ControlledApplicationStatus;
+    trackingToken?: string | null;
+  };
+  provider: IntegrationProvider;
+  integrationRecord?: {
+    id: string;
+    providerCode: string;
+    correlationId: string;
+    status: string;
+    attemptCount: number;
+    trackingToken?: string | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  environment: string;
+  disclaimer: string;
+}

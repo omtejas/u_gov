@@ -43,8 +43,10 @@ export const HomeView: React.FC = () => {
 
         <div className="relative z-10 max-w-3xl space-y-6">
           {/* DPI Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs">
+            <div className="w-5 h-5 rounded-md bg-[#0b1f3a] p-0.5 flex items-center justify-center overflow-hidden border border-white/20">
+              <img src="/logo.png" alt="U-GOV" className="w-full h-full object-contain" />
+            </div>
             <span className="font-semibold tracking-wide text-amber-200 uppercase text-[11px]">
               National Digital Public Infrastructure • Smart India Hackathon 2026
             </span>

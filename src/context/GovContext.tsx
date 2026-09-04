@@ -12,6 +12,7 @@ import {
   GovernmentApplication,
   ApplicationReviewData,
   ServiceRequirementsEvaluation,
+  ApplicationIntegrationTelemetry,
 } from "../types";
 import { MOCK_SERVICES } from "../data/mockServices";
 import { MOCK_APPLICATIONS } from "../data/mockApplications";
@@ -135,6 +136,12 @@ interface GovContextType {
   checkServiceRequirements: (
     serviceIdOrCode: string
   ) => Promise<{ success: boolean; evaluation?: ServiceRequirementsEvaluation; error?: string }>;
+  getApplicationIntegrationTelemetry: (
+    applicationId: string
+  ) => Promise<{ success: boolean; telemetry?: ApplicationIntegrationTelemetry; error?: string }>;
+  pollApplicationIntegrationStatus: (
+    applicationId: string
+  ) => Promise<{ success: boolean; status?: any; error?: string }>;
   activeApplicationModal: GovernmentApplication | null;
   openApplicationModal: (app: GovernmentApplication) => void;
   closeApplicationModal: () => void;
@@ -934,6 +941,41 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  const getApplicationIntegrationTelemetry = async (
+    applicationId: string
+  ): Promise<{ success: boolean; telemetry?: ApplicationIntegrationTelemetry; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/integrations/applications/${applicationId}`, { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to fetch integration telemetry." };
+      }
+      return { success: true, telemetry: data };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error fetching integration telemetry." };
+    }
+  };
+
+  const pollApplicationIntegrationStatus = async (
+    applicationId: string
+  ): Promise<{ success: boolean; status?: any; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/integrations/applications/${applicationId}/status`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to poll integration status." };
+      }
+      await refreshApplications();
+      await refreshAuditLogs();
+      return { success: true, status: data.status };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error polling status." };
+    }
+  };
+
   const openApplicationModal = (app: GovernmentApplication) => {
     setActiveApplicationModal(app);
   };
@@ -976,6 +1018,8 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         submitGovernmentApplication,
         cancelGovernmentApplication,
         checkServiceRequirements,
+        getApplicationIntegrationTelemetry,
+        pollApplicationIntegrationStatus,
         activeApplicationModal,
         openApplicationModal,
         closeApplicationModal,

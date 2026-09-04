@@ -18,9 +18,8 @@ export const Header: React.FC = () => {
           onClick={() => setActiveTab("home")}
           className="flex items-center gap-3 cursor-pointer select-none group"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#0b1f3a] p-1.5 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-            <span className="font-extrabold text-sm tracking-tighter text-amber-400">U</span>
-            <span className="font-bold text-xs tracking-tighter text-white">GOV</span>
+          <div className="w-10 h-10 rounded-xl bg-[#0b1f3a] p-1 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+            <img src="/logo.png" alt="U-GOV Sovereign Emblem" className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">

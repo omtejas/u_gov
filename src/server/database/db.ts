@@ -157,6 +157,21 @@ export interface GovernmentApplicationRecord {
   updatedAt: string;
 }
 
+export interface ApplicationIntegrationRecord {
+  id: string;
+  applicationId: string;
+  providerCode: string;
+  idempotencyKey: string;
+  correlationId: string;
+  status: string;
+  trackingToken?: string | null;
+  providerReference?: string | null;
+  attemptCount: number;
+  lastErrorCode?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   users: UserRecord[];
   profiles: ProfileRecord[];
@@ -171,6 +186,7 @@ interface DatabaseSchema {
   documentConsents: DocumentConsentRecord[];
   governmentServices: GovernmentServiceRecord[];
   governmentApplications: GovernmentApplicationRecord[];
+  applicationIntegrations: ApplicationIntegrationRecord[];
 }
 
 const getDbPath = () => {
@@ -504,6 +520,7 @@ class Database {
           parsed.governmentServices = this.getDefaultGovernmentServices();
         }
         if (!parsed.governmentApplications) parsed.governmentApplications = [];
+        if (!parsed.applicationIntegrations) parsed.applicationIntegrations = [];
         return parsed;
       }
     } catch (err) {
@@ -659,6 +676,7 @@ class Database {
       documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
       governmentServices: this.getDefaultGovernmentServices(),
       governmentApplications: [],
+      applicationIntegrations: [],
     };
 
     try {
@@ -780,8 +798,8 @@ class Database {
     event.hash = computeAuditHash(prevHash, canonicalData);
 
     this.data.auditEvents.push(event);
-    if (this.data.auditEvents.length > 500) {
-      this.data.auditEvents = this.data.auditEvents.slice(this.data.auditEvents.length - 500);
+    if (this.data.auditEvents.length > 50000) {
+      this.data.auditEvents = this.data.auditEvents.slice(this.data.auditEvents.length - 50000);
     }
     this.save();
   }
@@ -795,7 +813,11 @@ class Database {
   }
 
   public verifyAuditLedger(): { valid: boolean; totalEvents: number; brokenIndex?: number; brokenEventId?: string } {
-    let expectedPrevHash = GENESIS_HASH;
+    if (!this.data.auditEvents || this.data.auditEvents.length === 0) {
+      return { valid: true, totalEvents: 0 };
+    }
+
+    let expectedPrevHash = this.data.auditEvents[0].prevHash || GENESIS_HASH;
     for (let i = 0; i < this.data.auditEvents.length; i++) {
       const e = this.data.auditEvents[i];
       if (e.prevHash && e.prevHash !== expectedPrevHash) {
@@ -992,6 +1014,54 @@ class Database {
   public deleteApplication(id: string): void {
     if (this.data.governmentApplications) {
       this.data.governmentApplications = this.data.governmentApplications.filter((app) => app.id !== id);
+      this.save();
+    }
+  }
+
+  // --- U-INTEGRATIONS Store & Telemetry (Phase 5) ---
+
+  public findIntegrationByApplicationId(applicationId: string): ApplicationIntegrationRecord | undefined {
+    return (this.data.applicationIntegrations || []).find((i) => i.applicationId === applicationId);
+  }
+
+  public findIntegrationByIdempotencyKey(key: string): ApplicationIntegrationRecord | undefined {
+    return (this.data.applicationIntegrations || []).find((i) => i.idempotencyKey === key);
+  }
+
+  public findIntegrationByCorrelationId(correlationId: string): ApplicationIntegrationRecord | undefined {
+    return (this.data.applicationIntegrations || []).find((i) => i.correlationId === correlationId);
+  }
+
+  public recordIntegrationAttempt(record: ApplicationIntegrationRecord): void {
+    if (!this.data.applicationIntegrations) this.data.applicationIntegrations = [];
+    const existingIndex = this.data.applicationIntegrations.findIndex(
+      (i) => i.idempotencyKey === record.idempotencyKey || i.id === record.id
+    );
+
+    if (existingIndex !== -1) {
+      this.data.applicationIntegrations[existingIndex] = {
+        ...this.data.applicationIntegrations[existingIndex],
+        ...record,
+        updatedAt: new Date().toISOString(),
+      };
+    } else {
+      this.data.applicationIntegrations.push(record);
+    }
+    this.save();
+  }
+
+  public updateIntegrationStatus(
+    applicationId: string,
+    status: string,
+    lastErrorCode?: string | null
+  ): void {
+    const integration = this.findIntegrationByApplicationId(applicationId);
+    if (integration) {
+      integration.status = status;
+      if (lastErrorCode !== undefined) {
+        integration.lastErrorCode = lastErrorCode;
+      }
+      integration.updatedAt = new Date().toISOString();
       this.save();
     }
   }

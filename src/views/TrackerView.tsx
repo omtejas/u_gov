@@ -281,6 +281,16 @@ export const TrackerView: React.FC = () => {
                     {app.trackingToken || "Generated upon submission"}
                   </span>
                 </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 sm:col-span-3 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    Integration Gateway: <strong className="font-mono text-slate-800">SANDBOX_{app.service?.serviceCode || "DEFAULT"}</strong>
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    SSRF Protected • Deterministic Mock Bus • Zero Live Outbound Network Calls
+                  </span>
+                </div>
               </div>
 
               {/* Cancellation notice if cancelled */}

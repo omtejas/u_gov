@@ -10,8 +10,8 @@ export const Footer: React.FC = () => {
           {/* Col 1: Platform Overview */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-xs">
-                U
+              <div className="w-8 h-8 rounded-lg bg-[#0b1f3a] p-0.5 flex items-center justify-center overflow-hidden border border-slate-700">
+                <img src="/logo.png" alt="U-GOV Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-base text-white tracking-tight">
                 U-GOV India

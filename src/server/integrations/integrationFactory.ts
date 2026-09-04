@@ -1,12 +1,13 @@
 import { IntegrationAdapter } from "./IntegrationAdapter";
-import { SandboxIntegrationAdapter } from "./SandboxIntegrationAdapter";
+import { integrationRegistry } from "./IntegrationRegistry";
 
-let activeAdapter: IntegrationAdapter = new SandboxIntegrationAdapter();
-
-export function getIntegrationAdapter(): IntegrationAdapter {
-  return activeAdapter;
+export function getIntegrationAdapter(serviceCode?: string): IntegrationAdapter {
+  if (serviceCode) {
+    return integrationRegistry.getAdapterForService(serviceCode);
+  }
+  return integrationRegistry.getAdapterForService("*");
 }
 
 export function setIntegrationAdapter(adapter: IntegrationAdapter): void {
-  activeAdapter = adapter;
+  integrationRegistry.setDefaultAdapter(adapter);
 }

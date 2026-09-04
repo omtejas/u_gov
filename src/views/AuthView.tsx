@@ -85,8 +85,8 @@ export const AuthView: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white text-lg shadow-sm">
-              U
+            <div className="w-14 h-14 rounded-2xl bg-[#0b1f3a] p-1 flex items-center justify-center border border-white/20 shadow-md overflow-hidden shrink-0">
+              <img src="/logo.png" alt="U-GOV Emblem" className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="font-extrabold text-2xl tracking-tight text-white block leading-none">

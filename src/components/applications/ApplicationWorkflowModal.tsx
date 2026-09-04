@@ -685,9 +685,14 @@ export const ApplicationWorkflowModal: React.FC = () => {
 
             {/* Key Information Table */}
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5">
-              <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                Application Metadata
-              </h5>
+              <div className="flex items-center justify-between">
+                <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                  Application & Integration Gateway Metadata
+                </h5>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  U-INTEGRATIONS Sandbox
+                </span>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
                 <div>
                   <span className="text-slate-400 block">Application Number:</span>
@@ -706,6 +711,12 @@ export const ApplicationWorkflowModal: React.FC = () => {
                   <span className="text-slate-900 font-semibold">{app.status}</span>
                 </div>
                 <div>
+                  <span className="text-slate-400 block">Integration Gateway:</span>
+                  <span className="text-slate-900 font-mono">
+                    SANDBOX_{app.service?.serviceCode || "DEFAULT"} (Simulated Bus)
+                  </span>
+                </div>
+                <div>
                   <span className="text-slate-400 block">Attached Credentials:</span>
                   <span className="text-slate-900 font-medium">
                     {app.attachedDocumentIds.length} credential(s) attached
@@ -715,6 +726,12 @@ export const ApplicationWorkflowModal: React.FC = () => {
                   <span className="text-slate-400 block">Active Consent Tokens:</span>
                   <span className="text-slate-900 font-medium">
                     {app.consentIds.length} statutory token(s) granted
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Security Boundary:</span>
+                  <span className="text-emerald-700 font-medium">
+                    Internal Mock Loopback (SSRF Safe)
                   </span>
                 </div>
               </div>

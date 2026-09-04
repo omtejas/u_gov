@@ -7,7 +7,14 @@ import {
   CitizenDocumentRecord,
 } from "../database/db";
 import { documentService } from "./documentService";
-import { getIntegrationAdapter, ApplicationSubmissionResult } from "../integrations";
+import {
+  getIntegrationAdapter,
+  ApplicationSubmissionResult,
+  integrationRegistry,
+  ReliabilityEngine,
+  IntegrationError,
+  StatusResponse,
+} from "../integrations";
 
 export interface CreateApplicationInput {
   serviceId: string;
@@ -569,24 +576,142 @@ export class ApplicationService {
       ipAddress: ip,
     });
 
-    // 2. Dispatch to integration adapter
-    const adapter = getIntegrationAdapter();
-    const submissionResult = await adapter.submitApplication({
-      applicationId: app.id,
-      applicationNumber: app.applicationNumber,
-      serviceCode: service.serviceCode,
-      serviceName: service.name,
-      citizenUserId: userId,
-      formData: app.formData,
-      attachedDocuments: readiness.validAttachedDocs.map((d) => ({
-        documentId: d.id,
-        documentTypeId: d.documentTypeId,
-        title: d.title,
-        documentNumber: d.documentNumber,
-        sha256Checksum: d.sha256Checksum,
-      })),
-      consentIds: newConsentIds,
+    // 2. Integration Idempotency & Correlation Setup
+    const correlationId = `UGOV-INT-${crypto.randomBytes(6).toString("hex")}`;
+    const idempotencyKey = crypto
+      .createHash("sha256")
+      .update(`${app.id}:${service.serviceCode}:${userId}`)
+      .digest("hex");
+
+    // Check if an integration submission already succeeded for this idempotency key
+    const existingSubmission = ReliabilityEngine.checkIdempotency(idempotencyKey);
+    if (existingSubmission) {
+      return {
+        success: true,
+        application: app,
+        submissionResult: existingSubmission,
+        consentsGrantedCount: app.consentIds.length,
+      };
+    }
+
+    // Resolve provider adapter from central IntegrationRegistry
+    const adapter = integrationRegistry.getAdapterForService(service.serviceCode);
+    const providerInfo = adapter.getProviderInfo();
+
+    db.recordAuditEvent({
+      id: `aud-${Date.now()}-intstart`,
+      timestamp: now,
+      actorId: userId,
+      actorName: profile?.displayName || "Citizen",
+      actorRole: "Citizen",
+      action: "INTEGRATION_SUBMISSION_STARTED",
+      resource: `Application ${app.applicationNumber}`,
+      result: "SUCCESS",
+      context: `Dispatched to integration provider ${providerInfo.providerCode} (Correlation: ${correlationId}).`,
+      ipAddress: ip,
     });
+
+    // Execute submission through ReliabilityEngine (Timeout + Bounded Retries)
+    let submissionResult: ApplicationSubmissionResult;
+    try {
+      const execResult = await ReliabilityEngine.withRetry(
+        async (attempt) => {
+          return await adapter.submitApplication({
+            applicationId: app.id,
+            applicationNumber: app.applicationNumber,
+            serviceCode: service.serviceCode,
+            serviceName: service.name,
+            citizenUserId: userId,
+            formData: app.formData,
+            attachedDocuments: readiness.validAttachedDocs.map((d) => ({
+              documentId: d.id,
+              documentTypeId: d.documentTypeId,
+              title: d.title,
+              documentNumber: d.documentNumber,
+              sha256Checksum: d.sha256Checksum,
+            })),
+            consentIds: newConsentIds,
+            correlationId,
+            idempotencyKey,
+            targetEnvironment: "SANDBOX",
+          });
+        },
+        providerInfo.providerCode,
+        correlationId,
+        { maxRetries: 3, timeoutMs: 5000 }
+      );
+
+      submissionResult = execResult.result;
+
+      // Persist to idempotency store
+      ReliabilityEngine.recordIdempotency(idempotencyKey, submissionResult);
+
+      // Record in application_integrations table
+      db.recordIntegrationAttempt({
+        id: `int-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        applicationId: app.id,
+        providerCode: providerInfo.providerCode,
+        idempotencyKey,
+        correlationId,
+        status: submissionResult.status,
+        trackingToken: submissionResult.trackingToken,
+        providerReference: submissionResult.providerApplicationId || submissionResult.externalReference || null,
+        attemptCount: execResult.attempts,
+        lastErrorCode: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      db.recordAuditEvent({
+        id: `aud-${Date.now()}-intsucc`,
+        timestamp: now,
+        actorId: userId,
+        actorName: profile?.displayName || "Citizen",
+        actorRole: "Citizen",
+        action: "INTEGRATION_SUBMISSION_SUCCEEDED",
+        resource: `Application ${app.applicationNumber}`,
+        result: "SUCCESS",
+        context: `Provider ${providerInfo.providerCode} acknowledged receipt with token ${submissionResult.trackingToken}.`,
+        ipAddress: ip,
+      });
+    } catch (err: any) {
+      const errorCode = err instanceof IntegrationError ? err.code : "INTEGRATION_UNKNOWN_ERROR";
+
+      db.recordIntegrationAttempt({
+        id: `int-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+        applicationId: app.id,
+        providerCode: providerInfo.providerCode,
+        idempotencyKey,
+        correlationId,
+        status: "FAILED",
+        trackingToken: null,
+        providerReference: null,
+        attemptCount: 1,
+        lastErrorCode: errorCode,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      db.recordAuditEvent({
+        id: `aud-${Date.now()}-intfail`,
+        timestamp: now,
+        actorId: userId,
+        actorName: profile?.displayName || "Citizen",
+        actorRole: "Citizen",
+        action: "INTEGRATION_SUBMISSION_FAILED",
+        resource: `Application ${app.applicationNumber}`,
+        result: "BLOCKED",
+        context: `Integration submission to ${providerInfo.providerCode} failed. Code: ${errorCode}.`,
+        ipAddress: ip,
+      });
+
+      const normalizedErr: any = new Error(
+        err.message || "The public service provider is temporarily unavailable. Please try again later."
+      );
+      normalizedErr.statusCode = err.statusCode || 502;
+      normalizedErr.code = errorCode;
+      throw normalizedErr;
+    }
 
     // 3. Update application state
     db.updateApplication(app.id, {
@@ -647,16 +772,67 @@ export class ApplicationService {
       throw err;
     }
 
-    const adapter = getIntegrationAdapter();
-    await adapter.cancelApplication(app.applicationNumber, reason);
+    const service = db.findServiceById(app.serviceId);
+    const adapter = integrationRegistry.getAdapterForService(service?.serviceCode || "*");
+    const providerInfo = adapter.getProviderInfo();
+    const correlationId = `UGOV-INT-${crypto.randomBytes(6).toString("hex")}`;
+    const now = new Date().toISOString();
+    const profile = db.getProfileByUserId(userId);
+
+    db.recordAuditEvent({
+      id: `aud-${Date.now()}-intcnlstart`,
+      timestamp: now,
+      actorId: userId,
+      actorName: profile?.displayName || "Citizen",
+      actorRole: "Citizen",
+      action: "INTEGRATION_CANCEL_STARTED",
+      resource: `Application ${app.applicationNumber}`,
+      result: "SUCCESS",
+      context: `Notified provider ${providerInfo.providerCode} of cancellation.`,
+      ipAddress: ip,
+    });
+
+    try {
+      await adapter.cancelApplication({
+        applicationId: app.id,
+        applicationNumber: app.applicationNumber,
+        serviceCode: service?.serviceCode || "GENERIC",
+        trackingToken: app.trackingToken,
+        reason,
+        correlationId,
+      });
+
+      db.recordAuditEvent({
+        id: `aud-${Date.now()}-intcnlsucc`,
+        timestamp: now,
+        actorId: userId,
+        actorName: profile?.displayName || "Citizen",
+        actorRole: "Citizen",
+        action: "INTEGRATION_CANCEL_SUCCEEDED",
+        resource: `Application ${app.applicationNumber}`,
+        result: "SUCCESS",
+        context: `Provider ${providerInfo.providerCode} confirmed cancellation of ${app.applicationNumber}.`,
+        ipAddress: ip,
+      });
+    } catch (err: any) {
+      db.recordAuditEvent({
+        id: `aud-${Date.now()}-intcnlfail`,
+        timestamp: now,
+        actorId: userId,
+        actorName: profile?.displayName || "Citizen",
+        actorRole: "Citizen",
+        action: "INTEGRATION_CANCEL_FAILED",
+        resource: `Application ${app.applicationNumber}`,
+        result: "WARNING",
+        context: `Provider ${providerInfo.providerCode} cancellation returned non-fatal error: ${err.message}.`,
+        ipAddress: ip,
+      });
+    }
 
     db.updateApplication(app.id, {
       status: "CANCELLED",
       cancellationReason: reason?.trim() || "Citizen requested cancellation",
     });
-
-    const profile = db.getProfileByUserId(userId);
-    const now = new Date().toISOString();
 
     db.recordAuditEvent({
       id: `aud-${Date.now()}-appcancel`,
@@ -672,6 +848,121 @@ export class ApplicationService {
     });
 
     return db.findApplicationById(app.id)!;
+  }
+
+  /**
+   * Poll external provider status and update application if changed
+   */
+  public async pollIntegrationStatus(
+    applicationId: string,
+    userId: string,
+    ip?: string
+  ): Promise<StatusResponse> {
+    const app = db.findApplicationById(applicationId);
+    if (!app) {
+      const err: any = new Error("Application not found.");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if (app.userId !== userId) {
+      const err: any = new Error("Access denied: You do not own this application.");
+      err.statusCode = 403;
+      throw err;
+    }
+
+    if (!app.trackingToken) {
+      const err: any = new Error("Application has not been submitted yet and has no tracking token.");
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const service = db.findServiceById(app.serviceId);
+    const adapter = integrationRegistry.getAdapterForService(service?.serviceCode || "*");
+    const providerInfo = adapter.getProviderInfo();
+    const correlationId = `UGOV-INT-${crypto.randomBytes(6).toString("hex")}`;
+    const now = new Date().toISOString();
+    const profile = db.getProfileByUserId(userId);
+
+    const statusResponse = await adapter.getApplicationStatus({
+      applicationId: app.id,
+      applicationNumber: app.applicationNumber,
+      serviceCode: service?.serviceCode || "GENERIC",
+      trackingToken: app.trackingToken,
+      correlationId,
+    });
+
+    db.recordAuditEvent({
+      id: `aud-${Date.now()}-intpoll`,
+      timestamp: now,
+      actorId: userId,
+      actorName: profile?.displayName || "Citizen",
+      actorRole: "Citizen",
+      action: "INTEGRATION_STATUS_CHECKED",
+      resource: `Application ${app.applicationNumber}`,
+      result: "SUCCESS",
+      context: `Checked status with provider ${providerInfo.providerCode}: ${statusResponse.status}.`,
+      ipAddress: ip,
+    });
+
+    // Update application state if status transitioned upstream
+    if (app.status !== statusResponse.status && !["CANCELLED"].includes(app.status)) {
+      db.updateApplication(app.id, {
+        status: statusResponse.status,
+      });
+
+      db.updateIntegrationStatus(app.id, statusResponse.status, null);
+
+      db.recordAuditEvent({
+        id: `aud-${Date.now()}-intstchange`,
+        timestamp: now,
+        actorId: userId,
+        actorName: profile?.displayName || "Citizen",
+        actorRole: "Citizen",
+        action: "INTEGRATION_STATUS_CHANGED",
+        resource: `Application ${app.applicationNumber}`,
+        result: "SUCCESS",
+        context: `Application status transitioned from ${app.status} to ${statusResponse.status} via provider polling.`,
+        ipAddress: ip,
+      });
+    }
+
+    return statusResponse;
+  }
+
+  /**
+   * Get integration attempt record for an application (strictly owner-scoped)
+   */
+  public getApplicationIntegration(applicationId: string, userId: string) {
+    const app = db.findApplicationById(applicationId);
+    if (!app) {
+      const err: any = new Error("Application not found.");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if (app.userId !== userId) {
+      const err: any = new Error("Access denied: You do not own this application.");
+      err.statusCode = 403;
+      throw err;
+    }
+
+    const integration = db.findIntegrationByApplicationId(applicationId);
+    const service = db.findServiceById(app.serviceId);
+    const adapter = integrationRegistry.getAdapterForService(service?.serviceCode || "*");
+
+    return {
+      application: {
+        id: app.id,
+        applicationNumber: app.applicationNumber,
+        status: app.status,
+        trackingToken: app.trackingToken,
+      },
+      provider: adapter.getProviderInfo(),
+      integrationRecord: integration || null,
+      environment: "SANDBOX",
+      disclaimer: "Sandbox Integration • Prototype Simulation • Not a live government connection",
+    };
   }
 }
 

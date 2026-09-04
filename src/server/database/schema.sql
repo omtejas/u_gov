@@ -231,5 +231,27 @@ CREATE INDEX IF NOT EXISTS idx_applications_service ON government_applications(s
 CREATE INDEX IF NOT EXISTS idx_applications_status ON government_applications(status);
 CREATE INDEX IF NOT EXISTS idx_applications_number ON government_applications(application_number);
 
+-- ==========================================================
+-- U-INTEGRATIONS Secure Integration Adapter Schema (Phase 5)
+-- ==========================================================
 
+-- 14. Application Integrations Audit & Telemetry Table
+CREATE TABLE IF NOT EXISTS application_integrations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    application_id UUID NOT NULL REFERENCES government_applications(id) ON DELETE CASCADE,
+    provider_code VARCHAR(64) NOT NULL, -- e.g. 'SANDBOX_NSP', 'SANDBOX_SARATHI'
+    idempotency_key VARCHAR(128) NOT NULL UNIQUE,
+    correlation_id VARCHAR(64) NOT NULL,
+    status VARCHAR(32) NOT NULL, -- 'SUBMITTED', 'PROCESSING', 'ACTION_REQUIRED', 'APPROVED', 'REJECTED'
+    tracking_token VARCHAR(128) DEFAULT NULL,
+    provider_reference VARCHAR(128) DEFAULT NULL,
+    attempt_count INTEGER DEFAULT 1,
+    last_error_code VARCHAR(64) DEFAULT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE INDEX IF NOT EXISTS idx_integrations_app ON application_integrations(application_id);
+CREATE INDEX IF NOT EXISTS idx_integrations_idempotency ON application_integrations(idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_integrations_correlation ON application_integrations(correlation_id);
+CREATE INDEX IF NOT EXISTS idx_integrations_provider ON application_integrations(provider_code);

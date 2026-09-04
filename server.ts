@@ -9,6 +9,7 @@ import { authRouter } from "./src/server/routes/auth";
 import { documentsRouter } from "./src/server/routes/documents";
 import { servicesRouter } from "./src/server/routes/services";
 import { applicationsRouter } from "./src/server/routes/applications";
+import { integrationsRouter } from "./src/server/routes/integrations";
 
 dotenv.config();
 
@@ -42,6 +43,9 @@ app.use("/api/v1/services", servicesRouter);
 
 // Mount U-APPLICATIONS Lifecycle Engine routes
 app.use("/api/v1/applications", applicationsRouter);
+
+// Mount U-INTEGRATIONS Adapter & Gateway routes (Phase 5)
+app.use("/api/v1/integrations", integrationsRouter);
 
 // Initialize Gemini lazily
 let genAI: GoogleGenAI | null = null;
