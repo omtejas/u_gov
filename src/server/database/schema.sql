@@ -112,3 +112,65 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('CITIZEN', 'documents:manage'),
 ('CITIZEN', 'applications:read')
 ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+-- ==========================================================
+-- U-DOCS Sovereign Digital Vault Schema (Phase 3)
+-- ==========================================================
+
+-- 9. Document Types Table (Credential Catalog)
+CREATE TABLE IF NOT EXISTS document_types (
+    id VARCHAR(64) PRIMARY KEY, -- 'AADHAAR', 'DRIVING_LICENCE', 'DOMICILE', 'INCOME_CERT', 'PAN', 'MARKSHEET'
+    name VARCHAR(255) NOT NULL,
+    issuing_authority VARCHAR(255) NOT NULL,
+    retention_days INTEGER DEFAULT NULL -- NULL means permanent retention
+);
+
+-- 10. Citizen Owned Documents Table
+CREATE TABLE IF NOT EXISTS citizen_documents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    document_type_id VARCHAR(64) NOT NULL REFERENCES document_types(id),
+    title VARCHAR(255) NOT NULL,
+    document_number VARCHAR(128) NOT NULL, -- Masked format e.g. 'XXXX-XXXX-4820'
+    file_name VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    file_size_bytes BIGINT NOT NULL,
+    storage_key VARCHAR(512) NOT NULL, -- Random UUID-based key, never raw citizen name
+    sha256_checksum VARCHAR(64) NOT NULL, -- Mathematical content integrity hash
+    verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED', -- 'UNVERIFIED', 'SELF_ATTESTED', 'SANDBOX_SIMULATED', 'DIGILOCKER_VERIFIED'
+    issuer_signature_data JSONB DEFAULT NULL,
+    expires_at TIMESTAMPTZ DEFAULT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_citizen_docs_owner ON citizen_documents(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_citizen_docs_type ON citizen_documents(document_type_id);
+
+-- 11. Document Consent Grants Table
+CREATE TABLE IF NOT EXISTS document_consents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID NOT NULL REFERENCES citizen_documents(id) ON DELETE CASCADE,
+    owner_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    recipient_entity VARCHAR(255) NOT NULL, -- e.g. 'RTO Maharashtra', 'Direct Benefit Transfer Cell'
+    purpose VARCHAR(512) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'REVOKED', 'EXPIRED'
+    granted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked_at TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_doc_consents_owner ON document_consents(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_doc_consents_doc ON document_consents(document_id);
+CREATE INDEX IF NOT EXISTS idx_doc_consents_status ON document_consents(status);
+
+-- Seed Initial Document Types
+INSERT INTO document_types (id, name, issuing_authority, retention_days) VALUES
+('AADHAAR', 'Aadhaar Identity Document', 'Unique Identification Authority of India (UIDAI)', NULL),
+('PAN', 'Permanent Account Number Card', 'Income Tax Department of India', NULL),
+('DRIVING_LICENCE', 'Driving Licence', 'Ministry of Road Transport & Highways (MoRTH)', 7300),
+('DOMICILE', 'State Domicile Certificate', 'Revenue & Forest Department, Govt of Maharashtra', NULL),
+('INCOME_CERT', 'Annual Income Certificate', 'Tehsildar / Sub-Divisional Officer', 365),
+('MARKSHEET', 'Secondary School Marksheet (10th/12th)', 'State Secondary Education Board', NULL)
+ON CONFLICT (id) DO NOTHING;
+

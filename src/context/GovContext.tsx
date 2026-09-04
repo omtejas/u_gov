@@ -6,6 +6,7 @@ import {
   GovService,
   GovApplication,
   DigiDocument,
+  DocumentType,
   AuditEvent,
   NotificationItem,
 } from "../types";
@@ -73,8 +74,23 @@ interface GovContextType {
   openExplain: (term: string) => void;
   closeExplain: () => void;
 
-  // Document actions
-  revokeConsent: (docId: string, consentId: string) => void;
+  // U-DOCS & U-CONSENT Engine
+  documentTypes: DocumentType[];
+  isLoadingDocuments: boolean;
+  refreshDocuments: () => Promise<void>;
+  depositDocument: (data: {
+    title: string;
+    documentTypeId: string;
+    documentNumber: string;
+    fileName: string;
+    mimeType: string;
+    fileData: string;
+  }) => Promise<{ success: boolean; document?: DigiDocument; error?: string }>;
+  downloadDocument: (docId: string, fileName?: string) => Promise<{ success: boolean; error?: string }>;
+  verifyDocumentIntegrity: (docId: string) => Promise<{ valid: boolean; storedHash?: string; liveHash?: string; error?: string }>;
+  deleteDocument: (docId: string) => Promise<{ success: boolean; error?: string }>;
+  grantConsent: (docId: string, recipientEntity: string, purpose: string, durationDays: number) => Promise<{ success: boolean; error?: string }>;
+  revokeConsent: (docId: string, consentId: string) => Promise<{ success: boolean; error?: string }>;
   uploadDocument: (doc: Partial<DigiDocument>) => void;
 }
 
@@ -96,6 +112,8 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [services, setServices] = useState<GovService[]>(MOCK_SERVICES);
   const [applications, setApplications] = useState<GovApplication[]>(MOCK_APPLICATIONS);
   const [documents, setDocuments] = useState<DigiDocument[]>(MOCK_DOCUMENTS);
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState<boolean>(false);
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>([]);
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([
@@ -131,6 +149,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     checkCurrentSession();
     refreshAuditLogs();
+    refreshDocuments();
   }, []);
 
   const checkCurrentSession = async () => {
@@ -233,6 +252,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       await checkCurrentSession();
       await refreshAuditLogs();
+      await refreshDocuments();
       setActiveTabState("dashboard");
       return { success: true };
     } catch (err: any) {
@@ -402,20 +422,243 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedTerm(null);
   };
 
-  const revokeConsent = (docId: string, consentId: string) => {
-    setDocuments((prev) =>
-      prev.map((d) => {
-        if (d.id === docId) {
-          return {
-            ...d,
-            consents: d.consents.map((c) =>
-              c.id === consentId ? { ...c, status: "revoked" as const } : c
-            ),
-          };
+  // --- U-DOCS & U-CONSENT Engine Methods ---
+
+  const refreshDocuments = async () => {
+    setIsLoadingDocuments(true);
+    try {
+      // 1. Fetch types
+      const typesRes = await fetch("/api/v1/documents/types", { credentials: "include" });
+      let typesData: DocumentType[] = [];
+      if (typesRes.ok) {
+        const td = await typesRes.json();
+        if (td.success && Array.isArray(td.types)) {
+          typesData = td.types;
+          setDocumentTypes(td.types);
         }
-        return d;
-      })
-    );
+      }
+
+      // 2. Fetch consents
+      const consentsRes = await fetch("/api/v1/documents/consents/all", { credentials: "include" });
+      let consentsData: any[] = [];
+      if (consentsRes.ok) {
+        const cd = await consentsRes.json();
+        if (cd.success && Array.isArray(cd.consents)) {
+          consentsData = cd.consents;
+        }
+      }
+
+      // 3. Fetch citizen documents
+      const docsRes = await fetch("/api/v1/documents", { credentials: "include" });
+      if (docsRes.ok) {
+        const dd = await docsRes.json();
+        if (dd.success && Array.isArray(dd.documents)) {
+          const mappedDocs: DigiDocument[] = dd.documents.map((bd: any) => {
+            const docConsents = consentsData
+              .filter((c: any) => c.documentId === bd.id)
+              .map((c: any) => ({
+                id: c.id,
+                documentId: c.documentId,
+                accessor: c.recipientEntity,
+                recipientEntity: c.recipientEntity,
+                purpose: c.purpose,
+                grantedAt: c.grantedAt ? c.grantedAt.split("T")[0] : new Date().toISOString().split("T")[0],
+                expiresAt: c.expiresAt ? c.expiresAt.split("T")[0] : "2026-12-31",
+                revokedAt: c.revokedAt,
+                status: (c.status.toLowerCase() as any) || "active",
+              }));
+
+            const typeObj = typesData.find((t) => t.id === bd.documentTypeId);
+
+            return {
+              id: bd.id,
+              name: bd.title,
+              docNumber: bd.documentNumber || "XXXX-XXXX",
+              type: typeObj?.name || "Citizen Identity Credential",
+              documentTypeId: bd.documentTypeId,
+              issuer: typeObj?.issuingAuthority || "Competent Authority",
+              issuedAt: bd.createdAt ? bd.createdAt.split("T")[0] : new Date().toISOString().split("T")[0],
+              verified: bd.verificationStatus === "EXTERNALLY_VERIFIED",
+              verificationStatus: bd.verificationStatus || "SELF_ATTESTED",
+              fileSize: bd.fileSizeBytes ? `${(bd.fileSizeBytes / (1024 * 1024)).toFixed(2)} MB` : "0.5 MB",
+              fileSizeBytes: bd.fileSizeBytes,
+              fileName: bd.fileName,
+              mimeType: bd.mimeType,
+              sha256Checksum: bd.sha256Checksum,
+              storageKey: bd.storageKey,
+              consents: docConsents,
+              integrityStatus: "UNVERIFIED" as const,
+            };
+          });
+          setDocuments(mappedDocs);
+        }
+      }
+    } catch (err) {
+      console.warn("Could not fetch remote documents:", err);
+    } finally {
+      setIsLoadingDocuments(false);
+    }
+  };
+
+  const depositDocument = async (data: {
+    title: string;
+    documentTypeId: string;
+    documentNumber: string;
+    fileName: string;
+    mimeType: string;
+    fileData: string;
+  }): Promise<{ success: boolean; document?: DigiDocument; error?: string }> => {
+    try {
+      const res = await fetch("/api/v1/documents/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        return { success: false, error: resData.error || "Failed to deposit document." };
+      }
+      await refreshDocuments();
+      await refreshAuditLogs();
+      return { success: true, document: resData.document };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error during deposit." };
+    }
+  };
+
+  const downloadDocument = async (
+    docId: string,
+    customFileName?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/documents/${docId}/download`, { credentials: "include" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return { success: false, error: data.error || `Download failed (${res.status})` };
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = customFileName || `document-${docId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      await refreshAuditLogs();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error during download." };
+    }
+  };
+
+  const verifyDocumentIntegrity = async (
+    docId: string
+  ): Promise<{ valid: boolean; storedHash?: string; liveHash?: string; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/documents/${docId}/verify-integrity`, { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { valid: false, error: data.error || "Integrity verification request failed" };
+      }
+      const isValid = data.integrity === "VALID";
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === docId
+            ? {
+                ...d,
+                integrityStatus: isValid ? "VALID" : "FAILED",
+                verificationStatus: isValid ? "INTEGRITY_VERIFIED" : "SELF_ATTESTED",
+                sha256Checksum: data.checksum || d.sha256Checksum,
+                lastVerifiedAt: data.verifiedAt,
+              }
+            : d
+        )
+      );
+      await refreshAuditLogs();
+      return { valid: isValid, storedHash: data.checksum, liveHash: data.liveChecksum };
+    } catch (err: any) {
+      return { valid: false, error: err.message || "Network error during integrity verification" };
+    }
+  };
+
+  const deleteDocument = async (docId: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/documents/${docId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const resData = await res.json().catch(() => ({}));
+      if (!res.ok || !resData.success) {
+        return { success: false, error: resData.error || "Failed to delete document." };
+      }
+      await refreshDocuments();
+      await refreshAuditLogs();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error during deletion." };
+    }
+  };
+
+  const grantConsent = async (
+    docId: string,
+    recipientEntity: string,
+    purpose: string,
+    durationDays: number = 30
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/documents/${docId}/consent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ recipientEntity, purpose, durationDays }),
+      });
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        return { success: false, error: resData.error || "Failed to grant consent." };
+      }
+      await refreshDocuments();
+      await refreshAuditLogs();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error while granting consent." };
+    }
+  };
+
+  const revokeConsent = async (
+    docId: string,
+    consentId: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/documents/consent/${consentId}/revoke`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const resData = await res.json().catch(() => ({}));
+      if (!res.ok || !resData.success) {
+        return { success: false, error: resData.error || "Failed to revoke consent." };
+      }
+      await refreshDocuments();
+      await refreshAuditLogs();
+      return { success: true };
+    } catch (err: any) {
+      // Local optimistic fallback
+      setDocuments((prev) =>
+        prev.map((d) => {
+          if (d.id === docId) {
+            return {
+              ...d,
+              consents: d.consents.map((c) =>
+                c.id === consentId ? { ...c, status: "revoked" as const } : c
+              ),
+            };
+          }
+          return d;
+        })
+      );
+      return { success: false, error: err.message || "Network error while revoking consent." };
+    }
   };
 
   const uploadDocument = (doc: Partial<DigiDocument>) => {
@@ -457,6 +700,14 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         services,
         applications,
         documents,
+        documentTypes,
+        isLoadingDocuments,
+        refreshDocuments,
+        depositDocument,
+        downloadDocument,
+        verifyDocumentIntegrity,
+        deleteDocument,
+        grantConsent,
         auditLogs,
         refreshAuditLogs,
         notifications,

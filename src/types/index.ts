@@ -92,25 +92,50 @@ export interface GovApplication {
   isSimulated?: boolean;
 }
 
+export interface DocumentType {
+  id: string;
+  name: string;
+  issuingAuthority: string;
+  retentionDays: number | null;
+}
+
 export interface ConsentRecord {
   id: string;
+  documentId?: string;
   accessor: string;
+  recipientEntity?: string;
   purpose: string;
   grantedAt: string;
   expiresAt: string;
+  revokedAt?: string;
   status: "active" | "revoked" | "expired";
 }
+
+export type DocumentVerificationStatus =
+  | "SELF_ATTESTED"
+  | "INTEGRITY_VERIFIED"
+  | "SANDBOX_SIMULATED"
+  | "EXTERNALLY_VERIFIED";
 
 export interface DigiDocument {
   id: string;
   name: string;
   docNumber: string;
   type: string;
+  documentTypeId?: string;
   issuer: string;
   issuedAt: string;
   verified: boolean;
+  verificationStatus?: DocumentVerificationStatus;
   fileSize: string;
+  fileSizeBytes?: number;
+  fileName?: string;
+  mimeType?: string;
+  sha256Checksum?: string;
+  storageKey?: string;
   consents: ConsentRecord[];
+  integrityStatus?: "VALID" | "FAILED" | "UNVERIFIED";
+  lastVerifiedAt?: string;
 }
 
 export interface AuditEvent {

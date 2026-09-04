@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { hashPassword, computeAuditHash } from "../auth/crypto";
 
@@ -67,6 +68,43 @@ export interface AuditEventRecord {
   hash?: string;
 }
 
+export interface DocumentTypeRecord {
+  id: string; // 'AADHAAR', 'DRIVING_LICENCE', 'DOMICILE', 'INCOME_CERT', 'PAN', 'MARKSHEET'
+  name: string;
+  issuingAuthority: string;
+  retentionDays: number | null;
+}
+
+export interface CitizenDocumentRecord {
+  id: string;
+  ownerUserId: string;
+  documentTypeId: string;
+  title: string;
+  documentNumber: string;
+  fileName: string;
+  mimeType: string;
+  fileSizeBytes: number;
+  storageKey: string;
+  sha256Checksum: string;
+  verificationStatus: "UNVERIFIED" | "SELF_ATTESTED" | "SANDBOX_SIMULATED" | "DIGILOCKER_VERIFIED";
+  issuerSignatureData?: any;
+  expiresAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocumentConsentRecord {
+  id: string;
+  documentId: string;
+  ownerUserId: string;
+  recipientEntity: string;
+  purpose: string;
+  status: "ACTIVE" | "REVOKED" | "EXPIRED";
+  grantedAt: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+}
+
 interface DatabaseSchema {
   users: UserRecord[];
   profiles: ProfileRecord[];
@@ -76,6 +114,9 @@ interface DatabaseSchema {
   rolePermissions: { roleId: string; permissionId: string }[];
   sessions: SessionRecord[];
   auditEvents: AuditEventRecord[];
+  documentTypes: DocumentTypeRecord[];
+  citizenDocuments: CitizenDocumentRecord[];
+  documentConsents: DocumentConsentRecord[];
 }
 
 const getDbPath = () => {
@@ -106,11 +147,112 @@ class Database {
     this.data = this.loadOrInitialize();
   }
 
+  private getDefaultDocumentTypes(): DocumentTypeRecord[] {
+    return [
+      { id: "AADHAAR", name: "Aadhaar Identity Document", issuingAuthority: "Unique Identification Authority of India (UIDAI)", retentionDays: null },
+      { id: "PAN", name: "Permanent Account Number Card", issuingAuthority: "Income Tax Department of India", retentionDays: null },
+      { id: "DRIVING_LICENCE", name: "Driving Licence", issuingAuthority: "Ministry of Road Transport & Highways (MoRTH)", retentionDays: 7300 },
+      { id: "DOMICILE", name: "State Domicile Certificate", issuingAuthority: "Revenue & Forest Department, Govt of Maharashtra", retentionDays: null },
+      { id: "INCOME_CERT", name: "Annual Income Certificate", issuingAuthority: "Tehsildar / Sub-Divisional Officer", retentionDays: 365 },
+      { id: "MARKSHEET", name: "Secondary School Marksheet (10th/12th)", issuingAuthority: "State Secondary Education Board", retentionDays: null },
+    ];
+  }
+
+  private seedDefaultCitizenDocuments(citizenUserId: string): {
+    documents: CitizenDocumentRecord[];
+    consents: DocumentConsentRecord[];
+  } {
+    try {
+      const vaultDir = path.resolve(process.cwd(), "storage", "vault");
+      if (!fs.existsSync(vaultDir)) {
+        fs.mkdirSync(vaultDir, { recursive: true, mode: 0o700 });
+      }
+
+      // 1. Seed Aadhaar Document
+      const aadhaarKey = crypto.randomUUID();
+      const aadhaarBuf = Buffer.from(
+        "%PDF-1.4\n%Official Aadhaar Identity Card - Government of India\nUIDAI Verified Cryptographic Seed Credential\n%%EOF"
+      );
+      const aadhaarSha = crypto.createHash("sha256").update(aadhaarBuf).digest("hex");
+      fs.writeFileSync(path.join(vaultDir, aadhaarKey), aadhaarBuf, { mode: 0o600 });
+
+      const aadhaarDoc: CitizenDocumentRecord = {
+        id: "doc-seed-aadhaar",
+        ownerUserId: citizenUserId,
+        documentTypeId: "AADHAAR",
+        title: "Aadhaar Identity Card",
+        documentNumber: "XXXX-XXXX-9012",
+        fileName: "aadhaar_identity_card.pdf",
+        mimeType: "application/pdf",
+        fileSizeBytes: aadhaarBuf.length,
+        storageKey: aadhaarKey,
+        sha256Checksum: aadhaarSha,
+        verificationStatus: "SELF_ATTESTED",
+        createdAt: "2026-08-01T00:00:00Z",
+        updatedAt: "2026-08-01T00:00:00Z",
+      };
+
+      // 2. Seed Income Certificate
+      const incomeKey = crypto.randomUUID();
+      const incomeBuf = Buffer.from(
+        "%PDF-1.4\n%Revenue Department Tahsildar Office Annual Income Certificate 2026-27\nState Government Seed Credential\n%%EOF"
+      );
+      const incomeSha = crypto.createHash("sha256").update(incomeBuf).digest("hex");
+      fs.writeFileSync(path.join(vaultDir, incomeKey), incomeBuf, { mode: 0o600 });
+
+      const incomeDoc: CitizenDocumentRecord = {
+        id: "doc-seed-income",
+        ownerUserId: citizenUserId,
+        documentTypeId: "INCOME_CERT",
+        title: "Annual Income Certificate",
+        documentNumber: "INC-2026-78129",
+        fileName: "income_certificate.pdf",
+        mimeType: "application/pdf",
+        fileSizeBytes: incomeBuf.length,
+        storageKey: incomeKey,
+        sha256Checksum: incomeSha,
+        verificationStatus: "SELF_ATTESTED",
+        createdAt: "2026-08-01T00:00:00Z",
+        updatedAt: "2026-08-01T00:00:00Z",
+      };
+
+      // 3. Seed Active Consent
+      const consentRecord: DocumentConsentRecord = {
+        id: "cst-seed-01",
+        documentId: "doc-seed-income",
+        ownerUserId: citizenUserId,
+        recipientEntity: "Department of Higher Education (NSP Portal)",
+        purpose: "Post-Matric Scholarship Eligibility Verification",
+        status: "ACTIVE",
+        grantedAt: "2026-08-15T00:00:00Z",
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+
+      return {
+        documents: [aadhaarDoc, incomeDoc],
+        consents: [consentRecord],
+      };
+    } catch (e) {
+      console.warn("Could not seed default documents to vault disk:", e);
+      return { documents: [], consents: [] };
+    }
+  }
+
   private loadOrInitialize(): DatabaseSchema {
     try {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, "utf-8");
-        return JSON.parse(raw);
+        const parsed: DatabaseSchema = JSON.parse(raw);
+        if (!parsed.documentTypes || parsed.documentTypes.length === 0) {
+          parsed.documentTypes = this.getDefaultDocumentTypes();
+        }
+        if (!parsed.citizenDocuments || parsed.citizenDocuments.length === 0) {
+          const seeded = this.seedDefaultCitizenDocuments("usr-citizen-01");
+          parsed.citizenDocuments = seeded.documents;
+          parsed.documentConsents = seeded.consents;
+        }
+        if (!parsed.documentConsents) parsed.documentConsents = [];
+        return parsed;
       }
     } catch (err) {
       console.warn("Could not load database file, re-initializing store:", err);
@@ -260,6 +402,9 @@ class Database {
           ),
         },
       ],
+      documentTypes: this.getDefaultDocumentTypes(),
+      citizenDocuments: this.seedDefaultCitizenDocuments(citizenUserId).documents,
+      documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
     };
 
     try {
@@ -412,6 +557,103 @@ class Database {
       }
     }
     return { valid: true, totalEvents: this.data.auditEvents.length };
+  }
+
+  // --- U-DOCS Document Types ---
+
+  public getDocumentTypes(): DocumentTypeRecord[] {
+    return this.data.documentTypes || [];
+  }
+
+  public findDocumentTypeById(id: string): DocumentTypeRecord | undefined {
+    return (this.data.documentTypes || []).find((dt) => dt.id === id);
+  }
+
+  // --- U-DOCS Citizen Documents ---
+
+  public getDocumentsByOwner(ownerUserId: string): CitizenDocumentRecord[] {
+    return (this.data.citizenDocuments || []).filter((d) => d.ownerUserId === ownerUserId);
+  }
+
+  public findDocumentById(id: string): CitizenDocumentRecord | undefined {
+    return (this.data.citizenDocuments || []).find((d) => d.id === id);
+  }
+
+  public createDocument(doc: CitizenDocumentRecord): void {
+    if (!this.data.citizenDocuments) {
+      this.data.citizenDocuments = [];
+    }
+    this.data.citizenDocuments.push(doc);
+    this.save();
+  }
+
+  public updateDocument(id: string, updates: Partial<CitizenDocumentRecord>): void {
+    const index = (this.data.citizenDocuments || []).findIndex((d) => d.id === id);
+    if (index !== -1) {
+      this.data.citizenDocuments[index] = {
+        ...this.data.citizenDocuments[index],
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      };
+      this.save();
+    }
+  }
+
+  public deleteDocument(id: string): boolean {
+    const initialLen = (this.data.citizenDocuments || []).length;
+    this.data.citizenDocuments = (this.data.citizenDocuments || []).filter((d) => d.id !== id);
+    this.data.documentConsents = (this.data.documentConsents || []).filter((c) => c.documentId !== id);
+    const deleted = this.data.citizenDocuments.length < initialLen;
+    if (deleted) {
+      this.save();
+    }
+    return deleted;
+  }
+
+  // --- U-DOCS Document Consents ---
+
+  public createConsent(consent: DocumentConsentRecord): void {
+    if (!this.data.documentConsents) {
+      this.data.documentConsents = [];
+    }
+    this.data.documentConsents.push(consent);
+    this.save();
+  }
+
+  public getConsentsByDocumentId(documentId: string): DocumentConsentRecord[] {
+    return (this.data.documentConsents || []).filter((c) => c.documentId === documentId);
+  }
+
+  public getConsentsByOwner(ownerUserId: string): DocumentConsentRecord[] {
+    return (this.data.documentConsents || []).filter((c) => c.ownerUserId === ownerUserId);
+  }
+
+  public findConsentById(consentId: string): DocumentConsentRecord | undefined {
+    return (this.data.documentConsents || []).find((c) => c.id === consentId);
+  }
+
+  public revokeConsent(consentId: string, ownerUserId: string): boolean {
+    const consent = (this.data.documentConsents || []).find(
+      (c) => c.id === consentId && c.ownerUserId === ownerUserId
+    );
+    if (consent && consent.status === "ACTIVE") {
+      consent.status = "REVOKED";
+      consent.revokedAt = new Date().toISOString();
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  public checkActiveConsent(documentId: string, recipientEntity: string): DocumentConsentRecord | undefined {
+    const now = new Date().toISOString();
+    return (this.data.documentConsents || []).find(
+      (c) =>
+        c.documentId === documentId &&
+        c.recipientEntity.toLowerCase() === recipientEntity.toLowerCase() &&
+        c.status === "ACTIVE" &&
+        c.expiresAt > now
+    );
   }
 }
 
