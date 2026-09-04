@@ -284,7 +284,7 @@ export const AuthView: React.FC = () => {
                 type="text"
                 value={regDisplayName}
                 onChange={(e) => setRegDisplayName(e.target.value)}
-                placeholder="e.g. Ganesh Ramesh Gite"
+                placeholder="e.g. TEJAS GAVADE"
                 required
               />
 

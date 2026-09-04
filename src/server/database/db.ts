@@ -596,7 +596,7 @@ class Database {
         {
           id: "prof-01",
           userId: citizenUserId,
-          displayName: "Ganesh Ramesh Gite",
+          displayName: "TEJAS GAVADE",
           phone: "+91 98234 56789",
           preferredLanguage: "en",
           kycLevel: "Tier 4 (Sovereign Full-KYC)",
