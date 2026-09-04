@@ -804,6 +804,21 @@ class Database {
     this.save();
   }
 
+  public insertAuditEvent(event: Omit<AuditEventRecord, "id" | "timestamp"> & { id?: string; timestamp?: string }): void {
+    this.recordAuditEvent({
+      id: event.id || `aud-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      timestamp: event.timestamp || new Date().toISOString(),
+      actorId: event.actorId,
+      actorName: event.actorName,
+      actorRole: event.actorRole,
+      action: event.action,
+      resource: event.resource,
+      result: event.result,
+      context: event.context,
+      ipAddress: event.ipAddress,
+    });
+  }
+
   public getAuditEvents(limit: number = 50): AuditEventRecord[] {
     return [...this.data.auditEvents].reverse().slice(0, limit);
   }
@@ -980,7 +995,16 @@ class Database {
     }
   }
 
-  // --- U-APPLICATIONS Lifecycle Engine (Phase 4.2) ---
+  public getAllApplications(): GovernmentApplicationRecord[] {
+    return this.data.governmentApplications || [];
+  }
+
+  public getApplications(userId?: string): GovernmentApplicationRecord[] {
+    if (userId) {
+      return this.getApplicationsByOwner(userId);
+    }
+    return this.data.governmentApplications || [];
+  }
 
   public getApplicationsByOwner(userId: string): GovernmentApplicationRecord[] {
     return (this.data.governmentApplications || [])

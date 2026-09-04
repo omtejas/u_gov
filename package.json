@@ -9,7 +9,7 @@
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=esm --packages=external --sourcemap --outfile=dist/server.js",
     "start": "node dist/server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/server/tests/auth.test.ts && tsx src/server/tests/api.test.ts && tsx src/server/tests/documents.test.ts && tsx src/server/tests/services.test.ts && tsx src/server/tests/applications.test.ts && tsx src/server/tests/applications_ui.test.ts && tsx src/server/tests/integrations.test.ts"
+    "test": "tsx src/server/tests/auth.test.ts && tsx src/server/tests/api.test.ts && tsx src/server/tests/documents.test.ts && tsx src/server/tests/services.test.ts && tsx src/server/tests/applications.test.ts && tsx src/server/tests/applications_ui.test.ts && tsx src/server/tests/integrations.test.ts && tsx src/server/tests/ai.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -62,6 +62,7 @@ export const GBotModal: React.FC = () => {
     try {
       const res = await fetch("/api/v1/ai/chat", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: query.trim(),
@@ -73,7 +74,36 @@ export const GBotModal: React.FC = () => {
         }),
       });
 
+      if (res.status === 401) {
+        const authMsg: Message = {
+          id: `msg-${Date.now() + 1}`,
+          sender: "bot",
+          text: "🔒 **Authentication Required**\n\nPlease sign in with your U-GOV citizen account to access Bharat G-Bot sovereign assistance, document readiness evaluations, and live application status tracking.",
+          source: "U-IDENTITY Security Gate",
+          suggestions: ["Sign In with Citizen ID", "Explore Public Services"],
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+        setMessages((prev) => [...prev, authMsg]);
+        return;
+      }
+
+      if (res.status === 429) {
+        const rateLimitMsg: Message = {
+          id: `msg-${Date.now() + 1}`,
+          sender: "bot",
+          text: "⏱️ **Rate Limit Exceeded**\n\nYou have submitted multiple AI inquiries in a short window. Please wait a few moments before submitting another question to preserve sovereign compute availability.",
+          source: "U-GOV Rate Limiter",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+        setMessages((prev) => [...prev, rateLimitMsg]);
+        return;
+      }
+
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to receive AI guidance.");
+      }
+
       const botMsg: Message = {
         id: `msg-${Date.now() + 1}`,
         sender: "bot",
@@ -83,11 +113,11 @@ export const GBotModal: React.FC = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
+    } catch (err: any) {
       const fallbackMsg: Message = {
         id: `msg-${Date.now() + 1}`,
         sender: "bot",
-        text: "I am having trouble connecting to the live AI gateway. You can discover services directly in the Services Hub or check the National Citizen Helplines.",
+        text: `⚠️ ${err.message || "I am having trouble connecting to the live AI gateway."}\n\nYou can discover services directly in the Services Hub or inspect application progress in the Tracker.`,
         source: "Offline Fallback Resolver",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
@@ -210,6 +240,11 @@ export const GBotModal: React.FC = () => {
             </div>
           )}
           <div ref={messagesEndRef} />
+        </div>
+
+        {/* AI Honesty & Legal Disclaimer Bar */}
+        <div className="px-4 py-1.5 bg-amber-50/80 border-t border-amber-200/60 text-[10px] text-amber-900 text-center flex items-center justify-center gap-1.5 font-medium select-none">
+          <span>⚠️ AI-generated guidance. Verify important statutory rules before application submission.</span>
         </div>
 
         {/* Input Bar */}
