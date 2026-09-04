@@ -48,12 +48,12 @@ export const DocumentsView: React.FC = () => {
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               U-DOCS Digital Vault & Consent Center
             </h1>
-            <Badge variant="success" size="sm" dot>
-              DPDP Act 2023 Compliant
+            <Badge variant="info" size="sm" dot>
+              DPDP Alignment in Progress
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Store, manage, and share sovereign digital documents with cryptographic integrity. You retain 100% control over third-party data access.
+            Store, manage, and share sovereign digital documents with cryptographic integrity. You retain 100% control over third-party data access (Phase 3 Architecture).
           </p>
         </div>
         <Button
@@ -70,7 +70,7 @@ export const DocumentsView: React.FC = () => {
       <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex items-start gap-3">
         <ShieldCheck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-700 leading-relaxed">
-          <strong>Non-Repudiation Principle:</strong> Under the Information Technology Act (IT Act 2000) and Digital Personal Data Protection (DPDP) Act 2023, credentials stored in U-DOCS are legally equivalent to original paper certificates. External departments cannot access your documents without an explicit, time-bound consent grant recorded in your tamper-evident audit ledger.
+          <strong>Architectural Principle:</strong> Designed in alignment with the Digital Personal Data Protection (DPDP) principles and IT framework, U-DOCS ensures credentials remain under strict citizen ownership. External departments will require an explicit, time-bound consent grant recorded in your audit ledger (Prototype Demonstration).
         </div>
       </div>
 
@@ -93,8 +93,8 @@ export const DocumentsView: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <Badge variant="success" size="sm" dot>
-                Verified
+              <Badge variant="info" size="sm" dot>
+                Sandbox Credential
               </Badge>
             </div>
 

@@ -170,3 +170,33 @@ export function rateLimiter(windowMs: number = 60000, maxRequests: number = 10) 
     next();
   };
 }
+
+/**
+ * CSRF Protection Middleware for state-changing operations
+ * Validates Origin and Referer headers against trusted host
+ */
+export function csrfProtection(req: Request, res: Response, next: NextFunction) {
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+    const origin = (req.headers.origin as string) || (req.headers.referer as string);
+    const host = req.headers.host;
+
+    if (origin && host) {
+      try {
+        const originUrl = new URL(origin);
+        if (originUrl.host !== host) {
+          return res.status(403).json({
+            success: false,
+            error: "CSRF check failed",
+            message: "Cross-origin request blocked by sovereign security policy.",
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          success: false,
+          error: "Invalid Origin header",
+        });
+      }
+    }
+  }
+  next();
+}

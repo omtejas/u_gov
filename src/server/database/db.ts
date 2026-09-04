@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { hashPassword } from "../auth/crypto";
+import { hashPassword, computeAuditHash } from "../auth/crypto";
 
 export interface UserRecord {
   id: string;
@@ -63,6 +63,8 @@ export interface AuditEventRecord {
   result: "SUCCESS" | "WARNING" | "FAILED" | "BLOCKED" | "INFO";
   context: string;
   ipAddress?: string;
+  prevHash?: string;
+  hash?: string;
 }
 
 interface DatabaseSchema {
@@ -87,11 +89,20 @@ const getDbPath = () => {
   }
 };
 const DB_FILE = getDbPath();
+const GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
 class Database {
   private data: DatabaseSchema;
 
   constructor() {
+    // Production Safety Guard: Do not allow silent fallback to JSON store in production
+    if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
+      if (!process.env.DATABASE_URL) {
+        throw new Error(
+          "[CRITICAL SECURITY GUARD] Production environment requires a valid DATABASE_URL pointing to PostgreSQL. Silent fallback to local development JSON file persistence is forbidden."
+        );
+      }
+    }
     this.data = this.loadOrInitialize();
   }
 
@@ -242,6 +253,11 @@ class Database {
           resource: "U-IDENTITY Store",
           result: "SUCCESS",
           context: "Seeded initial sovereign roles, permissions, and baseline cryptographic entities",
+          prevHash: GENESIS_HASH,
+          hash: computeAuditHash(
+            GENESIS_HASH,
+            `2026-08-01T00:00:00Z|SYSTEM|U-GOV Core Gateway|SYSTEM_INITIALIZATION|U-IDENTITY Store|SUCCESS|Seeded initial sovereign roles, permissions, and baseline cryptographic entities`
+          ),
         },
       ],
     };
@@ -358,15 +374,40 @@ class Database {
   // --- Audit Events ---
 
   public recordAuditEvent(event: AuditEventRecord): void {
-    this.data.auditEvents.unshift(event);
+    const lastEvent = this.data.auditEvents[this.data.auditEvents.length - 1];
+    const prevHash = lastEvent?.hash || GENESIS_HASH;
+    const canonicalData = `${event.timestamp}|${event.actorId || ""}|${event.actorName}|${event.action}|${event.resource}|${event.result}|${event.context}`;
+    event.prevHash = prevHash;
+    event.hash = computeAuditHash(prevHash, canonicalData);
+
+    this.data.auditEvents.push(event);
     if (this.data.auditEvents.length > 500) {
-      this.data.auditEvents = this.data.auditEvents.slice(0, 500);
+      this.data.auditEvents = this.data.auditEvents.slice(this.data.auditEvents.length - 500);
     }
     this.save();
   }
 
   public getAuditEvents(limit: number = 50): AuditEventRecord[] {
-    return this.data.auditEvents.slice(0, limit);
+    return [...this.data.auditEvents].reverse().slice(0, limit);
+  }
+
+  public verifyAuditLedger(): { valid: boolean; totalEvents: number; brokenIndex?: number; brokenEventId?: string } {
+    let expectedPrevHash = GENESIS_HASH;
+    for (let i = 0; i < this.data.auditEvents.length; i++) {
+      const e = this.data.auditEvents[i];
+      if (e.prevHash && e.prevHash !== expectedPrevHash) {
+        return { valid: false, totalEvents: this.data.auditEvents.length, brokenIndex: i, brokenEventId: e.id };
+      }
+      const canonicalData = `${e.timestamp}|${e.actorId || ""}|${e.actorName}|${e.action}|${e.resource}|${e.result}|${e.context}`;
+      const calculatedHash = computeAuditHash(expectedPrevHash, canonicalData);
+      if (e.hash && e.hash !== calculatedHash) {
+        return { valid: false, totalEvents: this.data.auditEvents.length, brokenIndex: i, brokenEventId: e.id };
+      }
+      if (e.hash) {
+        expectedPrevHash = e.hash;
+      }
+    }
+    return { valid: true, totalEvents: this.data.auditEvents.length };
   }
 }
 

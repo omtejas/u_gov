@@ -45,3 +45,11 @@ export function generateSessionToken(): string {
 export function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
+
+/**
+ * Compute SHA-256 hash for tamper-evident chained audit ledger
+ */
+export function computeAuditHash(prevHash: string, canonicalData: string): string {
+  return crypto.createHash("sha256").update(`${prevHash}|${canonicalData}`).digest("hex");
+}
+

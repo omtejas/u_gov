@@ -28,11 +28,11 @@ export const AuditView: React.FC = () => {
               <span>U-AUDIT Sovereign Event Ledger</span>
             </h1>
             <Badge variant="success" size="sm" dot>
-              Tamper-Evident
+              SHA-256 Hash-Chained
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Every authentication, document access, and status transition is cryptographically sealed in an append-only audit trail.
+            Every authentication, document access, and status transition is cryptographically chained in an append-only audit trail.
           </p>
         </div>
 
@@ -64,19 +64,19 @@ export const AuditView: React.FC = () => {
             Who → What → When → Result
           </h4>
           <p className="text-xs text-slate-500">
-            Non-repudiable logs cannot be altered by ordinary users or administrators.
+            Append-only application ledger prevents unauthorized log erasure.
           </p>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Cryptographic Sealing
+            Cryptographic Integrity
           </span>
           <h4 className="text-sm font-bold text-slate-800">
-            SHA-256 Merkle Ledger
+            SHA-256 Hash Chain
           </h4>
           <p className="text-xs text-slate-500">
-            Consecutive event hashes chained to guarantee zero retroactive tampering.
+            Consecutive event hashes chained sequentially to detect retroactive modification.
           </p>
         </div>
 
@@ -85,10 +85,10 @@ export const AuditView: React.FC = () => {
             Statutory Accountability
           </span>
           <h4 className="text-sm font-bold text-slate-800">
-            DPDP & IT Act 2000
+            DPDP Alignment in Progress
           </h4>
           <p className="text-xs text-slate-500">
-            Authorized departmental officers are auditable for every document accessed.
+            Architected in alignment with citizen data ownership principles (Prototype Implementation).
           </p>
         </div>
       </div>

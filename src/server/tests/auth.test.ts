@@ -76,8 +76,8 @@ async function runTestSuite() {
   const revokedSession = db.findSessionByHash(testHash);
   assert(!revokedSession, "Revoked session cannot be used (fails lookup)");
 
-  // 5. Audit Logging Integration
-  console.log("\n[Test Suite 5: Tamper-Evident Audit Logging]");
+  // 5. Audit Logging & Cryptographic Integrity Verification
+  console.log("\n[Test Suite 5: Cryptographic Audit Ledger Integrity]");
   const initialAuditCount = db.getAuditEvents().length;
   db.recordAuditEvent({
     id: `aud-test-${Date.now()}`,
@@ -93,6 +93,51 @@ async function runTestSuite() {
   assert(updatedAuditCount === initialAuditCount + 1, "Audit event append-only recorded");
   const latestEvent = db.getAuditEvents(1)[0];
   assert(latestEvent.action === "SECURITY_TEST_EXECUTION", "Audit event contains exact action");
+  assert(Boolean(latestEvent.hash && latestEvent.prevHash), "Audit event has SHA-256 hash and prevHash chained");
+
+  const ledgerVerification = db.verifyAuditLedger();
+  assert(ledgerVerification.valid, "Untampered audit ledger passes cryptographic integrity verification");
+
+  // 6. Expired Session Invalidation
+  console.log("\n[Test Suite 6: Session Expiration & Global Invalidation]");
+  const expiredToken = generateSessionToken();
+  const expiredHash = hashToken(expiredToken);
+  const pastTime = new Date(Date.now() - 3600000).toISOString(); // 1 hour ago
+  db.createSession({
+    id: `sess-expired-${Date.now()}`,
+    userId: testUserId,
+    tokenHash: expiredHash,
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+    expiresAt: pastTime,
+  });
+  const foundExpired = db.findSessionByHash(expiredHash);
+  assert(!foundExpired, "Expired session is automatically rejected on lookup");
+
+  // 7. Revoke All Sessions
+  const bulkToken1 = generateSessionToken();
+  const bulkHash1 = hashToken(bulkToken1);
+  const bulkToken2 = generateSessionToken();
+  const bulkHash2 = hashToken(bulkToken2);
+  db.createSession({
+    id: `sess-bulk-1-${Date.now()}`,
+    userId: "usr-bulk-test",
+    tokenHash: bulkHash1,
+    createdAt: now,
+    expiresAt: expires,
+  });
+  db.createSession({
+    id: `sess-bulk-2-${Date.now()}`,
+    userId: "usr-bulk-test",
+    tokenHash: bulkHash2,
+    createdAt: now,
+    expiresAt: expires,
+  });
+  assert(Boolean(db.findSessionByHash(bulkHash1)), "First active session valid");
+  assert(Boolean(db.findSessionByHash(bulkHash2)), "Second active session valid");
+
+  db.revokeAllUserSessions("usr-bulk-test");
+  assert(!db.findSessionByHash(bulkHash1), "First session revoked by global invalidation");
+  assert(!db.findSessionByHash(bulkHash2), "Second session revoked by global invalidation");
 
   // Summary
   console.log("\n==================================================");
