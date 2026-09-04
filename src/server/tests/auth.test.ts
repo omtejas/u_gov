@@ -43,7 +43,7 @@ async function runTestSuite() {
   if (defaultCitizen) {
     const profile = db.getProfileByUserId(defaultCitizen.id);
     assert(Boolean(profile), "Citizen profile linked to user entity");
-    assert(profile?.displayName === "TEJAS GAVADE", "Profile displays correct full name");
+    assert(profile?.displayName === "Tejas Gavade", "Profile displays correct full name");
     const roles = db.getUserRoles(defaultCitizen.id);
     assert(roles.some((r) => r.id === "CITIZEN"), "Citizen has CITIZEN role");
     const perms = db.getUserPermissions(defaultCitizen.id);

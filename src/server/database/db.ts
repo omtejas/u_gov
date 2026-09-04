@@ -537,8 +537,8 @@ class Database {
         // Auto-migrate the existing demo user's name if they have the old name in the persistent DB
         if (parsed.profiles) {
           const demoProfile = parsed.profiles.find((p) => p.userId === "usr-citizen-01");
-          if (demoProfile && demoProfile.displayName === "Ganesh Ramesh Gite") {
-            demoProfile.displayName = "TEJAS GAVADE";
+          if (demoProfile && demoProfile.displayName.toLowerCase().includes("ganesh") || (demoProfile && demoProfile.displayName === "TEJAS GAVADE")) {
+            demoProfile.displayName = "Tejas Gavade";
             
             // Also write the update back to the persistent disk right away
             try {
@@ -612,7 +612,7 @@ class Database {
         {
           id: "prof-01",
           userId: citizenUserId,
-          displayName: "TEJAS GAVADE",
+          displayName: "Tejas Gavade",
           phone: "+91 98234 56789",
           preferredLanguage: "en",
           kycLevel: "Tier 4 (Sovereign Full-KYC)",
