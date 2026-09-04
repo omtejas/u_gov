@@ -159,3 +159,24 @@ npm run dev
 
 # The platform runs on http://localhost:3000
 ```
+
+---
+
+## 🌐 Deployment Architecture
+
+U-GOV supports a dual-target deployment model:
+
+### 1. Unified Full-Stack Node.js Deployment (Render, Railway, VPS, Docker)
+- **Frontend & Backend in One**: The Express server in `server.ts` statically serves the compiled Vite frontend from `dist/` and mounts all secure `/api/v1/*` routes.
+- **Build**: `npm run build` (builds both Vite client and `dist/server.js`).
+- **Run**: `npm start` (`node dist/server.js`).
+- **Database**: PostgreSQL via `DATABASE_URL` (with automated migrations / PostgreSQL driver).
+
+### 2. Decoupled Frontend (Vercel) + API Server
+- **Frontend SPA (Vercel)**:
+  - Configured via `vercel.json` (`buildCommand: "vite build"`, `outputDirectory: "dist"`, SPA fallback rewrites).
+  - Environment variables: `VITE_API_URL` (optional, pointing to the external Node.js backend if decoupled).
+- **Backend API**:
+  - Deploy `server.ts` to any long-running Node.js container or PaaS (Render, Railway, Fly.io, or AWS ECS).
+  - Securely inject `DATABASE_URL`, `SESSION_SECRET`, and `GEMINI_API_KEY` only into the backend environment.
+
