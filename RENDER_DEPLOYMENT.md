@@ -10,6 +10,9 @@ Render web service. It stores temporary demo data under `/tmp/ugov-data`.
 3. Render detects `render.yaml`. Review it and click **Apply**.
 4. Add `GEMINI_API_KEY` only if the AI assistant is required, then deploy.
 
+The Blueprint installs development dependencies during the build because Vite's
+React plugin is a build-time dependency.
+
 Render generates `SESSION_SECRET`; never commit or paste that value publicly.
 
 ## Scope and limits
