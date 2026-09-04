@@ -533,6 +533,22 @@ class Database {
         }
         if (!parsed.governmentApplications) parsed.governmentApplications = [];
         if (!parsed.applicationIntegrations) parsed.applicationIntegrations = [];
+
+        // Auto-migrate the existing demo user's name if they have the old name in the persistent DB
+        if (parsed.profiles) {
+          const demoProfile = parsed.profiles.find((p) => p.userId === "usr-citizen-01");
+          if (demoProfile && demoProfile.displayName === "Ganesh Ramesh Gite") {
+            demoProfile.displayName = "TEJAS GAVADE";
+            
+            // Also write the update back to the persistent disk right away
+            try {
+              fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+            } catch (e) {
+              console.warn("Failed to save migrated name to disk:", e);
+            }
+          }
+        }
+
         return parsed;
       }
     } catch (err) {
