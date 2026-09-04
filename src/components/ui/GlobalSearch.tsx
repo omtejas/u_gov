@@ -187,11 +187,13 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
         ) : query.length < 2 && !query ? (
           <div className="px-4 py-5">
             <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Quick Navigation</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[
                 { label: "Services Catalogue", tab: "services", icon: Layers },
                 { label: "DigiVault", tab: "documents", icon: FileText },
                 { label: "Application Tracker", tab: "tracker", icon: History },
+                { label: "Where Am I? (Journey)", tab: "whereami", icon: Zap },
+                { label: "Officer Desk", tab: "officer", icon: History },
                 { label: "Help & FAQ", tab: "faq", icon: BookOpen },
               ].map((item) => {
                 const Icon = item.icon;
@@ -199,7 +201,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
                   <button
                     key={item.tab}
                     onClick={() => { setActiveTab(item.tab); onClose(); }}
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors text-left border border-slate-100"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors text-left border border-slate-100"
                   >
                     <Icon className="w-4 h-4 text-slate-500 shrink-0" />
                     <span className="text-xs font-semibold text-slate-700">{item.label}</span>

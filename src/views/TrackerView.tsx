@@ -230,6 +230,15 @@ export const TrackerView: React.FC = () => {
                   </div>
 
                   <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActiveTab("whereami")}
+                    className="h-8 text-xs shrink-0 text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                  >
+                    Where Am I?
+                  </Button>
+
+                  <Button
                     variant={isReady ? "saffron" : isSubmitted ? "outline" : "primary"}
                     size="sm"
                     onClick={() => openApplicationModal(app)}

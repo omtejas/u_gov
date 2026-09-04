@@ -1,5 +1,6 @@
 import React from "react";
 import { useGov } from "../../context/GovContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import {
   Home,
   Layers,
@@ -14,29 +15,37 @@ import {
   Database,
   Shield,
   HelpCircle,
+  Compass,
+  Briefcase,
 } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
 
 export const Navbar: React.FC = () => {
-  const { activeTab, setActiveTab, mode, setMode, openGBot } = useGov();
+  const { activeTab, setActiveTab, mode, setMode, openGBot, roles } = useGov();
   const { unreadCount } = useNotifications();
+  const { t } = useTranslation();
 
   const navItems = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "services", label: "Services Hub", icon: Layers },
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "documents", label: "Digital Vault", icon: FolderLock },
-    { id: "tracker", label: "Track Applications", icon: Activity },
-    { id: "consent", label: "Consent Center", icon: Shield },
-    { id: "notifications", label: "Alerts", icon: Bell, badge: unreadCount > 0 ? unreadCount : undefined },
-    { id: "mydata", label: "My Data", icon: Database },
-    { id: "faq", label: "Help & FAQ", icon: HelpCircle },
-    { id: "grievance", label: "Issue Solver", icon: ShieldAlert },
-    { id: "audit", label: "Audit & Security", icon: ShieldCheck },
+    { id: "home", label: t("nav.home"), icon: Home },
+    { id: "services", label: t("nav.services"), icon: Layers },
+    { id: "dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+    { id: "documents", label: t("nav.documents"), icon: FolderLock },
+    { id: "tracker", label: t("nav.applications"), icon: Activity },
+    { id: "whereami", label: t("nav.whereami"), icon: Compass },
+    { id: "consent", label: t("nav.consent"), icon: Shield },
+    { id: "notifications", label: t("nav.notifications"), icon: Bell, badge: unreadCount > 0 ? unreadCount : undefined },
+    { id: "mydata", label: t("nav.mydata"), icon: Database },
+    { id: "faq", label: t("nav.faq"), icon: HelpCircle },
+    { id: "grievance", label: t("nav.grievance"), icon: ShieldAlert },
+    { id: "audit", label: t("nav.audit"), icon: ShieldCheck },
   ];
 
-  if (mode === "admin" || mode === "official") {
-    navItems.push({ id: "admin", label: "U-SYS Telemetry", icon: Server });
+  if (mode === "admin" || mode === "official" || roles.includes("OFFICIAL") || roles.includes("ADMIN")) {
+    navItems.push({ id: "officer", label: t("nav.officer"), icon: Briefcase });
+  }
+
+  if (mode === "admin" || mode === "official" || roles.includes("ADMIN")) {
+    navItems.push({ id: "admin", label: t("nav.admin"), icon: Server });
   }
 
   return (

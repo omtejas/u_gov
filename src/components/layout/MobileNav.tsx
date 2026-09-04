@@ -1,16 +1,18 @@
 import React from "react";
 import { useGov } from "../../context/GovContext";
+import { useTranslation } from "../../hooks/useTranslation";
 import { Home, Layers, LayoutDashboard, FolderLock, Sparkles } from "lucide-react";
 
 export const MobileNav: React.FC = () => {
   const { activeTab, setActiveTab, openGBot } = useGov();
+  const { t } = useTranslation();
 
   const mobileTabs = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "services", label: "Services", icon: Layers },
+    { id: "home", label: t("nav.home"), icon: Home },
+    { id: "services", label: t("nav.services"), icon: Layers },
     { id: "gbot", label: "G-Bot AI", icon: Sparkles, isAction: true },
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "documents", label: "DigiVault", icon: FolderLock },
+    { id: "dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+    { id: "documents", label: t("nav.documents"), icon: FolderLock },
   ];
 
   return (

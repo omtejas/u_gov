@@ -14,12 +14,13 @@ import { searchRouter } from "./src/server/routes/search";
 import { notificationsRouter } from "./src/server/routes/notifications";
 import { feedbackRouter } from "./src/server/routes/feedback";
 import { faqRouter } from "./src/server/routes/faq";
+import { officerRouter } from "./src/server/routes/officer";
 import { requireAuth } from "./src/server/middleware/auth";
 import type { AuthenticatedRequest } from "./src/server/middleware/auth";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.disable("x-powered-by");
@@ -38,6 +39,17 @@ app.use((_req, res, next) => {
 });
 
 app.use(express.json({ limit: "10mb" }));
+
+// A redirect to a Netlify Function carries this internal prefix in some
+// runtimes. Strip it so the existing /api/v1 routes work both locally and on
+// Netlify without changing client-side request URLs.
+app.use((req, _res, next) => {
+  const functionPrefix = "/.netlify/functions/api";
+  if (req.url === functionPrefix || req.url.startsWith(`${functionPrefix}/`)) {
+    req.url = req.url.slice(functionPrefix.length) || "/";
+  }
+  next();
+});
 
 // Apply session authentication middleware
 app.use(authenticate as any);
@@ -65,6 +77,7 @@ app.use("/api/v1/search", searchRouter);
 app.use("/api/v1/notifications", notificationsRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/faq", faqRouter);
+app.use("/api/v1/officer", officerRouter);
 
 // User Preferences endpoint (lightweight, citizen-scoped)
 const preferencesStore: Record<string, Record<string, unknown>> = {};
@@ -116,4 +129,8 @@ async function startServer() {
   });
 }
 
-startServer();
+// Netlify imports `app` from its function entry point.  Do not open a long-lived
+// listener in that environment; Netlify owns the HTTP server lifecycle.
+if (!process.env.NETLIFY) {
+  startServer();
+}

@@ -29,6 +29,8 @@ const FEATURE_ITEMS = [
   { id: "feat-faq", label: "Help & FAQ", tab: "faq", description: "Frequently asked questions and help guides", keywords: ["help", "faq", "guide", "support", "how to"] },
   { id: "feat-audit", label: "Audit Ledger", tab: "audit", description: "Inspect the SHA-256 Hash-Chained Audit Ledger", keywords: ["audit", "ledger", "logs", "security", "sha256"] },
   { id: "feat-grievance", label: "Grievance", tab: "grievance", description: "Report an issue or file a complaint", keywords: ["grievance", "complaint", "report", "issue", "problem"] },
+  { id: "feat-whereami", label: "Where Am I? — Citizen Journey Tracer", tab: "whereami", description: "Trace active application progress, requirements, milestones, and next actions", keywords: ["where", "journey", "tracer", "progress", "milestone", "stage", "timeline"] },
+  { id: "feat-officer", label: "Officer Desk — Verification Workspace", tab: "officer", description: "Secure government case officer review and verification portal", keywords: ["officer", "desk", "review", "verify", "case", "workflow", "approve", "reject"] },
 ];
 
 /**

@@ -26,6 +26,8 @@ import { ConsentCenterView } from "./views/ConsentCenterView";
 import { NotificationsView } from "./views/NotificationsView";
 import { FAQView } from "./views/FAQView";
 import { MyDataView } from "./views/MyDataView";
+import { WhereAmIView } from "./views/WhereAmIView";
+import { OfficerDeskView } from "./views/OfficerDeskView";
 
 const TUTORIAL_KEY = "ugov_tutorial_seen_v1";
 
@@ -91,6 +93,10 @@ const AppContent: React.FC = () => {
         return <MyDataView />;
       case "grievance":
         return <GrievanceView />;
+      case "whereami":
+        return <WhereAmIView />;
+      case "officer":
+        return <OfficerDeskView />;
       case "audit":
         return <AuditView />;
       case "admin":
