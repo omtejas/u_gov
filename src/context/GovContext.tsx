@@ -9,6 +9,9 @@ import {
   DocumentType,
   AuditEvent,
   NotificationItem,
+  GovernmentApplication,
+  ApplicationReviewData,
+  ServiceRequirementsEvaluation,
 } from "../types";
 import { MOCK_SERVICES } from "../data/mockServices";
 import { MOCK_APPLICATIONS } from "../data/mockApplications";
@@ -92,6 +95,49 @@ interface GovContextType {
   grantConsent: (docId: string, recipientEntity: string, purpose: string, durationDays: number) => Promise<{ success: boolean; error?: string }>;
   revokeConsent: (docId: string, consentId: string) => Promise<{ success: boolean; error?: string }>;
   uploadDocument: (doc: Partial<DigiDocument>) => void;
+
+  // U-APPLICATIONS Engine (Phase 4.2 & 4.3)
+  governmentApplications: GovernmentApplication[];
+  isLoadingApplications: boolean;
+  refreshApplications: () => Promise<void>;
+  createGovernmentApplication: (
+    serviceId: string,
+    formData?: Record<string, any>,
+    attachedDocumentIds?: string[]
+  ) => Promise<{ success: boolean; application?: GovernmentApplication; error?: string }>;
+  getGovernmentApplicationById: (
+    applicationId: string
+  ) => Promise<{ success: boolean; application?: GovernmentApplication; error?: string }>;
+  attachDocumentToApplication: (
+    applicationId: string,
+    documentId: string
+  ) => Promise<{ success: boolean; application?: GovernmentApplication; error?: string }>;
+  removeDocumentFromApplication: (
+    applicationId: string,
+    documentId: string
+  ) => Promise<{ success: boolean; application?: GovernmentApplication; error?: string }>;
+  reviewGovernmentApplication: (
+    applicationId: string
+  ) => Promise<{ success: boolean; review?: ApplicationReviewData; error?: string }>;
+  submitGovernmentApplication: (
+    applicationId: string
+  ) => Promise<{
+    success: boolean;
+    application?: GovernmentApplication;
+    submission?: any;
+    consentsGrantedCount?: number;
+    error?: string;
+  }>;
+  cancelGovernmentApplication: (
+    applicationId: string,
+    reason?: string
+  ) => Promise<{ success: boolean; application?: GovernmentApplication; error?: string }>;
+  checkServiceRequirements: (
+    serviceIdOrCode: string
+  ) => Promise<{ success: boolean; evaluation?: ServiceRequirementsEvaluation; error?: string }>;
+  activeApplicationModal: GovernmentApplication | null;
+  openApplicationModal: (app: GovernmentApplication) => void;
+  closeApplicationModal: () => void;
 }
 
 const GovContext = createContext<GovContextType | undefined>(undefined);
@@ -111,6 +157,9 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [services, setServices] = useState<GovService[]>(MOCK_SERVICES);
   const [applications, setApplications] = useState<GovApplication[]>(MOCK_APPLICATIONS);
+  const [governmentApplications, setGovernmentApplications] = useState<GovernmentApplication[]>([]);
+  const [isLoadingApplications, setIsLoadingApplications] = useState<boolean>(false);
+  const [activeApplicationModal, setActiveApplicationModal] = useState<GovernmentApplication | null>(null);
   const [documents, setDocuments] = useState<DigiDocument[]>(MOCK_DOCUMENTS);
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [isLoadingDocuments, setIsLoadingDocuments] = useState<boolean>(false);
@@ -150,6 +199,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     checkCurrentSession();
     refreshAuditLogs();
     refreshDocuments();
+    refreshApplications();
   }, []);
 
   const checkCurrentSession = async () => {
@@ -253,6 +303,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       await checkCurrentSession();
       await refreshAuditLogs();
       await refreshDocuments();
+      await refreshApplications();
       setActiveTabState("dashboard");
       return { success: true };
     } catch (err: any) {
@@ -319,6 +370,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUser(null);
       setRoles([]);
       setPermissions([]);
+      setGovernmentApplications([]);
       await refreshAuditLogs();
       setActiveTabState("home");
     }
@@ -676,6 +728,220 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setDocuments((prev) => [newDoc, ...prev]);
   };
 
+  // U-APPLICATIONS Lifecycle Implementation
+  const refreshApplications = async (): Promise<void> => {
+    setIsLoadingApplications(true);
+    try {
+      const res = await fetch("/api/v1/applications", { credentials: "include" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setGovernmentApplications(data.applications || []);
+      }
+    } catch (e) {
+      console.warn("Could not refresh applications:", e);
+    } finally {
+      setIsLoadingApplications(false);
+    }
+  };
+
+  const createGovernmentApplication = async (
+    serviceId: string,
+    formData?: Record<string, any>,
+    attachedDocumentIds?: string[]
+  ): Promise<{ success: boolean; application?: GovernmentApplication; error?: string }> => {
+    try {
+      const res = await fetch("/api/v1/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ serviceId, formData, attachedDocumentIds }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to create application." };
+      }
+      await refreshApplications();
+      await refreshAuditLogs();
+      return { success: true, application: data.application };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error while creating application." };
+    }
+  };
+
+  const getGovernmentApplicationById = async (
+    applicationId: string
+  ): Promise<{ success: boolean; application?: GovernmentApplication; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}`, { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to fetch application." };
+      }
+      return { success: true, application: data.application };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error fetching application." };
+    }
+  };
+
+  const attachDocumentToApplication = async (
+    applicationId: string,
+    documentId: string
+  ): Promise<{ success: boolean; application?: GovernmentApplication; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/documents`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ documentId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to attach document." };
+      }
+      await refreshApplications();
+      await refreshAuditLogs();
+      if (activeApplicationModal && activeApplicationModal.id === applicationId) {
+        setActiveApplicationModal(data.application);
+      }
+      return { success: true, application: data.application };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error attaching document." };
+    }
+  };
+
+  const removeDocumentFromApplication = async (
+    applicationId: string,
+    documentId: string
+  ): Promise<{ success: boolean; application?: GovernmentApplication; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/documents/${documentId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to remove document." };
+      }
+      await refreshApplications();
+      await refreshAuditLogs();
+      if (activeApplicationModal && activeApplicationModal.id === applicationId) {
+        setActiveApplicationModal(data.application);
+      }
+      return { success: true, application: data.application };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error removing document." };
+    }
+  };
+
+  const reviewGovernmentApplication = async (
+    applicationId: string
+  ): Promise<{ success: boolean; review?: ApplicationReviewData; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/review`, { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to retrieve review disclosures." };
+      }
+      return { success: true, review: data.review };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error reviewing application." };
+    }
+  };
+
+  const submitGovernmentApplication = async (
+    applicationId: string
+  ): Promise<{
+    success: boolean;
+    application?: GovernmentApplication;
+    submission?: any;
+    consentsGrantedCount?: number;
+    error?: string;
+  }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/submit`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to submit application." };
+      }
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#FF9933", "#FFFFFF", "#138808", "#0B1F3A"],
+        });
+      } catch (e) {
+        // confetti fallback
+      }
+      await refreshApplications();
+      await refreshDocuments();
+      await refreshAuditLogs();
+      if (activeApplicationModal && activeApplicationModal.id === applicationId) {
+        setActiveApplicationModal(data.application);
+      }
+      return {
+        success: true,
+        application: data.application,
+        submission: data.submission,
+        consentsGrantedCount: data.consentsGrantedCount,
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error submitting application." };
+    }
+  };
+
+  const cancelGovernmentApplication = async (
+    applicationId: string,
+    reason?: string
+  ): Promise<{ success: boolean; application?: GovernmentApplication; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to cancel application." };
+      }
+      await refreshApplications();
+      await refreshAuditLogs();
+      if (activeApplicationModal && activeApplicationModal.id === applicationId) {
+        setActiveApplicationModal(data.application);
+      }
+      return { success: true, application: data.application };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error cancelling application." };
+    }
+  };
+
+  const checkServiceRequirements = async (
+    serviceIdOrCode: string
+  ): Promise<{ success: boolean; evaluation?: ServiceRequirementsEvaluation; error?: string }> => {
+    try {
+      const res = await fetch(`/api/v1/services/${serviceIdOrCode}/requirements`, { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to check service requirements." };
+      }
+      return { success: true, evaluation: data.evaluation };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error checking requirements." };
+    }
+  };
+
+  const openApplicationModal = (app: GovernmentApplication) => {
+    setActiveApplicationModal(app);
+  };
+
+  const closeApplicationModal = () => {
+    setActiveApplicationModal(null);
+  };
+
   return (
     <GovContext.Provider
       value={{
@@ -699,6 +965,20 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setSearchQuery,
         services,
         applications,
+        governmentApplications,
+        isLoadingApplications,
+        refreshApplications,
+        createGovernmentApplication,
+        getGovernmentApplicationById,
+        attachDocumentToApplication,
+        removeDocumentFromApplication,
+        reviewGovernmentApplication,
+        submitGovernmentApplication,
+        cancelGovernmentApplication,
+        checkServiceRequirements,
+        activeApplicationModal,
+        openApplicationModal,
+        closeApplicationModal,
         documents,
         documentTypes,
         isLoadingDocuments,

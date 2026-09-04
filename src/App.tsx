@@ -8,6 +8,7 @@ import { FloatingGBot } from "./components/ai/FloatingGBot";
 import { GBotModal } from "./components/ai/GBotModal";
 import { ExplainModal } from "./components/ai/ExplainModal";
 import { ServiceDetailsModal } from "./components/services/ServiceDetailsModal";
+import { ApplicationWorkflowModal } from "./components/applications/ApplicationWorkflowModal";
 
 // Views
 import { HomeView } from "./views/HomeView";
@@ -73,6 +74,7 @@ const AppContent: React.FC = () => {
       <GBotModal />
       <ExplainModal />
       <ServiceDetailsModal />
+      <ApplicationWorkflowModal />
 
       {/* Mobile Navigation */}
       {isAuthenticated && <MobileNav />}

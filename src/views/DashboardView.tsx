@@ -17,10 +17,27 @@ import {
 } from "lucide-react";
 
 export const DashboardView: React.FC = () => {
-  const { user, applications, documents, auditLogs, setActiveTab, openServiceModal, services } = useGov();
+  const {
+    user,
+    applications,
+    governmentApplications,
+    documents,
+    auditLogs,
+    setActiveTab,
+    openServiceModal,
+    openApplicationModal,
+    services,
+  } = useGov();
 
-  const activeApplications = applications.filter((a) => a.status !== "completed");
-  const pendingActions = applications.filter((a) => a.status === "action_required");
+  const activeGovernmentApps = governmentApplications.filter(
+    (a) => !["APPROVED", "REJECTED", "CANCELLED"].includes(a.status)
+  );
+  const activeApplications = governmentApplications.length > 0
+    ? activeGovernmentApps
+    : applications.filter((a) => a.status !== "completed");
+  const pendingActions = governmentApplications.length > 0
+    ? governmentApplications.filter((a) => a.status === "DOCUMENTS_REQUIRED" || a.status === "ACTION_REQUIRED")
+    : applications.filter((a) => a.status === "action_required");
 
   const displayName = user?.name || "Citizen";
   const kycLevel = user?.kycLevel || "Tier 1 (Basic)";
@@ -81,7 +98,7 @@ export const DashboardView: React.FC = () => {
                 Action Required on {pendingActions.length} Application(s)
               </h4>
               <p className="text-xs text-amber-800 mt-0.5">
-                {pendingActions[0].actionRequiredText || "Additional verification or slot booking required."}
+                {(pendingActions[0] as any)?.actionRequiredText || "Additional document verification or biometric confirmation required."}
               </p>
             </div>
           </div>
@@ -159,58 +176,86 @@ export const DashboardView: React.FC = () => {
               onClick={() => setActiveTab("tracker")}
               className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>View All ({applications.length})</span>
+              <span>View All ({governmentApplications.length > 0 ? governmentApplications.length : applications.length})</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="space-y-3">
-            {applications.map((app) => (
-              <Card key={app.id} variant="hoverable" padding="md" onClick={() => setActiveTab("tracker")}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-slate-700">
-                      {app.refNumber}
+            {governmentApplications.length > 0 ? (
+              governmentApplications.slice(0, 3).map((app) => (
+                <Card key={app.id} variant="hoverable" padding="md" onClick={() => openApplicationModal(app)}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-slate-700">
+                        {app.applicationNumber}
+                      </span>
+                      <Badge
+                        variant={
+                          app.status === "SUBMITTED" || app.status === "APPROVED"
+                            ? "success"
+                            : app.status === "DOCUMENTS_REQUIRED"
+                            ? "warning"
+                            : "info"
+                        }
+                        size="sm"
+                        dot
+                      >
+                        {app.status.replace("_", " ")}
+                      </Badge>
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      SLA: {app.service?.slaDays || 15} Days
                     </span>
-                    <Badge
-                      variant={
-                        app.status === "approved"
-                          ? "success"
-                          : app.status === "action_required"
-                          ? "warning"
-                          : "info"
-                      }
-                      size="sm"
-                    >
-                      {app.status.replace("_", " ").toUpperCase()}
-                    </Badge>
                   </div>
-                  <span className="text-[11px] text-slate-500">
-                    Target SLA: {new Date(app.slaTargetDate).toLocaleDateString()}
-                  </span>
-                </div>
 
-                <div className="py-2.5">
-                  <h4 className="text-sm font-bold text-slate-900">
-                    {app.serviceName}
-                  </h4>
-                  <span className="text-xs text-slate-500 block mt-0.5">
-                    {app.department}
-                  </span>
-                </div>
+                  <div className="py-2.5">
+                    <h4 className="text-sm font-bold text-slate-900">
+                      {app.service?.name || "Government Application"}
+                    </h4>
+                    <span className="text-xs text-slate-500 block mt-0.5">
+                      {app.service?.department} • {app.attachedDocumentIds.length} Credential(s) Attached
+                    </span>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              applications.map((app) => (
+                <Card key={app.id} variant="hoverable" padding="md" onClick={() => setActiveTab("tracker")}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-slate-700">
+                        {app.refNumber}
+                      </span>
+                      <Badge
+                        variant={
+                          app.status === "approved"
+                            ? "success"
+                            : app.status === "action_required"
+                            ? "warning"
+                            : "info"
+                        }
+                        size="sm"
+                      >
+                        {app.status.replace("_", " ").toUpperCase()}
+                      </Badge>
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      Target SLA: {new Date(app.slaTargetDate).toLocaleDateString()}
+                    </span>
+                  </div>
 
-                {/* Current Stage */}
-                <div className="pt-2 flex items-center gap-2 text-xs text-slate-600">
-                  <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>
-                    Current Stage:{" "}
-                    <strong>
-                      {app.timeline.find((t) => t.current)?.title || app.timeline[app.timeline.length - 1].title}
-                    </strong>
-                  </span>
-                </div>
-              </Card>
-            ))}
+                  <div className="py-2.5">
+                    <h4 className="text-sm font-bold text-slate-900">
+                      {app.serviceName}
+                    </h4>
+                    <span className="text-xs text-slate-500 block mt-0.5">
+                      {app.department}
+                    </span>
+                  </div>
+                </Card>
+              ))
+            )}
           </div>
         </div>
 

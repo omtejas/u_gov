@@ -3,172 +3,320 @@ import { useGov } from "../context/GovContext";
 import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
-import { Activity, Clock, CheckCircle2, AlertCircle, AlertTriangle, Calendar, ExternalLink } from "lucide-react";
+import {
+  Activity,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  AlertTriangle,
+  ExternalLink,
+  FileText,
+  FileCheck2,
+  Lock,
+  Sparkles,
+  Copy,
+  Check,
+  ArrowRight,
+  ShieldCheck,
+  Layers,
+} from "lucide-react";
+import { GovernmentApplication } from "../types";
 
 export const TrackerView: React.FC = () => {
-  const { applications, setActiveTab } = useGov();
-  const [filter, setFilter] = useState<string>("all");
+  const {
+    governmentApplications,
+    isLoadingApplications,
+    refreshApplications,
+    openApplicationModal,
+    setActiveTab,
+  } = useGov();
 
-  const filteredApps = applications.filter((a) => {
+  const [filter, setFilter] = useState<string>("all");
+  const [copiedAppNumber, setCopiedAppNumber] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedAppNumber(text);
+    setTimeout(() => setCopiedAppNumber(null), 2000);
+  };
+
+  const filteredApps = governmentApplications.filter((app) => {
     if (filter === "all") return true;
-    return a.status === filter;
+    if (filter === "required") return app.status === "DOCUMENTS_REQUIRED" || app.status === "DRAFT";
+    if (filter === "ready") return app.status === "READY" || app.status === "CONSENT_REQUIRED";
+    if (filter === "submitted") return app.status === "SUBMITTED" || app.status === "PROCESSING";
+    if (filter === "cancelled") return app.status === "CANCELLED";
+    return true;
   });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "DRAFT":
+        return <Badge variant="neutral" size="sm">DRAFT</Badge>;
+      case "DOCUMENTS_REQUIRED":
+        return <Badge variant="warning" size="sm" dot>DOCUMENTS REQUIRED</Badge>;
+      case "READY":
+        return <Badge variant="info" size="sm" dot>READY FOR CONSENT</Badge>;
+      case "CONSENT_REQUIRED":
+      case "CONSENT_GRANTED":
+        return <Badge variant="info" size="sm" dot>{status.replace("_", " ")}</Badge>;
+      case "SUBMITTED":
+        return <Badge variant="success" size="sm" dot>SUBMITTED (SANDBOX)</Badge>;
+      case "PROCESSING":
+        return <Badge variant="info" size="sm" dot>PROCESSING</Badge>;
+      case "ACTION_REQUIRED":
+        return <Badge variant="warning" size="sm" dot>ACTION REQUIRED</Badge>;
+      case "APPROVED":
+        return <Badge variant="success" size="sm">APPROVED</Badge>;
+      case "REJECTED":
+        return <Badge variant="error" size="sm">REJECTED</Badge>;
+      case "CANCELLED":
+        return <Badge variant="neutral" size="sm">CANCELLED</Badge>;
+      default:
+        return <Badge variant="neutral" size="sm">{status}</Badge>;
+    }
+  };
+
+  const submittedCount = governmentApplications.filter((a) => a.status === "SUBMITTED" || a.status === "PROCESSING").length;
+  const readyCount = governmentApplications.filter((a) => a.status === "READY").length;
+  const requiredCount = governmentApplications.filter((a) => a.status === "DOCUMENTS_REQUIRED" || a.status === "DRAFT").length;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
             <Activity className="w-6 h-6 text-blue-600" />
-            <span>U-TRACK Unified Application Radar</span>
+            <span>U-APPLICATIONS Unified Lifecycle Radar</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Real-time status tracking across Central & State government portals with statutory SLA countdowns.
+            End-to-end citizen application lifecycle with sovereign document authorization and Sandbox Gateway simulation.
           </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {[
-            { id: "all", label: "All Requests" },
-            { id: "under_review", label: "Under Review" },
-            { id: "action_required", label: "Action Required" },
-            { id: "approved", label: "Approved" },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setFilter(item.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
-                filter === item.id
-                  ? "bg-[#0b1f3a] text-white shadow-2xs"
-                  : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshApplications}
+            disabled={isLoadingApplications}
+            className="text-xs"
+          >
+            {isLoadingApplications ? "Refreshing..." : "Refresh Radar"}
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setActiveTab("services")}
+            leftIcon={<Layers className="w-3.5 h-3.5" />}
+            className="text-xs"
+          >
+            Apply for Service
+          </Button>
         </div>
       </div>
 
-      {/* Applications List */}
-      <div className="space-y-6">
-        {filteredApps.map((app) => (
-          <Card key={app.id} variant="default" padding="lg" className="space-y-5">
-            {/* Top Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-                    {app.serviceName}
-                  </h3>
-                  <Badge
-                    variant={
-                      app.status === "approved"
-                        ? "success"
-                        : app.status === "action_required"
-                        ? "warning"
-                        : "info"
-                    }
-                    size="sm"
-                    dot
-                  >
-                    {app.status.replace("_", " ").toUpperCase()}
-                  </Badge>
-                </div>
-                <span className="text-xs text-slate-500 block font-medium">
-                  {app.department} • Ref: <strong className="text-slate-700 font-mono">{app.refNumber}</strong>
-                </span>
-              </div>
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+            Total Applications
+          </span>
+          <span className="text-2xl font-extrabold text-slate-900">
+            {governmentApplications.length}
+          </span>
+        </div>
 
-              <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shrink-0">
-                <Clock className="w-4 h-4 text-blue-600" />
-                <span>
-                  SLA Target: <strong>{new Date(app.slaTargetDate).toLocaleDateString()}</strong>
-                </span>
-              </div>
-            </div>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">
+            Documents Required
+          </span>
+          <span className="text-2xl font-extrabold text-amber-600">
+            {requiredCount}
+          </span>
+        </div>
 
-            {/* Action Required Banner if status === action_required */}
-            {app.status === "action_required" && app.actionRequiredText && (
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="space-y-1 flex-1">
-                  <h5 className="text-xs font-bold uppercase tracking-wider text-amber-900">
-                    Citizen Action Required
-                  </h5>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    {app.actionRequiredText}
-                  </p>
-                </div>
-                <Button variant="saffron" size="sm" className="shrink-0">
-                  Book Slot
-                </Button>
-              </div>
-            )}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
+            Ready for Consent
+          </span>
+          <span className="text-2xl font-extrabold text-blue-600">
+            {readyCount}
+          </span>
+        </div>
 
-            {/* Timeline progression */}
-            <div>
-              <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-                Statutory Milestone Progression
-              </h5>
-              <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-                {app.timeline.map((step, idx) => (
-                  <div key={idx} className="relative">
-                    <div
-                      className={`absolute -left-6 top-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                        step.completed
-                          ? "border-emerald-600 bg-emerald-600 text-white"
-                          : step.current
-                          ? "border-blue-600 bg-white ring-4 ring-blue-100"
-                          : "border-slate-300 bg-white"
-                      }`}
-                    >
-                      {step.completed && <CheckCircle2 className="w-3 h-3" />}
-                    </div>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">
+            Submitted to Sandbox
+          </span>
+          <span className="text-2xl font-extrabold text-emerald-600">
+            {submittedCount}
+          </span>
+        </div>
+      </div>
 
-                    <div className="space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`text-xs font-bold ${
-                            step.completed
-                              ? "text-slate-900"
-                              : step.current
-                              ? "text-blue-700"
-                              : "text-slate-400"
-                          }`}
-                        >
-                          {step.title}
-                        </span>
-                        {step.timestamp && (
-                          <span className="text-[10px] text-slate-400">
-                            ({step.timestamp})
-                          </span>
-                        )}
-                      </div>
-                      {step.notes && (
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                          {step.notes}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        {[
+          { id: "all", label: `All Applications (${governmentApplications.length})` },
+          { id: "required", label: `Credentials Required (${requiredCount})` },
+          { id: "ready", label: `Ready for Consent (${readyCount})` },
+          { id: "submitted", label: `Submitted (${submittedCount})` },
+          { id: "cancelled", label: "Cancelled" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setFilter(item.id)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+              filter === item.id
+                ? "bg-[#0b1f3a] text-white shadow-2xs"
+                : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            {item.label}
+          </button>
         ))}
+      </div>
 
+      {/* Applications List */}
+      <div className="space-y-4">
+        {filteredApps.map((app) => {
+          const isSubmitted = ["SUBMITTED", "PROCESSING"].includes(app.status);
+          const isReady = app.status === "READY";
+          const isCancelled = app.status === "CANCELLED";
+
+          return (
+            <Card key={app.id} variant="default" padding="lg" className="space-y-4 hover:border-slate-300 transition-all">
+              {/* Header Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                      {app.service?.name || "Government Public Service"}
+                    </h3>
+                    {getStatusBadge(app.status)}
+                    <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-semibold px-2 py-0.5 rounded-full">
+                      Sandbox Simulation
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                    <span>{app.service?.department || "Department"}</span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      App Number:
+                      <strong className="font-mono text-slate-800">{app.applicationNumber}</strong>
+                      <button
+                        onClick={() => handleCopy(app.applicationNumber)}
+                        title="Copy Application Number"
+                        className="text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
+                      >
+                        {copiedAppNumber === app.applicationNumber ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shrink-0 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-blue-600" />
+                    <span>SLA: <strong>{app.service?.slaDays || 15} Days</strong></span>
+                  </div>
+
+                  <Button
+                    variant={isReady ? "saffron" : isSubmitted ? "outline" : "primary"}
+                    size="sm"
+                    onClick={() => openApplicationModal(app)}
+                    className="h-8 text-xs shrink-0"
+                    rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                  >
+                    {isReady
+                      ? "Review & Submit"
+                      : isSubmitted
+                      ? "Track Details"
+                      : isCancelled
+                      ? "View Record"
+                      : "Continue Application"}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Progress & Metadata Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-0.5">
+                    Attached Vault Credentials
+                  </span>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>{app.attachedDocumentIds.length} Credential(s) Attached</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-0.5">
+                    Statutory U-CONSENT
+                  </span>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>
+                      {app.consentIds.length > 0
+                        ? `${app.consentIds.length} Token(s) Authorized`
+                        : "Pending Authorization"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-0.5">
+                    Tracking Identifier
+                  </span>
+                  <span className="font-mono text-slate-900 font-bold block truncate">
+                    {app.trackingToken || "Generated upon submission"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Cancellation notice if cancelled */}
+              {isCancelled && app.cancellationReason && (
+                <div className="p-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span>
+                    <strong>Cancellation Note:</strong> {app.cancellationReason}
+                  </span>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+
+        {/* Empty State */}
         {filteredApps.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
-            <p className="text-sm font-semibold text-slate-700">No applications match this filter.</p>
+          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+              <FileCheck2 className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-900">
+              {governmentApplications.length === 0
+                ? "No Government Applications Yet"
+                : "No applications match this filter"}
+            </h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Select a service from the Public Services Directory, verify your DigiVault prerequisites, and submit with explicit statutory consent.
+            </p>
             <Button
               variant="primary"
               size="sm"
-              className="mt-4"
+              className="mt-2"
               onClick={() => setActiveTab("services")}
             >
-              Apply for a Service
+              Browse Services Directory
             </Button>
           </div>
         )}

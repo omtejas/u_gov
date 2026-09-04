@@ -67,6 +67,19 @@ export type ApplicationStatus =
   | "rejected"
   | "completed";
 
+export type ControlledApplicationStatus =
+  | "DRAFT"
+  | "DOCUMENTS_REQUIRED"
+  | "READY"
+  | "CONSENT_REQUIRED"
+  | "CONSENT_GRANTED"
+  | "SUBMITTED"
+  | "PROCESSING"
+  | "ACTION_REQUIRED"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED";
+
 export interface TimelineStep {
   title: string;
   timestamp?: string;
@@ -90,6 +103,110 @@ export interface GovApplication {
   timeline: TimelineStep[];
   feePaid: number;
   isSimulated?: boolean;
+}
+
+export interface GovernmentApplication {
+  id: string;
+  applicationNumber: string;
+  userId: string;
+  serviceId: string;
+  status: ControlledApplicationStatus;
+  formData: Record<string, any>;
+  attachedDocumentIds: string[];
+  consentIds: string[];
+  trackingToken?: string | null;
+  submittedAt?: string | null;
+  cancellationReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  service?: {
+    id: string;
+    serviceCode: string;
+    name: string;
+    department: string;
+    ministry: string;
+    category?: string;
+    slaDays: number;
+    fee: number;
+  } | null;
+  attachedDocuments?: DigiDocument[];
+}
+
+export interface ApplicationReviewData {
+  application: {
+    id: string;
+    applicationNumber: string;
+    status: ControlledApplicationStatus;
+    formData: Record<string, any>;
+    createdAt: string;
+    submittedAt?: string | null;
+  };
+  service: {
+    id: string;
+    serviceCode: string;
+    name: string;
+    department: string;
+    ministry: string;
+    slaDays: number;
+    fee: number;
+  };
+  attachedDocuments: {
+    id: string;
+    title: string;
+    documentTypeId: string;
+    documentNumber: string;
+    sha256Checksum: string;
+    verificationStatus: string;
+  }[];
+  requirements: {
+    totalRequired: number;
+    attachedCount: number;
+    satisfied: boolean;
+    missingDocumentTypeIds: string[];
+  };
+  dataSharingDisclosure: {
+    recipientEntity: string;
+    purpose: string;
+    validityDays: number;
+    accessType: string;
+    documentsToShare: {
+      id: string;
+      title: string;
+      documentTypeId: string;
+      sha256Checksum: string;
+    }[];
+  };
+}
+
+export interface ServiceRequirementItem {
+  documentTypeId: string;
+  documentTypeName: string;
+  issuingAuthority: string;
+  satisfied: boolean;
+  matchedDocument?: {
+    id: string;
+    title: string;
+    documentNumber: string;
+    fileName: string;
+    sha256Checksum: string;
+    verificationStatus: string;
+    createdAt: string;
+  };
+}
+
+export interface ServiceRequirementsEvaluation {
+  service: {
+    id: string;
+    serviceCode: string;
+    name: string;
+    department: string;
+  };
+  totalRequired: number;
+  satisfiedCount: number;
+  missingCount: number;
+  isApplicationReady: boolean;
+  readinessPercentage: number;
+  requirements: ServiceRequirementItem[];
 }
 
 export interface DocumentType {
