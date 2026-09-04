@@ -128,6 +128,35 @@ export interface GovernmentServiceRecord {
   updatedAt: string;
 }
 
+export type ApplicationStatus =
+  | "DRAFT"
+  | "DOCUMENTS_REQUIRED"
+  | "READY"
+  | "CONSENT_REQUIRED"
+  | "CONSENT_GRANTED"
+  | "SUBMITTED"
+  | "PROCESSING"
+  | "ACTION_REQUIRED"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED";
+
+export interface GovernmentApplicationRecord {
+  id: string;
+  applicationNumber: string;
+  userId: string;
+  serviceId: string;
+  status: ApplicationStatus;
+  formData: Record<string, any>;
+  attachedDocumentIds: string[];
+  consentIds: string[];
+  trackingToken?: string | null;
+  submittedAt?: string | null;
+  cancellationReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   users: UserRecord[];
   profiles: ProfileRecord[];
@@ -141,6 +170,7 @@ interface DatabaseSchema {
   citizenDocuments: CitizenDocumentRecord[];
   documentConsents: DocumentConsentRecord[];
   governmentServices: GovernmentServiceRecord[];
+  governmentApplications: GovernmentApplicationRecord[];
 }
 
 const getDbPath = () => {
@@ -473,6 +503,7 @@ class Database {
         if (!parsed.governmentServices || parsed.governmentServices.length === 0) {
           parsed.governmentServices = this.getDefaultGovernmentServices();
         }
+        if (!parsed.governmentApplications) parsed.governmentApplications = [];
         return parsed;
       }
     } catch (err) {
@@ -627,6 +658,7 @@ class Database {
       citizenDocuments: this.seedDefaultCitizenDocuments(citizenUserId).documents,
       documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
       governmentServices: this.getDefaultGovernmentServices(),
+      governmentApplications: [],
     };
 
     try {
@@ -922,6 +954,44 @@ class Database {
     const s = this.findServiceById(id);
     if (s) {
       Object.assign(s, updates, { updatedAt: new Date().toISOString() });
+      this.save();
+    }
+  }
+
+  // --- U-APPLICATIONS Lifecycle Engine (Phase 4.2) ---
+
+  public getApplicationsByOwner(userId: string): GovernmentApplicationRecord[] {
+    return (this.data.governmentApplications || [])
+      .filter((app) => app.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public findApplicationById(id: string): GovernmentApplicationRecord | undefined {
+    return (this.data.governmentApplications || []).find((app) => app.id === id);
+  }
+
+  public findApplicationByNumber(applicationNumber: string): GovernmentApplicationRecord | undefined {
+    const clean = applicationNumber.toUpperCase().trim();
+    return (this.data.governmentApplications || []).find((app) => app.applicationNumber.toUpperCase() === clean);
+  }
+
+  public createApplication(app: GovernmentApplicationRecord): void {
+    if (!this.data.governmentApplications) this.data.governmentApplications = [];
+    this.data.governmentApplications.push(app);
+    this.save();
+  }
+
+  public updateApplication(id: string, updates: Partial<GovernmentApplicationRecord>): void {
+    const app = this.findApplicationById(id);
+    if (app) {
+      Object.assign(app, updates, { updatedAt: new Date().toISOString() });
+      this.save();
+    }
+  }
+
+  public deleteApplication(id: string): void {
+    if (this.data.governmentApplications) {
+      this.data.governmentApplications = this.data.governmentApplications.filter((app) => app.id !== id);
       this.save();
     }
   }

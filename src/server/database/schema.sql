@@ -206,4 +206,30 @@ CREATE INDEX IF NOT EXISTS idx_services_category ON government_services(category
 CREATE INDEX IF NOT EXISTS idx_services_status ON government_services(status);
 CREATE INDEX IF NOT EXISTS idx_services_code ON government_services(service_code);
 
+-- ==========================================================
+-- U-APPLICATIONS Lifecycle Engine Schema (Phase 4.2)
+-- ==========================================================
+
+-- 13. Public Service Applications Table
+CREATE TABLE IF NOT EXISTS government_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    application_number VARCHAR(64) UNIQUE NOT NULL, -- e.g. 'UGOV-2026-NSP-881290'
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    service_id VARCHAR(64) NOT NULL REFERENCES government_services(id),
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT', -- 'DRAFT', 'DOCUMENTS_REQUIRED', 'READY', 'CONSENT_REQUIRED', 'CONSENT_GRANTED', 'SUBMITTED', 'PROCESSING', 'ACTION_REQUIRED', 'APPROVED', 'REJECTED', 'CANCELLED'
+    form_data JSONB DEFAULT '{}',
+    attached_document_ids TEXT[] DEFAULT '{}',
+    consent_ids TEXT[] DEFAULT '{}',
+    tracking_token VARCHAR(128) DEFAULT NULL,
+    submitted_at TIMESTAMPTZ DEFAULT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_applications_user ON government_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_applications_service ON government_applications(service_id);
+CREATE INDEX IF NOT EXISTS idx_applications_status ON government_applications(status);
+CREATE INDEX IF NOT EXISTS idx_applications_number ON government_applications(application_number);
+
+
 

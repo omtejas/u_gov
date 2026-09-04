@@ -402,7 +402,7 @@ authRouter.get("/audit/verify", requireAuth, (_req: AuthenticatedRequest, res: R
     success: true,
     verification: {
       ...verification,
-      algorithm: "SHA-256 Chained Merkle-Root Ledger",
+      algorithm: "SHA-256 Hash-Chained Append-Only Ledger",
       verifiedAt: new Date().toISOString(),
     },
   });
