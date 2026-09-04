@@ -11,8 +11,12 @@ export class LocalStorageDriver implements StorageDriver {
     if (vaultDir) {
       this.vaultDirectory = path.resolve(vaultDir);
     } else {
-      // Default to private /storage/vault/ at the project root
-      this.vaultDirectory = path.resolve(process.cwd(), "storage", "vault");
+      // Render and similar hosts provide a mounted persistent directory through
+      // this variable. Local development continues to use ./storage/vault.
+      const dataDirectory = process.env.UGOV_DATA_DIR
+        ? path.resolve(process.env.UGOV_DATA_DIR)
+        : path.resolve(process.cwd(), "storage");
+      this.vaultDirectory = path.join(dataDirectory, "vault");
     }
     this.ensureDirectoryExists();
   }

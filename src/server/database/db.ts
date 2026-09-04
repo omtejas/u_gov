@@ -189,7 +189,19 @@ interface DatabaseSchema {
   applicationIntegrations: ApplicationIntegrationRecord[];
 }
 
+const getDataDirectory = () => {
+  // A persistent directory is supplied by hosts such as Render. Keeping all
+  // mutable demo data below it makes redeploys and restarts safe.
+  if (process.env.UGOV_DATA_DIR) {
+    return path.resolve(process.env.UGOV_DATA_DIR);
+  }
+  return path.join(process.cwd(), "storage");
+};
+
 const getDbPath = () => {
+  if (process.env.UGOV_DATA_DIR) {
+    return path.join(getDataDirectory(), "ugov_store.json");
+  }
   try {
     if (typeof __dirname !== "undefined") {
       return path.join(__dirname, "ugov_store.json");
@@ -208,9 +220,9 @@ class Database {
   constructor() {
     // Production Safety Guard: Do not allow silent fallback to JSON store in production
     if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
-      if (!process.env.DATABASE_URL) {
+      if (!process.env.DATABASE_URL && !process.env.UGOV_DATA_DIR) {
         throw new Error(
-          "[CRITICAL SECURITY GUARD] Production environment requires a valid DATABASE_URL pointing to PostgreSQL. Silent fallback to local development JSON file persistence is forbidden."
+          "[CRITICAL SECURITY GUARD] Production requires DATABASE_URL or an explicitly configured persistent UGOV_DATA_DIR."
         );
       }
     }
@@ -427,7 +439,7 @@ class Database {
     consents: DocumentConsentRecord[];
   } {
     try {
-      const vaultDir = path.resolve(process.cwd(), "storage", "vault");
+      const vaultDir = path.join(getDataDirectory(), "vault");
       if (!fs.existsSync(vaultDir)) {
         fs.mkdirSync(vaultDir, { recursive: true, mode: 0o700 });
       }
