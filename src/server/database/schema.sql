@@ -174,3 +174,36 @@ INSERT INTO document_types (id, name, issuing_authority, retention_days) VALUES
 ('MARKSHEET', 'Secondary School Marksheet (10th/12th)', 'State Secondary Education Board', NULL)
 ON CONFLICT (id) DO NOTHING;
 
+-- ==========================================================
+-- U-SERVICES Public Service Catalogue Schema (Phase 4.1)
+-- ==========================================================
+
+-- 12. Public Government Services Registry
+CREATE TABLE IF NOT EXISTS government_services (
+    id VARCHAR(64) PRIMARY KEY, -- e.g. 'serv-nsp', 'serv-parivahan'
+    service_code VARCHAR(64) UNIQUE NOT NULL, -- e.g. 'NSP', 'SARATHI-DL'
+    name VARCHAR(255) NOT NULL,
+    department VARCHAR(255) NOT NULL,
+    ministry VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(64) NOT NULL, -- 'education', 'transport', 'agriculture', 'welfare', 'revenue'
+    state VARCHAR(64) DEFAULT 'ALL_INDIA',
+    required_document_type_ids TEXT[] DEFAULT '{}',
+    required_documents JSONB DEFAULT '[]',
+    benefits JSONB DEFAULT '[]',
+    eligibility JSONB DEFAULT '[]',
+    sla_days INTEGER DEFAULT 15,
+    fee_inr NUMERIC(10, 2) DEFAULT 0.00,
+    status VARCHAR(32) DEFAULT 'AVAILABLE', -- 'AVAILABLE', 'SANDBOX_PROTOTYPE', 'MAINTENANCE'
+    official_portal VARCHAR(512),
+    is_popular BOOLEAN DEFAULT FALSE,
+    featured BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_services_category ON government_services(category);
+CREATE INDEX IF NOT EXISTS idx_services_status ON government_services(status);
+CREATE INDEX IF NOT EXISTS idx_services_code ON government_services(service_code);
+
+

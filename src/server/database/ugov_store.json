@@ -226,6 +226,86 @@
       "createdAt": "2026-09-04T09:14:01.389Z",
       "updatedAt": "2026-09-04T09:14:01.389Z",
       "lastLoginAt": "2026-09-04T09:14:01.389Z"
+    },
+    {
+      "id": "usr-1788513539197-231",
+      "identifier": "citizen_1788513539136@domain.com",
+      "passwordHash": "91d7527f67d69ffb18b5bd2d9d1d2afbbb8c45f4da34ce7e74266257e2030402f87dc9774be4f17971ba7d43d05035d0bc53d0df5e4c8d72fa456ff9ed741b6e",
+      "salt": "345b99201f69eb7428784dfbcd2ba777",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:18:59.198Z",
+      "updatedAt": "2026-09-04T09:18:59.334Z",
+      "lastLoginAt": "2026-09-04T09:18:59.333Z"
+    },
+    {
+      "id": "usr-1788513539976-423",
+      "identifier": "citizen_a_1788513539914@test.gov.in",
+      "passwordHash": "bc6f3c2eadf365ed9a3aa845a492ea5e97431ff22abe93d9012a133ac459a71415aa504d0cbd79d9ad452ce5e65fc229c48dd02acd77c9961fad9c360e56c839",
+      "salt": "08b97136aaac029a2293821e5bca868c",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:18:59.976Z",
+      "updatedAt": "2026-09-04T09:18:59.976Z",
+      "lastLoginAt": "2026-09-04T09:18:59.976Z"
+    },
+    {
+      "id": "usr-1788513540029-885",
+      "identifier": "citizen_b_1788513539982@test.gov.in",
+      "passwordHash": "2ac91347549c779b1eaea27f8253f06ec8bd9f646b7c2255bcaf2321b5ff6246af133c941b75e109025251e2116171a0938cceac33f77b979a9d9eeea12a658e",
+      "salt": "6a7dcbd44f9ec94f53d6fe61e83d21e2",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:19:00.029Z",
+      "updatedAt": "2026-09-04T09:19:00.029Z",
+      "lastLoginAt": "2026-09-04T09:19:00.029Z"
+    },
+    {
+      "id": "usr-1788513830423-814",
+      "identifier": "citizen_services_1788513830346@test.gov.in",
+      "passwordHash": "ffd0598113bcf8b130e0561e757f75b501554376ecb6da29d2d99b942f54b40bb5e209d5f7878e1003f6d8f2370ef927576aaf6b9f9652e31019b39aec719909",
+      "salt": "d2e120ccf62d8d24323480fe7574a910",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:23:50.423Z",
+      "updatedAt": "2026-09-04T09:23:50.423Z",
+      "lastLoginAt": "2026-09-04T09:23:50.423Z"
+    },
+    {
+      "id": "usr-1788513853457-684",
+      "identifier": "citizen_1788513853398@domain.com",
+      "passwordHash": "d4e867ba12153240851b312ff194be1fe61f8adeb32497fc4ed01e951c9fd8dc0dec03c75117486bba694d24bd17dd45dec5f7132a26165a28a3e6cbe0b9205c",
+      "salt": "778d5523b0f9d6c44566bc92ec6bccaf",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:24:13.457Z",
+      "updatedAt": "2026-09-04T09:24:13.578Z",
+      "lastLoginAt": "2026-09-04T09:24:13.576Z"
+    },
+    {
+      "id": "usr-1788513854266-612",
+      "identifier": "citizen_a_1788513854215@test.gov.in",
+      "passwordHash": "3131232f46dc99cd597314da4adc0bf4bb94baea4cbc3032516ba09f3f700916d099542543563f1b24c39842731d783b5a9786bd27e183f8fa11fd8a99069f40",
+      "salt": "e7ec63778883d8e3a87a5f353eaa9ab8",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:24:14.266Z",
+      "updatedAt": "2026-09-04T09:24:14.266Z",
+      "lastLoginAt": "2026-09-04T09:24:14.266Z"
+    },
+    {
+      "id": "usr-1788513854314-203",
+      "identifier": "citizen_b_1788513854274@test.gov.in",
+      "passwordHash": "6b0b7ed727b1cf1911e9682613e27b71ad02da4a75f2c565fcb3f9ebe28ddb3ba00a9985caf085c51f46361f754cc020cf203629c8b60637afbf0065d8663627",
+      "salt": "83add2a6c8b952264f005e5aa3feaa7c",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:24:14.314Z",
+      "updatedAt": "2026-09-04T09:24:14.314Z",
+      "lastLoginAt": "2026-09-04T09:24:14.314Z"
+    },
+    {
+      "id": "usr-1788513855322-248",
+      "identifier": "citizen_services_1788513855248@test.gov.in",
+      "passwordHash": "c94965550981334d396bae51b64d4fa8eb7aa6e0ce748d0754711e6cc24e4096209a39f3572bcaa90303cbd6389d907d77644c56ba5a32b3a8e65a887dc3afbe",
+      "salt": "edcd1998db1158ce343b01c9cd52deef",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T09:24:15.322Z",
+      "updatedAt": "2026-09-04T09:24:15.322Z",
+      "lastLoginAt": "2026-09-04T09:24:15.322Z"
     }
   ],
   "profiles": [
@@ -550,6 +630,118 @@
       "district": "Pune",
       "createdAt": "2026-09-04T09:14:01.389Z",
       "updatedAt": "2026-09-04T09:14:01.389Z"
+    },
+    {
+      "id": "prof-1788513539198",
+      "userId": "usr-1788513539197-231",
+      "displayName": "Anjali Kadam (Updated)",
+      "phone": "+91 99887 76655",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Satara",
+      "createdAt": "2026-09-04T09:18:59.198Z",
+      "updatedAt": "2026-09-04T09:18:59.370Z"
+    },
+    {
+      "id": "prof-1788513539976",
+      "userId": "usr-1788513539976-423",
+      "displayName": "Citizen Alpha",
+      "phone": "+91 91111 22222",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Pune",
+      "createdAt": "2026-09-04T09:18:59.976Z",
+      "updatedAt": "2026-09-04T09:18:59.976Z"
+    },
+    {
+      "id": "prof-1788513540029",
+      "userId": "usr-1788513540029-885",
+      "displayName": "Citizen Beta",
+      "phone": "+91 93333 44444",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Pune",
+      "createdAt": "2026-09-04T09:19:00.029Z",
+      "updatedAt": "2026-09-04T09:19:00.029Z"
+    },
+    {
+      "id": "prof-1788513830423",
+      "userId": "usr-1788513830423-814",
+      "displayName": "Sushant V. Patil",
+      "phone": "+91 94444 55555",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Kolhapur",
+      "createdAt": "2026-09-04T09:23:50.423Z",
+      "updatedAt": "2026-09-04T09:23:50.423Z"
+    },
+    {
+      "id": "prof-1788513853457",
+      "userId": "usr-1788513853457-684",
+      "displayName": "Anjali Kadam (Updated)",
+      "phone": "+91 99887 76655",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Satara",
+      "createdAt": "2026-09-04T09:24:13.457Z",
+      "updatedAt": "2026-09-04T09:24:13.602Z"
+    },
+    {
+      "id": "prof-1788513854266",
+      "userId": "usr-1788513854266-612",
+      "displayName": "Citizen Alpha",
+      "phone": "+91 91111 22222",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Pune",
+      "createdAt": "2026-09-04T09:24:14.266Z",
+      "updatedAt": "2026-09-04T09:24:14.266Z"
+    },
+    {
+      "id": "prof-1788513854314",
+      "userId": "usr-1788513854314-203",
+      "displayName": "Citizen Beta",
+      "phone": "+91 93333 44444",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Pune",
+      "createdAt": "2026-09-04T09:24:14.314Z",
+      "updatedAt": "2026-09-04T09:24:14.314Z"
+    },
+    {
+      "id": "prof-1788513855322",
+      "userId": "usr-1788513855322-248",
+      "displayName": "Sushant V. Patil",
+      "phone": "+91 94444 55555",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Kolhapur",
+      "createdAt": "2026-09-04T09:24:15.322Z",
+      "updatedAt": "2026-09-04T09:24:15.322Z"
     }
   ],
   "roles": [
@@ -697,6 +889,38 @@
     },
     {
       "userId": "usr-1788513241389-264",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513539197-231",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513539976-423",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513540029-885",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513830423-814",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513853457-684",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513854266-612",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513854314-203",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788513855322-248",
       "roleId": "CITIZEN"
     }
   ],
@@ -1337,6 +1561,162 @@
       "tokenHash": "679fe052648ec8f0f6300b0982be01b8f9ae28c011e66ec56d8e57f50de03aae",
       "createdAt": "2026-09-04T09:14:01.389Z",
       "expiresAt": "2026-09-11T09:14:01.390Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-test-1788513538528",
+      "userId": "usr-test-session",
+      "tokenHash": "9017dc43d9b05ec0f7b027dfb8f80338a5c7994930da70e7e6909807407e317e",
+      "createdAt": "2026-09-04T09:18:58.526Z",
+      "expiresAt": "2026-09-04T10:18:58.527Z",
+      "revokedAt": "2026-09-04T09:18:58.529Z"
+    },
+    {
+      "id": "sess-expired-1788513538534",
+      "userId": "usr-test-session",
+      "tokenHash": "8453e3cf134b8ff8d7de872a9bc5fa0b0f0a541505059ae4d77c88c7735e9573",
+      "createdAt": "2026-09-04T07:18:58.534Z",
+      "expiresAt": "2026-09-04T08:18:58.533Z"
+    },
+    {
+      "id": "sess-bulk-1-1788513538535",
+      "userId": "usr-bulk-test",
+      "tokenHash": "8b03ef0140f825791d26ecb9d05d1cea1cd62cc2dd169f45f5845da81542c396",
+      "createdAt": "2026-09-04T09:18:58.526Z",
+      "expiresAt": "2026-09-04T10:18:58.527Z",
+      "revokedAt": "2026-09-04T09:18:58.537Z"
+    },
+    {
+      "id": "sess-bulk-2-1788513538536",
+      "userId": "usr-bulk-test",
+      "tokenHash": "41933b95cbb3b91e104312208faf72cb77e90e1821d3fe54fbe4b785fba4aa3a",
+      "createdAt": "2026-09-04T09:18:58.526Z",
+      "expiresAt": "2026-09-04T10:18:58.527Z",
+      "revokedAt": "2026-09-04T09:18:58.537Z"
+    },
+    {
+      "id": "sess-1788513539199",
+      "userId": "usr-1788513539197-231",
+      "tokenHash": "476e5daf78a018c239ce54f92cf68a26a6c0e7b6f2c10f0d0ce021c8aaf8fdaf",
+      "createdAt": "2026-09-04T09:18:59.198Z",
+      "expiresAt": "2026-09-11T09:18:59.199Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T09:18:59.400Z"
+    },
+    {
+      "id": "sess-1788513539333",
+      "userId": "usr-1788513539197-231",
+      "tokenHash": "ab652c6aeb14c082fd95d3e2ce9537871ee5b0b817f61511a2a4be4f9f721873",
+      "createdAt": "2026-09-04T09:18:59.333Z",
+      "expiresAt": "2026-09-11T09:18:59.333Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T09:18:59.400Z"
+    },
+    {
+      "id": "sess-1788513539978",
+      "userId": "usr-1788513539976-423",
+      "tokenHash": "081f8187c6c74aa8312837b16e038a6feef4aa57822544dfad5960b2dd8f7eb6",
+      "createdAt": "2026-09-04T09:18:59.976Z",
+      "expiresAt": "2026-09-11T09:18:59.978Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-1788513540031",
+      "userId": "usr-1788513540029-885",
+      "tokenHash": "3097ad2fa55080e77b07f7113d8fd296e8b80ae73e8f2f9081fe209f68c48a1a",
+      "createdAt": "2026-09-04T09:19:00.029Z",
+      "expiresAt": "2026-09-11T09:19:00.031Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-1788513830426",
+      "userId": "usr-1788513830423-814",
+      "tokenHash": "dd2f9109062daabe0edac7f5a97078b2dffc91bddb3fe173184f86c10f390868",
+      "createdAt": "2026-09-04T09:23:50.423Z",
+      "expiresAt": "2026-09-11T09:23:50.426Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-test-1788513852774",
+      "userId": "usr-test-session",
+      "tokenHash": "2c778c432ae65426961721fb9290280079f1e007499ea0de7575d9eaa6a9f4fa",
+      "createdAt": "2026-09-04T09:24:12.773Z",
+      "expiresAt": "2026-09-04T10:24:12.774Z",
+      "revokedAt": "2026-09-04T09:24:12.776Z"
+    },
+    {
+      "id": "sess-expired-1788513852784",
+      "userId": "usr-test-session",
+      "tokenHash": "c4deaae6dd2db294fa0d0a0b8fc790b4ea0f7f320b214d19587cf7aaa9082375",
+      "createdAt": "2026-09-04T07:24:12.784Z",
+      "expiresAt": "2026-09-04T08:24:12.784Z"
+    },
+    {
+      "id": "sess-bulk-1-1788513852786",
+      "userId": "usr-bulk-test",
+      "tokenHash": "26b29c833adc5581fff03f8cf47c02cbfb5a146e672740578ffc48b21bb8419e",
+      "createdAt": "2026-09-04T09:24:12.773Z",
+      "expiresAt": "2026-09-04T10:24:12.774Z",
+      "revokedAt": "2026-09-04T09:24:12.791Z"
+    },
+    {
+      "id": "sess-bulk-2-1788513852789",
+      "userId": "usr-bulk-test",
+      "tokenHash": "589013db02f28e755eb756bcf7a72107b91564a3c7c839c82cfe771008bfbf07",
+      "createdAt": "2026-09-04T09:24:12.773Z",
+      "expiresAt": "2026-09-04T10:24:12.774Z",
+      "revokedAt": "2026-09-04T09:24:12.791Z"
+    },
+    {
+      "id": "sess-1788513853460",
+      "userId": "usr-1788513853457-684",
+      "tokenHash": "08ac0e6b3799ce1ba5081efc7a89c3e839da3772394d93802c20635262214cb7",
+      "createdAt": "2026-09-04T09:24:13.457Z",
+      "expiresAt": "2026-09-11T09:24:13.460Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T09:24:13.663Z"
+    },
+    {
+      "id": "sess-1788513853576",
+      "userId": "usr-1788513853457-684",
+      "tokenHash": "a397672c12ed8a1f8d3b6c1cb7b3421aec753948e091468d62d750e8ba917399",
+      "createdAt": "2026-09-04T09:24:13.576Z",
+      "expiresAt": "2026-09-11T09:24:13.576Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T09:24:13.663Z"
+    },
+    {
+      "id": "sess-1788513854269",
+      "userId": "usr-1788513854266-612",
+      "tokenHash": "d583dd18e7b2f766e4f1c9802053a8586762f2c5ed4ec9956b06f7c749491c1d",
+      "createdAt": "2026-09-04T09:24:14.266Z",
+      "expiresAt": "2026-09-11T09:24:14.269Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-1788513854316",
+      "userId": "usr-1788513854314-203",
+      "tokenHash": "c99aaa68667bc7617220ba76dc7cda0ddba688285148f125f6486f5e5802a0ae",
+      "createdAt": "2026-09-04T09:24:14.314Z",
+      "expiresAt": "2026-09-11T09:24:14.315Z",
+      "ipAddress": "::1",
+      "userAgent": "node"
+    },
+    {
+      "id": "sess-1788513855324",
+      "userId": "usr-1788513855322-248",
+      "tokenHash": "31c8c939a82dc5a3dc384aeea8ade5c776c0848e2c65cc4182dd96fe1b05ec38",
+      "createdAt": "2026-09-04T09:24:15.322Z",
+      "expiresAt": "2026-09-11T09:24:15.324Z",
       "ipAddress": "::1",
       "userAgent": "node"
     }
@@ -2868,6 +3248,618 @@
       "ipAddress": "::1",
       "prevHash": "7a0a6c49e64b757bcaea507f55d797543684ac5a42849cee25678283a70f2c22",
       "hash": "eb47ff2b1f6f7e27605b4b7a5e00409d8d4befb15676e9b160ff5eda88639d78"
+    },
+    {
+      "id": "aud-test-1788513538531",
+      "timestamp": "2026-09-04T09:18:58.531Z",
+      "actorName": "Test Suite Actor",
+      "actorRole": "Test Runner",
+      "action": "SECURITY_TEST_EXECUTION",
+      "resource": "Auth Test Suite",
+      "result": "SUCCESS",
+      "context": "Automated verification of Phase 2 security contracts",
+      "prevHash": "eb47ff2b1f6f7e27605b4b7a5e00409d8d4befb15676e9b160ff5eda88639d78",
+      "hash": "ee53d6ac0664860d22b178263b90e718ba8234aabb51dc6bd7e0688f58228a0f"
+    },
+    {
+      "id": "aud-1788513539200-reg",
+      "timestamp": "2026-09-04T09:18:59.198Z",
+      "actorId": "usr-1788513539197-231",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_1788513539136@domain.com",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "ee53d6ac0664860d22b178263b90e718ba8234aabb51dc6bd7e0688f58228a0f",
+      "hash": "7a4cffb78013a463cebdae4f65d38acfa24cc96313886a2c4fdd11c9c74d4f04"
+    },
+    {
+      "id": "aud-1788513539272-fail",
+      "timestamp": "2026-09-04T09:18:59.272Z",
+      "actorId": "usr-1788513539197-231",
+      "actorName": "citizen_1788513539136@domain.com",
+      "actorRole": "Citizen",
+      "action": "FAILED_LOGIN_ATTEMPT",
+      "resource": "National Gateway Login",
+      "result": "FAILED",
+      "context": "Password verification failed",
+      "ipAddress": "::1",
+      "prevHash": "7a4cffb78013a463cebdae4f65d38acfa24cc96313886a2c4fdd11c9c74d4f04",
+      "hash": "fd8f22b5d7f0363daec02012ac19d2c2b74cd4b0dfefbf9eda0d1719cf93129b"
+    },
+    {
+      "id": "aud-1788513539334-login",
+      "timestamp": "2026-09-04T09:18:59.333Z",
+      "actorId": "usr-1788513539197-231",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "CITIZEN",
+      "action": "CITIZEN_LOGIN",
+      "resource": "National Gateway Session",
+      "result": "SUCCESS",
+      "context": "Authenticated successfully via password verification",
+      "ipAddress": "::1",
+      "prevHash": "fd8f22b5d7f0363daec02012ac19d2c2b74cd4b0dfefbf9eda0d1719cf93129b",
+      "hash": "c66763388457c0eb3cda217ad52d55bed0b01adda860bfaac3616cdb8199e8e1"
+    },
+    {
+      "id": "aud-1788513539371-prof",
+      "timestamp": "2026-09-04T09:18:59.371Z",
+      "actorId": "usr-1788513539197-231",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "PROFILE_UPDATE",
+      "resource": "Citizen Profile",
+      "result": "SUCCESS",
+      "context": "Citizen updated profile attributes: displayName, district",
+      "ipAddress": "::1",
+      "prevHash": "c66763388457c0eb3cda217ad52d55bed0b01adda860bfaac3616cdb8199e8e1",
+      "hash": "e8769959a14c3c85c7033a72ec83ba493190f3ef4e3713fb2912c2a31ae53c57"
+    },
+    {
+      "id": "aud-1788513539401-revall",
+      "timestamp": "2026-09-04T09:18:59.401Z",
+      "actorId": "usr-1788513539197-231",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "ALL_SESSIONS_REVOKED",
+      "resource": "All Active Sessions",
+      "result": "SUCCESS",
+      "context": "Citizen terminated all active sessions across all devices",
+      "ipAddress": "::1",
+      "prevHash": "e8769959a14c3c85c7033a72ec83ba493190f3ef4e3713fb2912c2a31ae53c57",
+      "hash": "82a892996724fc3159277043b2ef29ae47946c46ef18e3ab85e2301490dcfb6f"
+    },
+    {
+      "id": "aud-1788513539978-reg",
+      "timestamp": "2026-09-04T09:18:59.976Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_a_1788513539914@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "82a892996724fc3159277043b2ef29ae47946c46ef18e3ab85e2301490dcfb6f",
+      "hash": "718ee43216afddea077aba5d574840fbcdd403640b3cd25367592dd5eb288972"
+    },
+    {
+      "id": "aud-1788513540032-reg",
+      "timestamp": "2026-09-04T09:19:00.029Z",
+      "actorId": "usr-1788513540029-885",
+      "actorName": "Citizen Beta",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_b_1788513539982@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "718ee43216afddea077aba5d574840fbcdd403640b3cd25367592dd5eb288972",
+      "hash": "de9cb3c7da20e8c0dbbb596e72c3164b8c2b515ba70f6e1f26fd2c343f2babd6"
+    },
+    {
+      "id": "aud-1788513540056-docup",
+      "timestamp": "2026-09-04T09:19:00.055Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513540055-be3d7f19)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: de1ec1d7254c1580...",
+      "ipAddress": "::1",
+      "prevHash": "de9cb3c7da20e8c0dbbb596e72c3164b8c2b515ba70f6e1f26fd2c343f2babd6",
+      "hash": "8143d0e2b7a5c4ea9205351f48240d8cbde58830e217f8cd8f395c762c237f57"
+    },
+    {
+      "id": "aud-1788513540103-integ",
+      "timestamp": "2026-09-04T09:19:00.103Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_INTEGRITY_VERIFIED",
+      "resource": "Document Aadhaar Card (doc-1788513540055-be3d7f19)",
+      "result": "SUCCESS",
+      "context": "Integrity check against mathematical SHA-256 checksum: PASS",
+      "ipAddress": "::1",
+      "prevHash": "8143d0e2b7a5c4ea9205351f48240d8cbde58830e217f8cd8f395c762c237f57",
+      "hash": "553ac3448727fcc9acc97fc42fc0942101a09245292e1bd464789c575f0d3cdd"
+    },
+    {
+      "id": "aud-1788513540107-docdl",
+      "timestamp": "2026-09-04T09:19:00.107Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Owner",
+      "action": "DOCUMENT_DOWNLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513540055-be3d7f19)",
+      "result": "SUCCESS",
+      "context": "Streamed encrypted private vault binary with verified SHA-256 integrity.",
+      "ipAddress": "::1",
+      "prevHash": "553ac3448727fcc9acc97fc42fc0942101a09245292e1bd464789c575f0d3cdd",
+      "hash": "b282d478d64be362bcfa34f497fdf7609b4a3c74f207e525a287da6b03d7a0ac"
+    },
+    {
+      "id": "aud-1788513540115-integ",
+      "timestamp": "2026-09-04T09:19:00.115Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_INTEGRITY_FAILED",
+      "resource": "Document Aadhaar Card (doc-1788513540055-be3d7f19)",
+      "result": "FAILED",
+      "context": "Integrity check against mathematical SHA-256 checksum: FAIL",
+      "ipAddress": "::1",
+      "prevHash": "b282d478d64be362bcfa34f497fdf7609b4a3c74f207e525a287da6b03d7a0ac",
+      "hash": "bc845f3160a230506058772c3756c52ef5ea11dcf61ef1438fc94cea56dadfb1"
+    },
+    {
+      "id": "aud-1788513540130-integfail",
+      "timestamp": "2026-09-04T09:19:00.130Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Security Monitor",
+      "action": "DOCUMENT_INTEGRITY_FAILED",
+      "resource": "Document doc-1788513540055-be3d7f19",
+      "result": "BLOCKED",
+      "context": "ALERT: Stored checksum (de1ec1d7254c1580578aa20a7054eaf08e663664477b4c693ee7410f2a594b43) does not match live file checksum (46a28057d991776d008191b584eccbaa25b80a96a0ba23d57cd71c61a65a41e3).",
+      "ipAddress": "::1",
+      "prevHash": "bc845f3160a230506058772c3756c52ef5ea11dcf61ef1438fc94cea56dadfb1",
+      "hash": "a0e6a49e6f059b879242bcf52470b9ba4afa71beb3496854f71ba2050ef94d45"
+    },
+    {
+      "id": "aud-1788513540134-cstgrant",
+      "timestamp": "2026-09-04T09:19:00.134Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "CONSENT_CREATED",
+      "resource": "Consent for Aadhaar Card -> Department of Higher Education",
+      "result": "SUCCESS",
+      "context": "Granted time-bound access (14 days) for purpose: \"National Scholarship Portal KYC Verification\".",
+      "ipAddress": "::1",
+      "prevHash": "a0e6a49e6f059b879242bcf52470b9ba4afa71beb3496854f71ba2050ef94d45",
+      "hash": "9ed89bdebe5407eaea7294bcbcbb3bd9076f262388b11b5392c1ec39ac5b823f"
+    },
+    {
+      "id": "aud-1788513540191-cstrev",
+      "timestamp": "2026-09-04T09:19:00.191Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "CONSENT_REVOKED",
+      "resource": "Consent cst-1788513540134-d68d351c",
+      "result": "SUCCESS",
+      "context": "Citizen unilaterally revoked department access consent immediately.",
+      "ipAddress": "::1",
+      "prevHash": "9ed89bdebe5407eaea7294bcbcbb3bd9076f262388b11b5392c1ec39ac5b823f",
+      "hash": "d91990e33d89f57a2ea482313af2c4dd010798934fb4216f03e6d24343e69451"
+    },
+    {
+      "id": "aud-1788513540225-docdel",
+      "timestamp": "2026-09-04T09:19:00.225Z",
+      "actorId": "usr-1788513539976-423",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Owner",
+      "action": "DOCUMENT_DELETED",
+      "resource": "Document Aadhaar Card (doc-1788513540055-be3d7f19)",
+      "result": "SUCCESS",
+      "context": "Citizen permanently deleted document and purged binary from private vault.",
+      "ipAddress": "::1",
+      "prevHash": "d91990e33d89f57a2ea482313af2c4dd010798934fb4216f03e6d24343e69451",
+      "hash": "761be8d4d326a08d55cdec543defafc63af52de9fea61e608e72450ec128f3a5"
+    },
+    {
+      "id": "aud-1788513830428-reg",
+      "timestamp": "2026-09-04T09:23:50.423Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_services_1788513830346@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "761be8d4d326a08d55cdec543defafc63af52de9fea61e608e72450ec128f3a5",
+      "hash": "00f12eeaf4049e3b1c5b06f1a8d6b8330c604b3095061c449bdf232de62d2adf"
+    },
+    {
+      "id": "aud-1788513830433-servreq",
+      "timestamp": "2026-09-04T09:23:50.433Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 0/2 documents satisfied in private vault. Readiness: 0%.",
+      "ipAddress": "::1",
+      "prevHash": "00f12eeaf4049e3b1c5b06f1a8d6b8330c604b3095061c449bdf232de62d2adf",
+      "hash": "1dba0f28ca1ba4ce9c929dc02d0ac700a81ebbb29f4a48cf2305e8d1a1c49bd9"
+    },
+    {
+      "id": "aud-1788513830442-docup",
+      "timestamp": "2026-09-04T09:23:50.441Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513830441-91d6062b)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: 76eb1bd517cdf061...",
+      "ipAddress": "::1",
+      "prevHash": "1dba0f28ca1ba4ce9c929dc02d0ac700a81ebbb29f4a48cf2305e8d1a1c49bd9",
+      "hash": "252110f031b6bdec27f1f8056f032165fd5f2ec8351fb6da01da6835aab0b0f0"
+    },
+    {
+      "id": "aud-1788513830453-servreq",
+      "timestamp": "2026-09-04T09:23:50.453Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 1/2 documents satisfied in private vault. Readiness: 50%.",
+      "ipAddress": "::1",
+      "prevHash": "252110f031b6bdec27f1f8056f032165fd5f2ec8351fb6da01da6835aab0b0f0",
+      "hash": "31494d89a6982e8c5aeefa746d43d38e05863d6194eb2859761d1689bcb51bb1"
+    },
+    {
+      "id": "aud-1788513830461-docup",
+      "timestamp": "2026-09-04T09:23:50.459Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document State Domicile Certificate (doc-1788513830459-b7bbcea1)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: 69477dc71c0cb267...",
+      "ipAddress": "::1",
+      "prevHash": "31494d89a6982e8c5aeefa746d43d38e05863d6194eb2859761d1689bcb51bb1",
+      "hash": "9e6fba12806729286e3d62e6e65645a868c1e9b6e6d072695d3a9f86befb8e0c"
+    },
+    {
+      "id": "aud-1788513830468-servreq",
+      "timestamp": "2026-09-04T09:23:50.468Z",
+      "actorId": "usr-1788513830423-814",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 2/2 documents satisfied in private vault. Readiness: 100%.",
+      "ipAddress": "::1",
+      "prevHash": "9e6fba12806729286e3d62e6e65645a868c1e9b6e6d072695d3a9f86befb8e0c",
+      "hash": "3b4eed451225232c4fc987b1b0beadf3332021392d66ba511ad964f1bb73cadb"
+    },
+    {
+      "id": "aud-test-1788513852779",
+      "timestamp": "2026-09-04T09:24:12.779Z",
+      "actorName": "Test Suite Actor",
+      "actorRole": "Test Runner",
+      "action": "SECURITY_TEST_EXECUTION",
+      "resource": "Auth Test Suite",
+      "result": "SUCCESS",
+      "context": "Automated verification of Phase 2 security contracts",
+      "prevHash": "3b4eed451225232c4fc987b1b0beadf3332021392d66ba511ad964f1bb73cadb",
+      "hash": "1a13fdb570d940e670e7f193de92eaa48861f5dff6542fcf7fe89e38212ceee3"
+    },
+    {
+      "id": "aud-1788513853462-reg",
+      "timestamp": "2026-09-04T09:24:13.457Z",
+      "actorId": "usr-1788513853457-684",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_1788513853398@domain.com",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "1a13fdb570d940e670e7f193de92eaa48861f5dff6542fcf7fe89e38212ceee3",
+      "hash": "b043cf66ebdaf4ec87e55597e6d849e7bee43aed82043250ec53ab04c1bee0db"
+    },
+    {
+      "id": "aud-1788513853530-fail",
+      "timestamp": "2026-09-04T09:24:13.530Z",
+      "actorId": "usr-1788513853457-684",
+      "actorName": "citizen_1788513853398@domain.com",
+      "actorRole": "Citizen",
+      "action": "FAILED_LOGIN_ATTEMPT",
+      "resource": "National Gateway Login",
+      "result": "FAILED",
+      "context": "Password verification failed",
+      "ipAddress": "::1",
+      "prevHash": "b043cf66ebdaf4ec87e55597e6d849e7bee43aed82043250ec53ab04c1bee0db",
+      "hash": "aef89924825f456cdf0c8a6d5686e55edee6dafcc5966114b5609d22a2e11f73"
+    },
+    {
+      "id": "aud-1788513853579-login",
+      "timestamp": "2026-09-04T09:24:13.576Z",
+      "actorId": "usr-1788513853457-684",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "CITIZEN",
+      "action": "CITIZEN_LOGIN",
+      "resource": "National Gateway Session",
+      "result": "SUCCESS",
+      "context": "Authenticated successfully via password verification",
+      "ipAddress": "::1",
+      "prevHash": "aef89924825f456cdf0c8a6d5686e55edee6dafcc5966114b5609d22a2e11f73",
+      "hash": "6df572656e7df89d82fae2bf60be898898452cd48e0be07ef391d7a46ea9455d"
+    },
+    {
+      "id": "aud-1788513853603-prof",
+      "timestamp": "2026-09-04T09:24:13.603Z",
+      "actorId": "usr-1788513853457-684",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "PROFILE_UPDATE",
+      "resource": "Citizen Profile",
+      "result": "SUCCESS",
+      "context": "Citizen updated profile attributes: displayName, district",
+      "ipAddress": "::1",
+      "prevHash": "6df572656e7df89d82fae2bf60be898898452cd48e0be07ef391d7a46ea9455d",
+      "hash": "db5e6115f50ac933b9586be6f24991a3b0cf19c037fed59859fb5f7031513b1f"
+    },
+    {
+      "id": "aud-1788513853664-revall",
+      "timestamp": "2026-09-04T09:24:13.664Z",
+      "actorId": "usr-1788513853457-684",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "ALL_SESSIONS_REVOKED",
+      "resource": "All Active Sessions",
+      "result": "SUCCESS",
+      "context": "Citizen terminated all active sessions across all devices",
+      "ipAddress": "::1",
+      "prevHash": "db5e6115f50ac933b9586be6f24991a3b0cf19c037fed59859fb5f7031513b1f",
+      "hash": "e0f777f25c9007ee0ebfbded96638639fd375529d798ab9d61e6941627d8aacc"
+    },
+    {
+      "id": "aud-1788513854270-reg",
+      "timestamp": "2026-09-04T09:24:14.266Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_a_1788513854215@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "e0f777f25c9007ee0ebfbded96638639fd375529d798ab9d61e6941627d8aacc",
+      "hash": "1fa9e2008020f30ba765ba2811051a588d5abaed03e0948547cf8b35a57f476f"
+    },
+    {
+      "id": "aud-1788513854317-reg",
+      "timestamp": "2026-09-04T09:24:14.314Z",
+      "actorId": "usr-1788513854314-203",
+      "actorName": "Citizen Beta",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_b_1788513854274@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "1fa9e2008020f30ba765ba2811051a588d5abaed03e0948547cf8b35a57f476f",
+      "hash": "6cf5b6953fff61b28ddd3b8b8f36f230a2918f1a252f5cfd30969f7ec72e3cc6"
+    },
+    {
+      "id": "aud-1788513854359-docup",
+      "timestamp": "2026-09-04T09:24:14.351Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513854351-44fb4c63)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: de1ec1d7254c1580...",
+      "ipAddress": "::1",
+      "prevHash": "6cf5b6953fff61b28ddd3b8b8f36f230a2918f1a252f5cfd30969f7ec72e3cc6",
+      "hash": "694a4d14068b6e2fd86a1d42cc89f66c073f3bf495042e79f784da88c0f50c3d"
+    },
+    {
+      "id": "aud-1788513854457-integ",
+      "timestamp": "2026-09-04T09:24:14.457Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_INTEGRITY_VERIFIED",
+      "resource": "Document Aadhaar Card (doc-1788513854351-44fb4c63)",
+      "result": "SUCCESS",
+      "context": "Integrity check against mathematical SHA-256 checksum: PASS",
+      "ipAddress": "::1",
+      "prevHash": "694a4d14068b6e2fd86a1d42cc89f66c073f3bf495042e79f784da88c0f50c3d",
+      "hash": "56ce98c1517d58c3b8541f04ace1b5f3c73e0243a7626d9671b96984768fe25f"
+    },
+    {
+      "id": "aud-1788513854472-docdl",
+      "timestamp": "2026-09-04T09:24:14.472Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Owner",
+      "action": "DOCUMENT_DOWNLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513854351-44fb4c63)",
+      "result": "SUCCESS",
+      "context": "Streamed encrypted private vault binary with verified SHA-256 integrity.",
+      "ipAddress": "::1",
+      "prevHash": "56ce98c1517d58c3b8541f04ace1b5f3c73e0243a7626d9671b96984768fe25f",
+      "hash": "8d191629f89941c482632fc4023a10d3593b71b264f48ccf48dbdbd6f56abd2b"
+    },
+    {
+      "id": "aud-1788513854487-integ",
+      "timestamp": "2026-09-04T09:24:14.487Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_INTEGRITY_FAILED",
+      "resource": "Document Aadhaar Card (doc-1788513854351-44fb4c63)",
+      "result": "FAILED",
+      "context": "Integrity check against mathematical SHA-256 checksum: FAIL",
+      "ipAddress": "::1",
+      "prevHash": "8d191629f89941c482632fc4023a10d3593b71b264f48ccf48dbdbd6f56abd2b",
+      "hash": "a3908db376748dd75c890383ee1fcc2a70b2177923960de681140a1e661807e0"
+    },
+    {
+      "id": "aud-1788513854503-integfail",
+      "timestamp": "2026-09-04T09:24:14.503Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Security Monitor",
+      "action": "DOCUMENT_INTEGRITY_FAILED",
+      "resource": "Document doc-1788513854351-44fb4c63",
+      "result": "BLOCKED",
+      "context": "ALERT: Stored checksum (de1ec1d7254c1580578aa20a7054eaf08e663664477b4c693ee7410f2a594b43) does not match live file checksum (46a28057d991776d008191b584eccbaa25b80a96a0ba23d57cd71c61a65a41e3).",
+      "ipAddress": "::1",
+      "prevHash": "a3908db376748dd75c890383ee1fcc2a70b2177923960de681140a1e661807e0",
+      "hash": "9df6390b95cd1f23167e471222cd502de03ccdbb6d1e7eaa3acfba03d68b7b93"
+    },
+    {
+      "id": "aud-1788513854519-cstgrant",
+      "timestamp": "2026-09-04T09:24:14.517Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "CONSENT_CREATED",
+      "resource": "Consent for Aadhaar Card -> Department of Higher Education",
+      "result": "SUCCESS",
+      "context": "Granted time-bound access (14 days) for purpose: \"National Scholarship Portal KYC Verification\".",
+      "ipAddress": "::1",
+      "prevHash": "9df6390b95cd1f23167e471222cd502de03ccdbb6d1e7eaa3acfba03d68b7b93",
+      "hash": "f17f48ad327ff599a1716811643d8fc514d18354b16d3bb6d7e3afa0ce5bc32f"
+    },
+    {
+      "id": "aud-1788513854581-cstrev",
+      "timestamp": "2026-09-04T09:24:14.581Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Citizen",
+      "action": "CONSENT_REVOKED",
+      "resource": "Consent cst-1788513854517-15e897bb",
+      "result": "SUCCESS",
+      "context": "Citizen unilaterally revoked department access consent immediately.",
+      "ipAddress": "::1",
+      "prevHash": "f17f48ad327ff599a1716811643d8fc514d18354b16d3bb6d7e3afa0ce5bc32f",
+      "hash": "c03d9db588f232611c2de8f02f3a71729eecbfd6cea92a1e1c4a36c91c15ecc9"
+    },
+    {
+      "id": "aud-1788513854613-docdel",
+      "timestamp": "2026-09-04T09:24:14.613Z",
+      "actorId": "usr-1788513854266-612",
+      "actorName": "Citizen Alpha",
+      "actorRole": "Owner",
+      "action": "DOCUMENT_DELETED",
+      "resource": "Document Aadhaar Card (doc-1788513854351-44fb4c63)",
+      "result": "SUCCESS",
+      "context": "Citizen permanently deleted document and purged binary from private vault.",
+      "ipAddress": "::1",
+      "prevHash": "c03d9db588f232611c2de8f02f3a71729eecbfd6cea92a1e1c4a36c91c15ecc9",
+      "hash": "b0c0fcb0c4b7efe744af0c318f108f0fb228cf8652820a781f59c7207706d17c"
+    },
+    {
+      "id": "aud-1788513855326-reg",
+      "timestamp": "2026-09-04T09:24:15.322Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_services_1788513855248@test.gov.in",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "b0c0fcb0c4b7efe744af0c318f108f0fb228cf8652820a781f59c7207706d17c",
+      "hash": "eee2462a099b6a5a19aa0815851853b1ece38ebb0a7f8a274e00abe737cd51cb"
+    },
+    {
+      "id": "aud-1788513855341-servreq",
+      "timestamp": "2026-09-04T09:24:15.341Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 0/2 documents satisfied in private vault. Readiness: 0%.",
+      "ipAddress": "::1",
+      "prevHash": "eee2462a099b6a5a19aa0815851853b1ece38ebb0a7f8a274e00abe737cd51cb",
+      "hash": "7691a741b840dc749bebf815b233b9d15e3ebdcb5deaf2f9e9d84596986ad8a0"
+    },
+    {
+      "id": "aud-1788513855362-docup",
+      "timestamp": "2026-09-04T09:24:15.360Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document Aadhaar Card (doc-1788513855360-11716e6c)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: 76eb1bd517cdf061...",
+      "ipAddress": "::1",
+      "prevHash": "7691a741b840dc749bebf815b233b9d15e3ebdcb5deaf2f9e9d84596986ad8a0",
+      "hash": "76d4d5320f37e3252ab5a675bbdc1444e3276abb7c58af3a217384f00848cbb7"
+    },
+    {
+      "id": "aud-1788513855371-servreq",
+      "timestamp": "2026-09-04T09:24:15.371Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 1/2 documents satisfied in private vault. Readiness: 50%.",
+      "ipAddress": "::1",
+      "prevHash": "76d4d5320f37e3252ab5a675bbdc1444e3276abb7c58af3a217384f00848cbb7",
+      "hash": "83cb1a60e10ed9e21e95385e3f99539c9a3b7801ed7de3029436910cfe4e3cef"
+    },
+    {
+      "id": "aud-1788513855391-docup",
+      "timestamp": "2026-09-04T09:24:15.389Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "DOCUMENT_UPLOADED",
+      "resource": "Document State Domicile Certificate (doc-1788513855389-3b913aeb)",
+      "result": "SUCCESS",
+      "context": "Citizen deposited credential to private DigiVault. SHA-256: 69477dc71c0cb267...",
+      "ipAddress": "::1",
+      "prevHash": "83cb1a60e10ed9e21e95385e3f99539c9a3b7801ed7de3029436910cfe4e3cef",
+      "hash": "ed53c50c03f0f08b044cc40c59b666722a8acdbd98780a47e8ba41ba86796ff7"
+    },
+    {
+      "id": "aud-1788513855403-servreq",
+      "timestamp": "2026-09-04T09:24:15.403Z",
+      "actorId": "usr-1788513855322-248",
+      "actorName": "Sushant V. Patil",
+      "actorRole": "Citizen",
+      "action": "SERVICE_REQUIREMENTS_CHECKED",
+      "resource": "Service Driving Licence & Learner's Licence (Sarathi) (SARATHI-DL)",
+      "result": "SUCCESS",
+      "context": "Prerequisite evaluation: 2/2 documents satisfied in private vault. Readiness: 100%.",
+      "ipAddress": "::1",
+      "prevHash": "ed53c50c03f0f08b044cc40c59b666722a8acdbd98780a47e8ba41ba86796ff7",
+      "hash": "84e5d2c7f56d274d06ddd4354dfd711e4923e5924e1a58f7e6f053dcdcaddeff"
     }
   ],
   "documentTypes": [
@@ -2938,6 +3930,66 @@
       "verificationStatus": "SELF_ATTESTED",
       "createdAt": "2026-08-01T00:00:00Z",
       "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "doc-1788513830441-91d6062b",
+      "ownerUserId": "usr-1788513830423-814",
+      "documentTypeId": "AADHAAR",
+      "title": "Aadhaar Card",
+      "documentNumber": "4455-6677-8899",
+      "fileName": "my_aadhaar.pdf",
+      "mimeType": "application/pdf",
+      "fileSizeBytes": 64,
+      "storageKey": "f1a6e09f-5fe3-4048-abd0-4be093b38554",
+      "sha256Checksum": "76eb1bd517cdf06104e1f39f3603b4b7dd74addcf6bf5f8c95a3b69b2fbafdc7",
+      "verificationStatus": "SELF_ATTESTED",
+      "createdAt": "2026-09-04T09:23:50.441Z",
+      "updatedAt": "2026-09-04T09:23:50.441Z"
+    },
+    {
+      "id": "doc-1788513830459-b7bbcea1",
+      "ownerUserId": "usr-1788513830423-814",
+      "documentTypeId": "DOMICILE",
+      "title": "State Domicile Certificate",
+      "documentNumber": "DOM-2026-99120",
+      "fileName": "domicile_certificate.pdf",
+      "mimeType": "application/pdf",
+      "fileSizeBytes": 61,
+      "storageKey": "96b34da4-682d-4b42-8e4c-824fbb9c5a55",
+      "sha256Checksum": "69477dc71c0cb26763b98959ba7447758182101e8aa6119fb68036882b5e4a3b",
+      "verificationStatus": "SELF_ATTESTED",
+      "createdAt": "2026-09-04T09:23:50.459Z",
+      "updatedAt": "2026-09-04T09:23:50.459Z"
+    },
+    {
+      "id": "doc-1788513855360-11716e6c",
+      "ownerUserId": "usr-1788513855322-248",
+      "documentTypeId": "AADHAAR",
+      "title": "Aadhaar Card",
+      "documentNumber": "4455-6677-8899",
+      "fileName": "my_aadhaar.pdf",
+      "mimeType": "application/pdf",
+      "fileSizeBytes": 64,
+      "storageKey": "2b6c7be7-3c96-418f-8e1a-1a40ac3829c2",
+      "sha256Checksum": "76eb1bd517cdf06104e1f39f3603b4b7dd74addcf6bf5f8c95a3b69b2fbafdc7",
+      "verificationStatus": "SELF_ATTESTED",
+      "createdAt": "2026-09-04T09:24:15.360Z",
+      "updatedAt": "2026-09-04T09:24:15.360Z"
+    },
+    {
+      "id": "doc-1788513855389-3b913aeb",
+      "ownerUserId": "usr-1788513855322-248",
+      "documentTypeId": "DOMICILE",
+      "title": "State Domicile Certificate",
+      "documentNumber": "DOM-2026-99120",
+      "fileName": "domicile_certificate.pdf",
+      "mimeType": "application/pdf",
+      "fileSizeBytes": 61,
+      "storageKey": "02d3cef2-99d1-4c0e-a2fa-d87de4b191c2",
+      "sha256Checksum": "69477dc71c0cb26763b98959ba7447758182101e8aa6119fb68036882b5e4a3b",
+      "verificationStatus": "SELF_ATTESTED",
+      "createdAt": "2026-09-04T09:24:15.389Z",
+      "updatedAt": "2026-09-04T09:24:15.389Z"
     }
   ],
   "documentConsents": [
@@ -2950,6 +4002,214 @@
       "status": "ACTIVE",
       "grantedAt": "2026-08-15T00:00:00Z",
       "expiresAt": "2026-10-04T09:13:59.737Z"
+    }
+  ],
+  "governmentServices": [
+    {
+      "id": "serv-nsp",
+      "serviceCode": "NSP",
+      "name": "National Scholarship Portal (NSP)",
+      "department": "Department of Higher Education",
+      "ministry": "Ministry of Education",
+      "description": "Direct Benefit Transfer (DBT) for pre-matric, post-matric, and merit-based national scholarships for recognized colleges and universities.",
+      "category": "education",
+      "state": "ALL_INDIA",
+      "requiredDocumentTypeIds": [
+        "AADHAAR",
+        "INCOME_CERT",
+        "MARKSHEET"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document",
+        "Annual Income Certificate (< 1 year old)",
+        "Secondary School Marksheet (10th/12th)"
+      ],
+      "benefits": [
+        "100% course tuition fee waiver directly to verified institution",
+        "Maintenance allowance up to ₹50,000/year for hostellers",
+        "Special incentives for STEM and girl students"
+      ],
+      "eligibility": [
+        "Enrolled in a recognized school, college, or university",
+        "Annual family income below ₹8 Lakh/year",
+        "Minimum 50% marks in previous qualifying examination"
+      ],
+      "slaDays": 21,
+      "fee": 0,
+      "status": "AVAILABLE",
+      "officialPortal": "https://scholarships.gov.in",
+      "isPopular": true,
+      "featured": true,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "serv-parivahan",
+      "serviceCode": "SARATHI-DL",
+      "name": "Driving Licence & Learner's Licence (Sarathi)",
+      "department": "Motor Vehicles Department (RTO)",
+      "ministry": "Ministry of Road Transport and Highways",
+      "description": "Application for Learner's Licence, Permanent Driving Licence, slot booking, address renewal, and digital mParivahan credential integration.",
+      "category": "transport",
+      "state": "ALL_INDIA",
+      "requiredDocumentTypeIds": [
+        "AADHAAR",
+        "DOMICILE"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document",
+        "State Domicile Certificate"
+      ],
+      "benefits": [
+        "Home-based online computer test for Learner's Licence",
+        "QR-coded digital Smart Card Driving Licence",
+        "Instant nationwide validity under Motor Vehicles Act"
+      ],
+      "eligibility": [
+        "Minimum 18 years of age (16 for gearless two-wheelers)",
+        "Passed computer-based road safety screening"
+      ],
+      "slaDays": 14,
+      "fee": 200,
+      "status": "AVAILABLE",
+      "officialPortal": "https://sarathi.parivahan.gov.in",
+      "isPopular": true,
+      "featured": true,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "serv-income",
+      "serviceCode": "INCOME-CERT",
+      "name": "Annual Income Certificate Issuance",
+      "department": "Revenue & Forest Department",
+      "ministry": "Government of Maharashtra",
+      "description": "Statutory certificate issued by the Sub-Divisional Officer / Tahsildar certifying total annual household income for education concessions and welfare.",
+      "category": "revenue",
+      "state": "Maharashtra",
+      "requiredDocumentTypeIds": [
+        "AADHAAR",
+        "PAN"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document",
+        "Permanent Account Number Card"
+      ],
+      "benefits": [
+        "Essential prerequisite for fee concessions, scholarships, and EWS quota",
+        "Valid across all state higher education institutions and welfare schemes"
+      ],
+      "eligibility": [
+        "Resident of Maharashtra with verified local residential record",
+        "Submitted self-declaration and employer salary slip or agricultural revenue slip"
+      ],
+      "slaDays": 7,
+      "fee": 33,
+      "status": "AVAILABLE",
+      "officialPortal": "https://aaplesarkar.mahaonline.gov.in",
+      "isPopular": true,
+      "featured": false,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "serv-domicile",
+      "serviceCode": "DOMICILE-CERT",
+      "name": "State Domicile & Age-Nationality Certificate",
+      "department": "District Magistrate Directorate",
+      "ministry": "State Revenue Department",
+      "description": "Official statutory certificate proving continuous residency in the state for 15+ years, essential for government job quotas and college admissions.",
+      "category": "revenue",
+      "state": "Maharashtra",
+      "requiredDocumentTypeIds": [
+        "AADHAAR",
+        "MARKSHEET"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document",
+        "Secondary School Marksheet (10th/12th)"
+      ],
+      "benefits": [
+        "State quota reservation in professional engineering & medical colleges",
+        "Eligibility for State Public Service Commission (MPSC) examinations"
+      ],
+      "eligibility": [
+        "Continuous residence in Maharashtra for minimum 15 years",
+        "Proof of residence or school attendance within the state"
+      ],
+      "slaDays": 15,
+      "fee": 50,
+      "status": "AVAILABLE",
+      "officialPortal": "https://edistrict.gov.in",
+      "isPopular": true,
+      "featured": false,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "serv-kisan",
+      "serviceCode": "PM-KISAN",
+      "name": "PM-KISAN Samman Nidhi",
+      "department": "Department of Agriculture & Farmers Welfare",
+      "ministry": "Ministry of Agriculture",
+      "description": "Direct income support of ₹6,000 per year in three equal instalments of ₹2,000 transferred directly into bank accounts of landholding farmer families.",
+      "category": "agriculture",
+      "state": "ALL_INDIA",
+      "requiredDocumentTypeIds": [
+        "AADHAAR"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document"
+      ],
+      "benefits": [
+        "₹6,000 annual direct cash transfer via Aadhaar DBT",
+        "Seamless integration with Kisan Credit Card (KCC)"
+      ],
+      "eligibility": [
+        "Small and marginal farmer families with cultivable landholding",
+        "Active Aadhaar e-KYC and land records seeding"
+      ],
+      "slaDays": 14,
+      "fee": 0,
+      "status": "AVAILABLE",
+      "officialPortal": "https://pmkisan.gov.in",
+      "isPopular": true,
+      "featured": true,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
+    },
+    {
+      "id": "serv-ayushman",
+      "serviceCode": "AYUSHMAN-CARD",
+      "name": "Ayushman Bharat PM-JAY Health Coverage",
+      "department": "National Health Authority",
+      "ministry": "Ministry of Health and Family Welfare",
+      "description": "Secondary and tertiary healthcare hospitalisation cover of up to ₹5,00,000 per family per year across 27,000+ empanelled hospitals.",
+      "category": "healthcare",
+      "state": "ALL_INDIA",
+      "requiredDocumentTypeIds": [
+        "AADHAAR",
+        "INCOME_CERT"
+      ],
+      "requiredDocuments": [
+        "Aadhaar Identity Document",
+        "Annual Income Certificate"
+      ],
+      "benefits": [
+        "Cashless and paperless access to healthcare services up to ₹5 Lakhs/year",
+        "Covers pre-existing conditions from day one"
+      ],
+      "eligibility": [
+        "Families identified in Socio-Economic Caste Census (SECC 2011) or state welfare list"
+      ],
+      "slaDays": 3,
+      "fee": 0,
+      "status": "AVAILABLE",
+      "officialPortal": "https://setu.pmjay.gov.in",
+      "isPopular": true,
+      "featured": true,
+      "createdAt": "2026-08-01T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z"
     }
   ]
 }

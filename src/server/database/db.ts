@@ -105,6 +105,29 @@ export interface DocumentConsentRecord {
   revokedAt?: string | null;
 }
 
+export interface GovernmentServiceRecord {
+  id: string;
+  serviceCode: string;
+  name: string;
+  department: string;
+  ministry: string;
+  description: string;
+  category: string;
+  state: string;
+  requiredDocumentTypeIds: string[];
+  requiredDocuments: string[];
+  benefits: string[];
+  eligibility: string[];
+  slaDays: number;
+  fee: number;
+  status: "AVAILABLE" | "SANDBOX_PROTOTYPE" | "MAINTENANCE";
+  officialPortal: string;
+  isPopular?: boolean;
+  featured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   users: UserRecord[];
   profiles: ProfileRecord[];
@@ -117,6 +140,7 @@ interface DatabaseSchema {
   documentTypes: DocumentTypeRecord[];
   citizenDocuments: CitizenDocumentRecord[];
   documentConsents: DocumentConsentRecord[];
+  governmentServices: GovernmentServiceRecord[];
 }
 
 const getDbPath = () => {
@@ -155,6 +179,200 @@ class Database {
       { id: "DOMICILE", name: "State Domicile Certificate", issuingAuthority: "Revenue & Forest Department, Govt of Maharashtra", retentionDays: null },
       { id: "INCOME_CERT", name: "Annual Income Certificate", issuingAuthority: "Tehsildar / Sub-Divisional Officer", retentionDays: 365 },
       { id: "MARKSHEET", name: "Secondary School Marksheet (10th/12th)", issuingAuthority: "State Secondary Education Board", retentionDays: null },
+    ];
+  }
+
+  private getDefaultGovernmentServices(): GovernmentServiceRecord[] {
+    const now = "2026-08-01T00:00:00Z";
+    return [
+      {
+        id: "serv-nsp",
+        serviceCode: "NSP",
+        name: "National Scholarship Portal (NSP)",
+        department: "Department of Higher Education",
+        ministry: "Ministry of Education",
+        description: "Direct Benefit Transfer (DBT) for pre-matric, post-matric, and merit-based national scholarships for recognized colleges and universities.",
+        category: "education",
+        state: "ALL_INDIA",
+        requiredDocumentTypeIds: ["AADHAAR", "INCOME_CERT", "MARKSHEET"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+          "Annual Income Certificate (< 1 year old)",
+          "Secondary School Marksheet (10th/12th)",
+        ],
+        benefits: [
+          "100% course tuition fee waiver directly to verified institution",
+          "Maintenance allowance up to ₹50,000/year for hostellers",
+          "Special incentives for STEM and girl students",
+        ],
+        eligibility: [
+          "Enrolled in a recognized school, college, or university",
+          "Annual family income below ₹8 Lakh/year",
+          "Minimum 50% marks in previous qualifying examination",
+        ],
+        slaDays: 21,
+        fee: 0,
+        status: "AVAILABLE",
+        officialPortal: "https://scholarships.gov.in",
+        isPopular: true,
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "serv-parivahan",
+        serviceCode: "SARATHI-DL",
+        name: "Driving Licence & Learner's Licence (Sarathi)",
+        department: "Motor Vehicles Department (RTO)",
+        ministry: "Ministry of Road Transport and Highways",
+        description: "Application for Learner's Licence, Permanent Driving Licence, slot booking, address renewal, and digital mParivahan credential integration.",
+        category: "transport",
+        state: "ALL_INDIA",
+        requiredDocumentTypeIds: ["AADHAAR", "DOMICILE"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+          "State Domicile Certificate",
+        ],
+        benefits: [
+          "Home-based online computer test for Learner's Licence",
+          "QR-coded digital Smart Card Driving Licence",
+          "Instant nationwide validity under Motor Vehicles Act",
+        ],
+        eligibility: [
+          "Minimum 18 years of age (16 for gearless two-wheelers)",
+          "Passed computer-based road safety screening",
+        ],
+        slaDays: 14,
+        fee: 200,
+        status: "AVAILABLE",
+        officialPortal: "https://sarathi.parivahan.gov.in",
+        isPopular: true,
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "serv-income",
+        serviceCode: "INCOME-CERT",
+        name: "Annual Income Certificate Issuance",
+        department: "Revenue & Forest Department",
+        ministry: "Government of Maharashtra",
+        description: "Statutory certificate issued by the Sub-Divisional Officer / Tahsildar certifying total annual household income for education concessions and welfare.",
+        category: "revenue",
+        state: "Maharashtra",
+        requiredDocumentTypeIds: ["AADHAAR", "PAN"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+          "Permanent Account Number Card",
+        ],
+        benefits: [
+          "Essential prerequisite for fee concessions, scholarships, and EWS quota",
+          "Valid across all state higher education institutions and welfare schemes",
+        ],
+        eligibility: [
+          "Resident of Maharashtra with verified local residential record",
+          "Submitted self-declaration and employer salary slip or agricultural revenue slip",
+        ],
+        slaDays: 7,
+        fee: 33,
+        status: "AVAILABLE",
+        officialPortal: "https://aaplesarkar.mahaonline.gov.in",
+        isPopular: true,
+        featured: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "serv-domicile",
+        serviceCode: "DOMICILE-CERT",
+        name: "State Domicile & Age-Nationality Certificate",
+        department: "District Magistrate Directorate",
+        ministry: "State Revenue Department",
+        description: "Official statutory certificate proving continuous residency in the state for 15+ years, essential for government job quotas and college admissions.",
+        category: "revenue",
+        state: "Maharashtra",
+        requiredDocumentTypeIds: ["AADHAAR", "MARKSHEET"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+          "Secondary School Marksheet (10th/12th)",
+        ],
+        benefits: [
+          "State quota reservation in professional engineering & medical colleges",
+          "Eligibility for State Public Service Commission (MPSC) examinations",
+        ],
+        eligibility: [
+          "Continuous residence in Maharashtra for minimum 15 years",
+          "Proof of residence or school attendance within the state",
+        ],
+        slaDays: 15,
+        fee: 50,
+        status: "AVAILABLE",
+        officialPortal: "https://edistrict.gov.in",
+        isPopular: true,
+        featured: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "serv-kisan",
+        serviceCode: "PM-KISAN",
+        name: "PM-KISAN Samman Nidhi",
+        department: "Department of Agriculture & Farmers Welfare",
+        ministry: "Ministry of Agriculture",
+        description: "Direct income support of ₹6,000 per year in three equal instalments of ₹2,000 transferred directly into bank accounts of landholding farmer families.",
+        category: "agriculture",
+        state: "ALL_INDIA",
+        requiredDocumentTypeIds: ["AADHAAR"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+        ],
+        benefits: [
+          "₹6,000 annual direct cash transfer via Aadhaar DBT",
+          "Seamless integration with Kisan Credit Card (KCC)",
+        ],
+        eligibility: [
+          "Small and marginal farmer families with cultivable landholding",
+          "Active Aadhaar e-KYC and land records seeding",
+        ],
+        slaDays: 14,
+        fee: 0,
+        status: "AVAILABLE",
+        officialPortal: "https://pmkisan.gov.in",
+        isPopular: true,
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "serv-ayushman",
+        serviceCode: "AYUSHMAN-CARD",
+        name: "Ayushman Bharat PM-JAY Health Coverage",
+        department: "National Health Authority",
+        ministry: "Ministry of Health and Family Welfare",
+        description: "Secondary and tertiary healthcare hospitalisation cover of up to ₹5,00,000 per family per year across 27,000+ empanelled hospitals.",
+        category: "healthcare",
+        state: "ALL_INDIA",
+        requiredDocumentTypeIds: ["AADHAAR", "INCOME_CERT"],
+        requiredDocuments: [
+          "Aadhaar Identity Document",
+          "Annual Income Certificate",
+        ],
+        benefits: [
+          "Cashless and paperless access to healthcare services up to ₹5 Lakhs/year",
+          "Covers pre-existing conditions from day one",
+        ],
+        eligibility: [
+          "Families identified in Socio-Economic Caste Census (SECC 2011) or state welfare list",
+        ],
+        slaDays: 3,
+        fee: 0,
+        status: "AVAILABLE",
+        officialPortal: "https://setu.pmjay.gov.in",
+        isPopular: true,
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
     ];
   }
 
@@ -252,6 +470,9 @@ class Database {
           parsed.documentConsents = seeded.consents;
         }
         if (!parsed.documentConsents) parsed.documentConsents = [];
+        if (!parsed.governmentServices || parsed.governmentServices.length === 0) {
+          parsed.governmentServices = this.getDefaultGovernmentServices();
+        }
         return parsed;
       }
     } catch (err) {
@@ -405,6 +626,7 @@ class Database {
       documentTypes: this.getDefaultDocumentTypes(),
       citizenDocuments: this.seedDefaultCitizenDocuments(citizenUserId).documents,
       documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
+      governmentServices: this.getDefaultGovernmentServices(),
     };
 
     try {
@@ -654,6 +876,54 @@ class Database {
         c.status === "ACTIVE" &&
         c.expiresAt > now
     );
+  }
+
+  // --- U-SERVICES Public Service Catalogue ---
+
+  public getServices(category?: string, query?: string, state?: string): GovernmentServiceRecord[] {
+    let list = this.data.governmentServices || [];
+    if (category && category !== "all") {
+      const cleanCat = category.toLowerCase().trim();
+      list = list.filter((s) => s.category.toLowerCase() === cleanCat);
+    }
+    if (state && state !== "ALL") {
+      const cleanState = state.toLowerCase().trim();
+      list = list.filter((s) => s.state === "ALL_INDIA" || s.state.toLowerCase() === cleanState);
+    }
+    if (query && query.trim()) {
+      const q = query.toLowerCase().trim();
+      list = list.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.serviceCode.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q) ||
+          s.department.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }
+
+  public findServiceById(id: string): GovernmentServiceRecord | undefined {
+    return (this.data.governmentServices || []).find((s) => s.id === id);
+  }
+
+  public findServiceByCode(code: string): GovernmentServiceRecord | undefined {
+    const clean = code.toUpperCase().trim();
+    return (this.data.governmentServices || []).find((s) => s.serviceCode.toUpperCase() === clean);
+  }
+
+  public createService(service: GovernmentServiceRecord): void {
+    if (!this.data.governmentServices) this.data.governmentServices = [];
+    this.data.governmentServices.push(service);
+    this.save();
+  }
+
+  public updateService(id: string, updates: Partial<GovernmentServiceRecord>): void {
+    const s = this.findServiceById(id);
+    if (s) {
+      Object.assign(s, updates, { updatedAt: new Date().toISOString() });
+      this.save();
+    }
   }
 }
 
