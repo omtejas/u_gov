@@ -391,6 +391,10 @@ class Database {
     return [...this.data.auditEvents].reverse().slice(0, limit);
   }
 
+  public getAuditEventsCount(): number {
+    return this.data.auditEvents.length;
+  }
+
   public verifyAuditLedger(): { valid: boolean; totalEvents: number; brokenIndex?: number; brokenEventId?: string } {
     let expectedPrevHash = GENESIS_HASH;
     for (let i = 0; i < this.data.auditEvents.length; i++) {

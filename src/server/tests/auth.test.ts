@@ -78,7 +78,7 @@ async function runTestSuite() {
 
   // 5. Audit Logging & Cryptographic Integrity Verification
   console.log("\n[Test Suite 5: Cryptographic Audit Ledger Integrity]");
-  const initialAuditCount = db.getAuditEvents().length;
+  const initialAuditCount = db.getAuditEventsCount();
   db.recordAuditEvent({
     id: `aud-test-${Date.now()}`,
     timestamp: new Date().toISOString(),
@@ -89,7 +89,7 @@ async function runTestSuite() {
     result: "SUCCESS",
     context: "Automated verification of Phase 2 security contracts",
   });
-  const updatedAuditCount = db.getAuditEvents().length;
+  const updatedAuditCount = db.getAuditEventsCount();
   assert(updatedAuditCount === initialAuditCount + 1, "Audit event append-only recorded");
   const latestEvent = db.getAuditEvents(1)[0];
   assert(latestEvent.action === "SECURITY_TEST_EXECUTION", "Audit event contains exact action");

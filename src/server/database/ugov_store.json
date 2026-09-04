@@ -106,6 +106,16 @@
       "createdAt": "2026-09-04T08:56:50.755Z",
       "updatedAt": "2026-09-04T08:56:50.872Z",
       "lastLoginAt": "2026-09-04T08:56:50.871Z"
+    },
+    {
+      "id": "usr-1788512274612-552",
+      "identifier": "citizen_1788512274545@domain.com",
+      "passwordHash": "6c0174b22ec82ddf6ae291ef9a4b5bd1120e34efd942365b56db0bf2463492d2579662339f641c80e2efee9a9346ca8a16f53a4c420a30e6c0a660874f8fbec3",
+      "salt": "fb864447b23beef4b6f0981cec6cb1cd",
+      "status": "ACTIVE",
+      "createdAt": "2026-09-04T08:57:54.612Z",
+      "updatedAt": "2026-09-04T08:57:54.733Z",
+      "lastLoginAt": "2026-09-04T08:57:54.732Z"
     }
   ],
   "profiles": [
@@ -262,6 +272,20 @@
       "district": "Satara",
       "createdAt": "2026-09-04T08:56:50.755Z",
       "updatedAt": "2026-09-04T08:56:50.907Z"
+    },
+    {
+      "id": "prof-1788512274612",
+      "userId": "usr-1788512274612-552",
+      "displayName": "Anjali Kadam (Updated)",
+      "phone": "+91 99887 76655",
+      "preferredLanguage": "en",
+      "kycLevel": "Tier 1 (Basic)",
+      "aadhaarLinked": false,
+      "panLinked": false,
+      "state": "Maharashtra",
+      "district": "Satara",
+      "createdAt": "2026-09-04T08:57:54.612Z",
+      "updatedAt": "2026-09-04T08:57:54.758Z"
     }
   ],
   "roles": [
@@ -361,6 +385,10 @@
     },
     {
       "userId": "usr-1788512210755-360",
+      "roleId": "CITIZEN"
+    },
+    {
+      "userId": "usr-1788512274612-552",
       "roleId": "CITIZEN"
     }
   ],
@@ -696,6 +724,88 @@
       "ipAddress": "::1",
       "userAgent": "node",
       "revokedAt": "2026-09-04T08:56:50.956Z"
+    },
+    {
+      "id": "sess-test-1788512248487",
+      "userId": "usr-test-session",
+      "tokenHash": "d6908ae9007152a25159e7bc947480dc970fcee5a79a07df6f44d67384768296",
+      "createdAt": "2026-09-04T08:57:28.486Z",
+      "expiresAt": "2026-09-04T09:57:28.487Z",
+      "revokedAt": "2026-09-04T08:57:28.489Z"
+    },
+    {
+      "id": "sess-expired-1788512248493",
+      "userId": "usr-test-session",
+      "tokenHash": "d9fb8b4bc1afe2c6c822f642b698c6f53627b29c71a9de8057088a02c8e872e8",
+      "createdAt": "2026-09-04T06:57:28.493Z",
+      "expiresAt": "2026-09-04T07:57:28.493Z"
+    },
+    {
+      "id": "sess-bulk-1-1788512248494",
+      "userId": "usr-bulk-test",
+      "tokenHash": "a02e6e06b6b862ad27810062fe5c1540b32275603f93979b4031bdddac338c6f",
+      "createdAt": "2026-09-04T08:57:28.486Z",
+      "expiresAt": "2026-09-04T09:57:28.487Z",
+      "revokedAt": "2026-09-04T08:57:28.496Z"
+    },
+    {
+      "id": "sess-bulk-2-1788512248495",
+      "userId": "usr-bulk-test",
+      "tokenHash": "c6969d3673457f8aa5a3c42803d86f9c022215b3a54efd50d0ff521ea7225af9",
+      "createdAt": "2026-09-04T08:57:28.486Z",
+      "expiresAt": "2026-09-04T09:57:28.487Z",
+      "revokedAt": "2026-09-04T08:57:28.496Z"
+    },
+    {
+      "id": "sess-test-1788512273936",
+      "userId": "usr-test-session",
+      "tokenHash": "bc3411243e78d57e23e3a36f161599a559c6a89ad49012e2f6e0c0032b237177",
+      "createdAt": "2026-09-04T08:57:53.935Z",
+      "expiresAt": "2026-09-04T09:57:53.936Z",
+      "revokedAt": "2026-09-04T08:57:53.937Z"
+    },
+    {
+      "id": "sess-expired-1788512273941",
+      "userId": "usr-test-session",
+      "tokenHash": "0cdd135ddb537c604ebdaa60d15a1c78a706e93e48ae1736562350e995627b25",
+      "createdAt": "2026-09-04T06:57:53.941Z",
+      "expiresAt": "2026-09-04T07:57:53.941Z"
+    },
+    {
+      "id": "sess-bulk-1-1788512273942",
+      "userId": "usr-bulk-test",
+      "tokenHash": "47d92d766a0ed283342b9d71862e8772f1e6ce602d31d74580fe972b90e5fec1",
+      "createdAt": "2026-09-04T08:57:53.935Z",
+      "expiresAt": "2026-09-04T09:57:53.936Z",
+      "revokedAt": "2026-09-04T08:57:53.944Z"
+    },
+    {
+      "id": "sess-bulk-2-1788512273943",
+      "userId": "usr-bulk-test",
+      "tokenHash": "1e08cb7f96cf0534f680dd8380afac43650aea1bec1dc4afaab1b73fe77623a4",
+      "createdAt": "2026-09-04T08:57:53.935Z",
+      "expiresAt": "2026-09-04T09:57:53.936Z",
+      "revokedAt": "2026-09-04T08:57:53.944Z"
+    },
+    {
+      "id": "sess-1788512274613",
+      "userId": "usr-1788512274612-552",
+      "tokenHash": "687e08430af2595c38abd59a51d9f06073cfc5ca7ef80db22821351986075b28",
+      "createdAt": "2026-09-04T08:57:54.612Z",
+      "expiresAt": "2026-09-11T08:57:54.613Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T08:57:54.803Z"
+    },
+    {
+      "id": "sess-1788512274732",
+      "userId": "usr-1788512274612-552",
+      "tokenHash": "8ce0c27b2f0537aa965454334c9f8a6f19962e23283801c25a915cbeac5f9e0f",
+      "createdAt": "2026-09-04T08:57:54.732Z",
+      "expiresAt": "2026-09-11T08:57:54.732Z",
+      "ipAddress": "::1",
+      "userAgent": "node",
+      "revokedAt": "2026-09-04T08:57:54.803Z"
     }
   ],
   "auditEvents": [
@@ -1325,6 +1435,100 @@
       "ipAddress": "::1",
       "prevHash": "2f1c11bf8065851ef7c5bfab2628255e24879c50c913c168bb57916ef45f43db",
       "hash": "caf1fffdfdc5577b36bdb8984a47b1c61c8dd94a1a88575f751805ee56864450"
+    },
+    {
+      "id": "aud-test-1788512248490",
+      "timestamp": "2026-09-04T08:57:28.490Z",
+      "actorName": "Test Suite Actor",
+      "actorRole": "Test Runner",
+      "action": "SECURITY_TEST_EXECUTION",
+      "resource": "Auth Test Suite",
+      "result": "SUCCESS",
+      "context": "Automated verification of Phase 2 security contracts",
+      "prevHash": "caf1fffdfdc5577b36bdb8984a47b1c61c8dd94a1a88575f751805ee56864450",
+      "hash": "197bee60501594cef6dbdb1ff16001371d04f95e81b3ec2c45baab2a6403fc1a"
+    },
+    {
+      "id": "aud-test-1788512273939",
+      "timestamp": "2026-09-04T08:57:53.939Z",
+      "actorName": "Test Suite Actor",
+      "actorRole": "Test Runner",
+      "action": "SECURITY_TEST_EXECUTION",
+      "resource": "Auth Test Suite",
+      "result": "SUCCESS",
+      "context": "Automated verification of Phase 2 security contracts",
+      "prevHash": "197bee60501594cef6dbdb1ff16001371d04f95e81b3ec2c45baab2a6403fc1a",
+      "hash": "33e9171bbe17d04c364cc0ef877c1644eab96359495cdb7c16f00b7a41a825f8"
+    },
+    {
+      "id": "aud-1788512274613-reg",
+      "timestamp": "2026-09-04T08:57:54.612Z",
+      "actorId": "usr-1788512274612-552",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "Citizen",
+      "action": "USER_REGISTRATION",
+      "resource": "Account citizen_1788512274545@domain.com",
+      "result": "SUCCESS",
+      "context": "Citizen self-registered sovereign U-GOV account with scrypt password hash",
+      "ipAddress": "::1",
+      "prevHash": "33e9171bbe17d04c364cc0ef877c1644eab96359495cdb7c16f00b7a41a825f8",
+      "hash": "888908bb1c81c6d3b1c3495b57a575833f89d18d082f47e9ce186b3ea74e598f"
+    },
+    {
+      "id": "aud-1788512274677-fail",
+      "timestamp": "2026-09-04T08:57:54.677Z",
+      "actorId": "usr-1788512274612-552",
+      "actorName": "citizen_1788512274545@domain.com",
+      "actorRole": "Citizen",
+      "action": "FAILED_LOGIN_ATTEMPT",
+      "resource": "National Gateway Login",
+      "result": "FAILED",
+      "context": "Password verification failed",
+      "ipAddress": "::1",
+      "prevHash": "888908bb1c81c6d3b1c3495b57a575833f89d18d082f47e9ce186b3ea74e598f",
+      "hash": "7699183f9db8e7db0049a9d1a750c226a68cde72e1bd7dc7efc1378269513776"
+    },
+    {
+      "id": "aud-1788512274734-login",
+      "timestamp": "2026-09-04T08:57:54.732Z",
+      "actorId": "usr-1788512274612-552",
+      "actorName": "Anjali Ramesh Kadam",
+      "actorRole": "CITIZEN",
+      "action": "CITIZEN_LOGIN",
+      "resource": "National Gateway Session",
+      "result": "SUCCESS",
+      "context": "Authenticated successfully via password verification",
+      "ipAddress": "::1",
+      "prevHash": "7699183f9db8e7db0049a9d1a750c226a68cde72e1bd7dc7efc1378269513776",
+      "hash": "586e1a7afdd6767940a0883eabdf5e908aae409a0988ad4cb9fe3d9ccd9e74d8"
+    },
+    {
+      "id": "aud-1788512274759-prof",
+      "timestamp": "2026-09-04T08:57:54.759Z",
+      "actorId": "usr-1788512274612-552",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "PROFILE_UPDATE",
+      "resource": "Citizen Profile",
+      "result": "SUCCESS",
+      "context": "Citizen updated profile attributes: displayName, district",
+      "ipAddress": "::1",
+      "prevHash": "586e1a7afdd6767940a0883eabdf5e908aae409a0988ad4cb9fe3d9ccd9e74d8",
+      "hash": "ca6b8b80b6f67f924dbc640bfb04c883944f67d2f9062110b315de592ea789f1"
+    },
+    {
+      "id": "aud-1788512274804-revall",
+      "timestamp": "2026-09-04T08:57:54.804Z",
+      "actorId": "usr-1788512274612-552",
+      "actorName": "Anjali Kadam (Updated)",
+      "actorRole": "Citizen",
+      "action": "ALL_SESSIONS_REVOKED",
+      "resource": "All Active Sessions",
+      "result": "SUCCESS",
+      "context": "Citizen terminated all active sessions across all devices",
+      "ipAddress": "::1",
+      "prevHash": "ca6b8b80b6f67f924dbc640bfb04c883944f67d2f9062110b315de592ea789f1",
+      "hash": "135415581e5a2421225a3d2f28c7e8dfa255237743cc6e3bfb530aa99e5c7435"
     }
   ]
 }
