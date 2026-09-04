@@ -1,8 +1,7 @@
 # Render functional-demo deployment
 
-This configuration runs the React site and Express API together as one Render
-web service. It stores the JSON demo database and uploaded document vault on a
-single persistent disk at `/var/data`, so they survive restarts and redeploys.
+This configuration runs the React site and Express API together as one free
+Render web service. It stores temporary demo data under `/tmp/ugov-data`.
 
 ## Deploy
 
@@ -15,8 +14,8 @@ Render generates `SESSION_SECRET`; never commit or paste that value publicly.
 
 ## Scope and limits
 
-This is a functional single-instance demo deployment. The persistent disk keeps
-the JSON store and files, but it does not provide database-level concurrency,
-backups, user-data governance, or multi-instance scaling. Do not use it for
-real citizen data. A production release requires a PostgreSQL implementation
-and managed object storage.
+This is a temporary preview deployment. Render's free service has ephemeral
+storage, so accounts, uploaded documents, applications, and other data can be
+lost after a restart or redeploy. Do not use it for real citizen data. A
+production release requires a PostgreSQL implementation and managed object
+storage.
