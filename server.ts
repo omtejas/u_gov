@@ -10,6 +10,12 @@ import { servicesRouter } from "./src/server/routes/services";
 import { applicationsRouter } from "./src/server/routes/applications";
 import { integrationsRouter } from "./src/server/routes/integrations";
 import { aiRouter } from "./src/server/routes/ai";
+import { searchRouter } from "./src/server/routes/search";
+import { notificationsRouter } from "./src/server/routes/notifications";
+import { feedbackRouter } from "./src/server/routes/feedback";
+import { faqRouter } from "./src/server/routes/faq";
+import { requireAuth } from "./src/server/middleware/auth";
+import type { AuthenticatedRequest } from "./src/server/middleware/auth";
 
 dotenv.config();
 
@@ -53,6 +59,31 @@ app.use("/api/v1/integrations", integrationsRouter);
 
 // Mount U-AI Sovereign Citizen Assistant & Intelligence routes (Phase 6)
 app.use("/api/v1/ai", aiRouter);
+
+// Mount U-WORKSPACE Functional Upgrade routes (Phase 7)
+app.use("/api/v1/search", searchRouter);
+app.use("/api/v1/notifications", notificationsRouter);
+app.use("/api/v1/feedback", feedbackRouter);
+app.use("/api/v1/faq", faqRouter);
+
+// User Preferences endpoint (lightweight, citizen-scoped)
+const preferencesStore: Record<string, Record<string, unknown>> = {};
+app.get("/api/v1/preferences", requireAuth as any, (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+  return res.json({ success: true, preferences: preferencesStore[userId] || {} });
+});
+app.patch("/api/v1/preferences", requireAuth as any, (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.id;
+  const allowed = ["tutorialSeen", "preferredLanguage", "notificationsEnabled", "dashboardLayout", "theme"];
+  const updates: Record<string, unknown> = {};
+  for (const key of allowed) {
+    if (req.body[key] !== undefined) {
+      updates[key] = req.body[key];
+    }
+  }
+  preferencesStore[userId] = { ...(preferencesStore[userId] || {}), ...updates };
+  return res.json({ success: true, preferences: preferencesStore[userId] });
+});
 
 // Health Telemetry Endpoint
 app.get("/api/v1/health", (_req: Request, res: Response) => {

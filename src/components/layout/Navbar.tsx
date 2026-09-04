@@ -10,10 +10,16 @@ import {
   ShieldCheck,
   Server,
   Sparkles,
+  Bell,
+  Database,
+  Shield,
+  HelpCircle,
 } from "lucide-react";
+import { useNotifications } from "../../context/NotificationContext";
 
 export const Navbar: React.FC = () => {
   const { activeTab, setActiveTab, mode, setMode, openGBot } = useGov();
+  const { unreadCount } = useNotifications();
 
   const navItems = [
     { id: "home", label: "Home", icon: Home },
@@ -21,6 +27,10 @@ export const Navbar: React.FC = () => {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "documents", label: "Digital Vault", icon: FolderLock },
     { id: "tracker", label: "Track Applications", icon: Activity },
+    { id: "consent", label: "Consent Center", icon: Shield },
+    { id: "notifications", label: "Alerts", icon: Bell, badge: unreadCount > 0 ? unreadCount : undefined },
+    { id: "mydata", label: "My Data", icon: Database },
+    { id: "faq", label: "Help & FAQ", icon: HelpCircle },
     { id: "grievance", label: "Issue Solver", icon: ShieldAlert },
     { id: "audit", label: "Audit & Security", icon: ShieldCheck },
   ];
@@ -41,7 +51,7 @@ export const Navbar: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                   isActive
                     ? "bg-[#0b1f3a] text-white shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -53,13 +63,18 @@ export const Navbar: React.FC = () => {
                   }`}
                 />
                 <span>{item.label}</span>
+                {(item as any).badge && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 ring-2 ring-white">
+                    {(item as any).badge > 9 ? "9+" : (item as any).badge}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
 
         {/* Right Action: G-Bot AI Assistant button & Mode Switcher */}
-        <div className="flex items-center gap-2 py-1.5">
+        <div className="flex items-center gap-2 py-1.5 shrink-0">
           {/* Mode Switcher */}
           <div className="flex items-center bg-slate-100 p-0.5 rounded-xl text-[11px] font-semibold border border-slate-200">
             <button
