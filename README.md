@@ -99,8 +99,8 @@
 - **Provider Abstraction**: Vendor-agnostic `AIProvider` interface with `MockAIProvider` (deterministic, zero external API keys) and `GeminiProvider` (bounded timeouts, zero secret leakage).
 - **Controlled Tool Gateway**:
   - `searchServices`: Discovers public services without unrestricted database access.
-  - `getServiceDetails`: Retrieves statutory SLAs, fees, and eligibility criteria.
-  - `checkRequirements`: Returns statutory document checklists.
+  - `getServiceDetails`: Retrieves service metadata from the U-GOV prototype catalogue; it does not independently validate statutory rules.
+  - `checkRequirements`: Returns document lists configured in the prototype catalogue.
   - `getCitizenApplicationStatus`: Citizen-scoped application status lookup with strict IDOR protection.
   - `getCitizenDocumentReadiness`: Evaluates vault readiness without exposing raw filesystem paths or document content.
 - **AI Safety & Honesty**: Clearly displays `"AI-generated guidance. Verify important information before submission."` Never performs autonomous submissions or consent authorizations.
@@ -116,7 +116,7 @@
 | **IDOR Protection** | Strict resource ownership checks on documents, consents, applications, integrations, audit events, and AI queries. |
 | **CSRF Defense** | Origin and Host verification on mutating requests (`POST`, `PUT`, `PATCH`, `DELETE`). |
 | **SSRF Defense** | Outbound boundary allowlist (`mock://bharat-bus.internal/*`), blocking localhost, private subnets, and cloud metadata. |
-| **Production DB Guard** | Enforces `DATABASE_URL` presence in production; prevents silent fallback to JSON storage. |
+| **Production Storage Guard** | Production requires an explicit `DATABASE_URL` or `UGOV_DATA_DIR`; the current implementation uses a JSON file store when `UGOV_DATA_DIR` is set. |
 | **Secret Protection** | Zero secrets, API keys, session cookies, or raw authorization headers exposed in logs, audit records, or API responses. |
 | **Security Headers** | `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and `Content-Security-Policy`. |
 
@@ -135,7 +135,7 @@ npm run lint
 npm run build
 ```
 
-### Verified Test Results (337 Tests Passing):
+### Test Results (historical README record; not re-verified for this revision):
 - `auth.test.ts`: **25 / 25 Passed** (Identity, Sessions, CSRF, Rate Limiting, Audit)
 - `api.test.ts`: **20 / 20 Passed** (Platform Endpoints, Fallbacks, Public Health)
 - `documents.test.ts`: **32 / 32 Passed** (U-DOCS Private Vault, SHA-256 Checksums, Ownership)
@@ -144,7 +144,7 @@ npm run build
 - `applications_ui.test.ts`: **32 / 32 Passed** (Citizen End-to-End Application UI Flows)
 - `integrations.test.ts`: **55 / 55 Passed** (U-INTEGRATIONS Registry, Idempotency, SSRF, Bounded Retries)
 - `ai.test.ts`: **70 / 70 Passed** (U-AI Provider Abstraction, Tool Gateway, IDOR Defense, Audit)
-- **Total: 337 / 337 Automated Tests Passing (100% Pass Rate)**
+- **Historical total: 337 / 337**. The current `npm test` script also includes `upgrade.test.ts`, which is not represented in the breakdown above. Run `npm test` on the current branch before quoting a current pass count.
 
 ---
 
@@ -162,6 +162,23 @@ npm run dev
 
 ---
 
+
+### G-Bot AI Provider and Demo Boundaries
+
+- The backend selects Google Gemini when `GEMINI_API_KEY` is configured and `NODE_ENV` is not `test`; otherwise it uses the deterministic `MockAIProvider`.
+- Gemini receives only the current bounded citizen question and public service-catalogue facts. Common Aadhaar, PAN, phone, email, and application-number patterns are redacted before the request.
+- Citizen-specific application tracking and document-readiness checks are routed to the local U-GOV tool gateway and are not sent to Gemini.
+- The catalogue, document vault, and government integration adapters in this prototype are demo/sandbox data. They are not live connections to government registries, Aadhaar, DigiLocker, or National Portals.
+- AI guidance is informational, may be incorrect, and must be checked with the issuing authority. G-Bot does not grant eligibility, approve applications, or submit an application autonomously.
+- Keep `GEMINI_API_KEY` in Render's backend environment settings only. Never commit it, expose it in frontend variables, or paste it into source control.
+
+### Render Storage and Runtime Status
+
+- The checked-in `render.yaml` currently sets `UGOV_DATA_DIR=/tmp/ugov-data`. This is temporary filesystem storage and must be treated as **ephemeral**; data may be lost on restart or redeploy.
+- The JSON database and private document vault both use `UGOV_DATA_DIR`. Durable operation requires mounting a supported persistent disk at the configured path and verifying the mount in the Render service settings. The current free-plan blueprint does not provision such a disk.
+- `GET /api/v1/health` reports the configured AI provider mode and storage engine/directory. It cannot prove that a persistent disk is mounted or that data survives a redeploy.
+- PostgreSQL is a future migration target, not an implemented or deployed capability in this branch.
+
 ## 🌐 Deployment Architecture
 
 U-GOV supports a dual-target deployment model:
@@ -170,7 +187,7 @@ U-GOV supports a dual-target deployment model:
 - **Frontend & Backend in One**: The Express server in `server.ts` statically serves the compiled Vite frontend from `dist/` and mounts all secure `/api/v1/*` routes.
 - **Build**: `npm run build` (builds both Vite client and `dist/server.js`).
 - **Run**: `npm start` (`node dist/server.js`).
-- **Database**: PostgreSQL via `DATABASE_URL` (with automated migrations / PostgreSQL driver).
+- **Database (current implementation)**: JSON file store at `UGOV_DATA_DIR/ugov_store.json` (or local `storage` directory). There is no PostgreSQL driver or PostgreSQL migration layer in this repository revision.
 
 ### 2. Decoupled Frontend (Vercel) + API Server
 - **Frontend SPA (Vercel)**:

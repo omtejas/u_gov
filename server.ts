@@ -99,13 +99,37 @@ app.patch("/api/v1/preferences", requireAuth as any, (req: AuthenticatedRequest,
 });
 
 // Health Telemetry Endpoint
+// Reports configured modes honestly; a configured directory is not proof that
+// the host has mounted durable storage at that path.
 app.get("/api/v1/health", (_req: Request, res: Response) => {
+  const dataDirectory = process.env.UGOV_DATA_DIR || path.join(process.cwd(), "storage");
+  const isEphemeralDirectory =
+    dataDirectory === "/tmp" ||
+    dataDirectory.startsWith("/tmp/") ||
+    dataDirectory.startsWith("/var/tmp/");
+
+  const geminiConfigured = Boolean(process.env.GEMINI_API_KEY);
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
     service: "U-GOV National Unified Governance Platform",
-    dpiVersion: "3.2-production-ready",
-    aiEngineActive: Boolean(process.env.GEMINI_API_KEY),
+    version: "3.2",
+    environment: process.env.NODE_ENV || "development",
+    aiEngineActive: geminiConfigured,
+    ai: {
+      provider: geminiConfigured && process.env.NODE_ENV !== "test" ? "gemini" : "mock",
+      credentialsConfigured: geminiConfigured,
+    },
+    storage: {
+      engine: "json-file",
+      dataDirectory,
+      durability: isEphemeralDirectory
+        ? "ephemeral"
+        : "configured-directory; persistent mount must be verified",
+    },
+    persistenceWarning: isEphemeralDirectory
+      ? "Data may be lost when the host restarts or redeploys because the configured directory is temporary."
+      : null,
   });
 });
 

@@ -108,7 +108,7 @@ export const GBotModal: React.FC = () => {
         id: `msg-${Date.now() + 1}`,
         sender: "bot",
         text: data.reply || "I am processing your query against the public service registry.",
-        source: data.source || "Sovereign Knowledge Base",
+        source: data.source || "U-GOV Prototype Assistant",
         suggestions: data.suggestions || [],
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
@@ -153,7 +153,7 @@ export const GBotModal: React.FC = () => {
                 </span>
               </div>
               <span className="text-[10px] text-slate-300">
-                Grounded in official National Portals • Zero Hallucination
+                Prototype guidance • Verify requirements with the issuing authority
               </span>
             </div>
           </div>
@@ -236,7 +236,7 @@ export const GBotModal: React.FC = () => {
               <div className="w-7 h-7 rounded-full bg-[#0b1f3a] text-amber-300 flex items-center justify-center">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               </div>
-              <span>Consulting official public service database...</span>
+              <span>Checking the U-GOV prototype service catalogue...</span>
             </div>
           )}
           <div ref={messagesEndRef} />

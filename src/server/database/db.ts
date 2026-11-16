@@ -558,13 +558,26 @@ class Database {
   }
 
   private save(): void {
+    const temporaryFile = DB_FILE + "." + process.pid + "." + crypto.randomUUID() + ".tmp";
     try {
       const dir = path.dirname(DB_FILE);
       if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+        fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
       }
-      fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), "utf-8");
+
+      // Write a complete snapshot first, then atomically replace the prior file.
+      // This reduces the chance of leaving a truncated JSON store after a crash.
+      fs.writeFileSync(temporaryFile, JSON.stringify(this.data, null, 2), {
+        encoding: "utf-8",
+        mode: 0o600,
+      });
+      fs.renameSync(temporaryFile, DB_FILE);
     } catch (err) {
+      try {
+        if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile);
+      } catch {
+        // Preserve the original persistence error for diagnostics.
+      }
       console.error("Failed to write to database file:", err);
     }
   }
@@ -577,6 +590,8 @@ class Database {
     const citizenUserId = "usr-citizen-01";
     const adminUserId = "usr-admin-01";
     const auditorUserId = "usr-auditor-01";
+    // Seed once so document metadata and consent reference the same vault files.
+    const seededCitizenData = this.seedDefaultCitizenDocuments(citizenUserId);
 
     const initialDb: DatabaseSchema = {
       users: [
@@ -700,8 +715,8 @@ class Database {
         },
       ],
       documentTypes: this.getDefaultDocumentTypes(),
-      citizenDocuments: this.seedDefaultCitizenDocuments(citizenUserId).documents,
-      documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
+      citizenDocuments: seededCitizenData.documents,
+      documentConsents: seededCitizenData.consents,
       governmentServices: this.getDefaultGovernmentServices(),
       governmentApplications: [],
       applicationIntegrations: [],

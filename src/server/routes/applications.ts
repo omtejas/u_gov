@@ -225,7 +225,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       return res.status(404).json({ success: false, error: "Application not found." });
     }
 
-    const service = applicationService.getServiceById(app.serviceId);
+    const service = app.service;
 
     // Compute stages
     const stages = [
@@ -333,7 +333,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
 
     return res.json({
       success: true,
-      application,
+      application: app,
       service,
       stages,
       slaDaysRemaining: service ? Math.max(1, service.slaDays - 2) : 7,
