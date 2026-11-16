@@ -246,13 +246,23 @@ export class DocumentService {
       throw err;
     }
 
-    // 1. Delete private binary
-    await this.storage.delete(doc.storageKey);
-
-    // 2. Delete database record & associated consents
+    // Persist the metadata/consent removal first. If the database write fails,
+    // the binary remains intact and the citizen can safely retry.
     const deleted = db.deleteDocument(documentId);
+    if (!deleted) return false;
 
-    // 3. Emit audit event
+    // Once metadata is removed, the binary is no longer addressable through
+    // the API. A failed purge is recorded for operational cleanup rather than
+    // restoring a document record that could point to a missing file.
+    let cleanupComplete = false;
+    try {
+      const existed = await this.storage.exists(doc.storageKey);
+      const removed = await this.storage.delete(doc.storageKey);
+      cleanupComplete = !existed || removed;
+    } catch {
+      cleanupComplete = false;
+    }
+
     const profile = db.getProfileByUserId(requestingUserId);
     db.recordAuditEvent({
       id: `aud-${Date.now()}-docdel`,
@@ -260,10 +270,12 @@ export class DocumentService {
       actorId: requestingUserId,
       actorName: profile?.displayName || "Citizen",
       actorRole: "Owner",
-      action: "DOCUMENT_DELETED",
+      action: cleanupComplete ? "DOCUMENT_DELETED" : "DOCUMENT_DELETED_STORAGE_CLEANUP_PENDING",
       resource: `Document ${doc.title} (${doc.id})`,
-      result: "SUCCESS",
-      context: `Citizen permanently deleted the U-DOCS document and its private storage binary.`,
+      result: cleanupComplete ? "SUCCESS" : "WARNING",
+      context: cleanupComplete
+        ? "Document metadata, associated consent records and private storage binary were deleted."
+        : "Document metadata and consent records were deleted; binary cleanup requires operational follow-up.",
       ipAddress: ip,
     });
 
