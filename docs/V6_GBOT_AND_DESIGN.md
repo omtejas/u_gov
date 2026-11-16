@@ -71,4 +71,4 @@ Red is reserved for destructive/urgent states, green for success, and yellow for
 
 ## Verification status
 
-GitHub branch writes were accepted. No local package install, TypeScript build, automated test run, browser QA or V6 deployment has been performed in this execution environment. Do not treat the code as tested or production-ready until CI/preview verification is complete.
+GitHub Actions verification passed for commit `e7edc50a10c8c04f718cf1abdfb7f3b108d6fdde`: `npm ci`, TypeScript type-check (`npm run lint`), production build (`npm run build`) and the full `npm test` suite all completed successfully. This verifies compilation and existing automated tests, but does not yet verify live OpenAI/Gemini/Tavily/Brave credentials, browser rendering, accessibility with assistive technology, mobile device behaviour or a V6 preview deployment. Those remain required before release.
