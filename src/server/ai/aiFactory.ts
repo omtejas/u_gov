@@ -8,6 +8,7 @@
 import { AIProvider, IAIToolGateway } from "./AIProvider";
 import { MockAIProvider } from "./MockAIProvider";
 import { GeminiProvider } from "./GeminiProvider";
+import { OpenAIProvider } from "./OpenAIProvider";
 import { AIToolGateway } from "./AIToolGateway";
 
 class AIFactory {
@@ -19,10 +20,10 @@ class AIFactory {
       return this.customProvider;
     }
 
-    if (process.env.GEMINI_API_KEY && process.env.NODE_ENV !== "test") {
-      return new GeminiProvider();
+    if (process.env.NODE_ENV !== "test") {
+      if (process.env.OPENAI_API_KEY) return new OpenAIProvider();
+      if (process.env.GEMINI_API_KEY) return new GeminiProvider();
     }
-
     return new MockAIProvider();
   }
 
