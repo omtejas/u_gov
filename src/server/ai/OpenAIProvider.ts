@@ -53,12 +53,14 @@ export class OpenAIProvider implements AIProvider {
       const safe = request.message.replace(/\b\d{12}\b/g, "[REDACTED ID]")
         .replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]")
         .replace(/\b\d{10}\b/g, "[REDACTED PHONE]")
-        .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]");
+        .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]")
+        .replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]")
+        .replace(/\bAPP-\d+-[A-F0-9]+\b/gi, "[REDACTED APPLICATION ID]");
       const messages = [
         { role: "system", content: system },
         ...(request.conversationHistory || []).slice(-12).map((m) => ({
           role: m.role === "user" ? "user" : "assistant",
-          content: m.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600),
+          content: m.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]").replace(/\bAPP-\d+-[A-F0-9]+\b/gi, "[REDACTED APPLICATION ID]").slice(0, 1600),
         })),
         { role: "user", content: safe.slice(0, 1600) },
       ];
