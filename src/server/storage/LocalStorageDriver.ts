@@ -11,8 +11,8 @@ export class LocalStorageDriver implements StorageDriver {
     if (vaultDir) {
       this.vaultDirectory = path.resolve(vaultDir);
     } else {
-      // Render and similar hosts provide a mounted persistent directory through
-      // this variable. Local development continues to use ./storage/vault.
+      // Local filesystem storage is durable only when this directory is backed
+      // by a persistent volume. Render's default filesystem is ephemeral.
       const dataDirectory = process.env.UGOV_DATA_DIR
         ? path.resolve(process.env.UGOV_DATA_DIR)
         : path.resolve(process.cwd(), "storage");
@@ -22,18 +22,43 @@ export class LocalStorageDriver implements StorageDriver {
   }
 
   private ensureDirectoryExists(): void {
-    if (!fs.existsSync(this.vaultDirectory)) {
-      fs.mkdirSync(this.vaultDirectory, { recursive: true, mode: 0o700 });
+    fs.mkdirSync(this.vaultDirectory, { recursive: true, mode: 0o700 });
+    try {
+      fs.chmodSync(this.vaultDirectory, 0o700);
+    } catch {
+      // Some filesystems do not support POSIX permission changes.
     }
   }
 
   private getFilePath(key: string): string {
-    // Prevent directory traversal attacks
+    // Storage keys are opaque UUIDs; never accept user-controlled paths.
     const sanitizedKey = path.basename(key);
-    if (!sanitizedKey || sanitizedKey !== key) {
-      throw new Error("Invalid storage key detected: directory traversal prohibited");
+    if (!sanitizedKey || sanitizedKey !== key || !/^[0-9a-f-]{36}$/i.test(key)) {
+      throw new Error("Invalid storage key: expected an opaque UUID.");
     }
     return path.join(this.vaultDirectory, sanitizedKey);
+  }
+
+  private async writeAtomically(targetPath: string, content: Buffer | string): Promise<void> {
+    const temporaryPath = `${targetPath}.${process.pid}.${crypto.randomUUID()}.tmp`;
+    let handle: fs.promises.FileHandle | undefined;
+    try {
+      handle = await fs.promises.open(temporaryPath, "wx", 0o600);
+      await handle.writeFile(content);
+      await handle.sync();
+      await handle.close();
+      handle = undefined;
+      await fs.promises.rename(temporaryPath, targetPath);
+      try {
+        await fs.promises.chmod(targetPath, 0o600);
+      } catch {
+        // Permission bits are best-effort on non-POSIX filesystems.
+      }
+    } catch (error) {
+      if (handle) await handle.close().catch(() => undefined);
+      await fs.promises.unlink(temporaryPath).catch(() => undefined);
+      throw error;
+    }
   }
 
   public async save(
@@ -41,19 +66,13 @@ export class LocalStorageDriver implements StorageDriver {
     options: SaveFileOptions
   ): Promise<{ key: string; sha256: string; size: number }> {
     this.ensureDirectoryExists();
+    if (!Buffer.isBuffer(content) || content.length === 0) {
+      throw new Error("Cannot store an empty or invalid document payload.");
+    }
 
-    // Generate random UUID key (never user-controlled filename)
     const key = crypto.randomUUID();
     const targetPath = this.getFilePath(key);
-
-    // Compute SHA-256 checksum over exact raw binary
     const sha256 = crypto.createHash("sha256").update(content).digest("hex");
-
-    // Write file with restricted permissions (0o600: read/write by owner only)
-    await fs.promises.writeFile(targetPath, content, { mode: 0o600 });
-
-    // Store minimal sidecar metadata for quick inspection
-    const metaPath = `${targetPath}.meta.json`;
     const metadata: FileMetadata = {
       key,
       sizeBytes: content.length,
@@ -61,28 +80,26 @@ export class LocalStorageDriver implements StorageDriver {
       createdAt: new Date().toISOString(),
       sha256Checksum: sha256,
     };
-    await fs.promises.writeFile(metaPath, JSON.stringify(metadata, null, 2), "utf-8");
 
-    return {
-      key,
-      sha256,
-      size: content.length,
-    };
+    // Publish the metadata only after the binary has been safely written.
+    await this.writeAtomically(targetPath, content);
+    try {
+      await this.writeAtomically(`${targetPath}.meta.json`, JSON.stringify(metadata, null, 2));
+    } catch (error) {
+      await fs.promises.unlink(targetPath).catch(() => undefined);
+      throw error;
+    }
+
+    return { key, sha256, size: content.length };
   }
 
   public async read(key: string): Promise<Buffer> {
-    const filePath = this.getFilePath(key);
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`Vault document not found: ${key}`);
-    }
-    return await fs.promises.readFile(filePath);
+    return fs.promises.readFile(this.getFilePath(key));
   }
 
   public async readStream(key: string): Promise<Readable> {
     const filePath = this.getFilePath(key);
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`Vault document not found: ${key}`);
-    }
+    await fs.promises.access(filePath, fs.constants.R_OK);
     return fs.createReadStream(filePath);
   }
 
@@ -91,20 +108,25 @@ export class LocalStorageDriver implements StorageDriver {
     const metaPath = `${filePath}.meta.json`;
     let deleted = false;
 
-    if (fs.existsSync(filePath)) {
+    try {
       await fs.promises.unlink(filePath);
       deleted = true;
+    } catch (error: any) {
+      if (error.code !== "ENOENT") throw error;
     }
-    if (fs.existsSync(metaPath)) {
+
+    try {
       await fs.promises.unlink(metaPath);
+    } catch (error: any) {
+      if (error.code !== "ENOENT") throw error;
     }
     return deleted;
   }
 
   public async exists(key: string): Promise<boolean> {
     try {
-      const filePath = this.getFilePath(key);
-      return fs.existsSync(filePath);
+      await fs.promises.access(this.getFilePath(key), fs.constants.R_OK);
+      return true;
     } catch {
       return false;
     }
@@ -119,24 +141,24 @@ export class LocalStorageDriver implements StorageDriver {
     const filePath = this.getFilePath(key);
     const metaPath = `${filePath}.meta.json`;
 
-    if (fs.existsSync(metaPath)) {
+    try {
       const raw = await fs.promises.readFile(metaPath, "utf-8");
-      return JSON.parse(raw);
-    }
-
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`Vault document not found: ${key}`);
+      const metadata = JSON.parse(raw) as FileMetadata;
+      if (metadata.key !== key || !Number.isFinite(metadata.sizeBytes) || !metadata.sha256Checksum) {
+        throw new Error("Stored document metadata is invalid.");
+      }
+      return metadata;
+    } catch (error: any) {
+      if (error.code !== "ENOENT") throw error;
     }
 
     const stat = await fs.promises.stat(filePath);
-    const checksum = await this.computeChecksum(key);
-
     return {
       key,
       sizeBytes: stat.size,
       mimeType: "application/octet-stream",
       createdAt: stat.birthtime.toISOString(),
-      sha256Checksum: checksum,
+      sha256Checksum: await this.computeChecksum(key),
     };
   }
 }
