@@ -511,7 +511,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
             ) : reviewData ? (
               <div className="space-y-4">
                 {/* Data Sharing Header Card */}
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-900 to-[#0b1f3a] text-white space-y-2">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-900 to-[#174EA6] text-white space-y-2">
                   <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
                     <Lock className="w-3.5 h-3.5" />
                     <span>U-GOV Prototype Data-Sharing Consent</span>
