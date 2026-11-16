@@ -234,7 +234,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
         stageNumber: 1,
         title: "Service Catalogue Review",
         department: service?.department || "U-GOV Service Catalogue",
-        desc: `Discovered statutory scheme ${service?.name || app.serviceId}. This prototype does not verify official eligibility.`,
+        desc: `Opened the listed service ${service?.name || app.serviceId}. Official eligibility is not verified by this prototype.`,
         status: "COMPLETED",
         timestamp: app.createdAt,
       },
@@ -286,8 +286,8 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
         id: "stage-6",
         stageNumber: 6,
         title: "Sandbox Adapter Response",
-        department: service?.department || "U-GOV Sandbox Gateway",
-        desc: `Prototype adapter response only; no live government system synchronization is performed. // formerly synchronized with ${service?.serviceCode || "STATUTORY"} integration adapter.`,
+        department: "U-GOV Sandbox Gateway",
+        desc: "Prototype adapter response only; no live government system synchronization is performed.",
         status: ["PROCESSING", "ACTION_REQUIRED", "APPROVED", "REJECTED"].includes(app.status)
           ? "COMPLETED"
           : (app.status === "SUBMITTED" ? "CURRENT" : "PENDING"),
@@ -296,7 +296,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
         id: "stage-7",
         stageNumber: 7,
         title: "Prototype Processing State",
-        department: `${service?.department || "U-GOV Demonstration Workflow"} Desk`,
+        department: "U-GOV Demonstration Workflow",
         desc: app.status === "ACTION_REQUIRED"
           ? (app.cancellationReason || "The prototype record is marked as requiring further action.")
           : (["APPROVED", "REJECTED"].includes(app.status)
@@ -310,7 +310,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
         id: "stage-8",
         stageNumber: 8,
         title: "Prototype Outcome",
-        department: service?.ministry || "Republic of India",
+        department: "U-GOV Demonstration Workflow",
         desc: app.status === "APPROVED"
           ? "Prototype status marked APPROVED. This is not an official government decision or certificate."
           : (app.status === "REJECTED"
@@ -326,7 +326,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
     } else if (app.status === "READY" || app.status === "CONSENT_REQUIRED") {
       nextAction = "Review the selected documents and record consent within the U-GOV prototype.";
     } else if (app.status === "ACTION_REQUIRED") {
-      nextAction = `Review the prototype application record and follow any displayed document or form instructions. // ${app.cancellationReason || "Please review and re-submit the required documents."}`;
+      nextAction = "Review the prototype application record and follow any displayed document or form instructions.";
     } else if (app.status === "APPROVED") {
       nextAction = "The prototype record has a terminal status. No official certificate is issued by this demonstration.";
     }
@@ -336,7 +336,7 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       application: app,
       service,
       stages,
-      slaDaysRemaining: service ? Math.max(1, service.slaDays - 2) : 7,
+      slaDaysRemaining: service ? Math.max(0, service.slaDays - Math.floor((Date.now() - new Date(app.submittedAt || app.createdAt).getTime()) / 86400000)) : null,
       nextAction,
     });
   } catch (err: any) {
