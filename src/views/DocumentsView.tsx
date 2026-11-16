@@ -272,7 +272,7 @@ export const DocumentsView: React.FC = () => {
     if (res.success) {
       setActionNotice({
         type: "success",
-        message: `Document "${deleteConfirmDoc.name}" and its private storage binary were deleted.`,
+        message: `Document "${deleteConfirmDoc.name}" and its consent records were removed. Storage cleanup status is recorded in U-AUDIT.`,
       });
     } else {
       setActionNotice({
