@@ -4,7 +4,7 @@ import { AuthenticatedRequest, requireAuth, csrfProtection } from "../middleware
 export const faqRouter = Router();
 
 // Static FAQ catalogue
-const FAQ_CATALOGUE = [
+export const FAQ_CATALOGUE = [
   {
     id: "faq-1",
     category: "getting-started",
@@ -156,6 +156,22 @@ const FAQ_CATALOGUE = [
     notHelpful: 0,
   },
 ];
+
+export function searchFaqKnowledge(query: string) {
+  const terms = query.toLowerCase().split(/[^a-z0-9]+/).filter((word) => word.length > 2);
+  if (!terms.length) return [];
+  return FAQ_CATALOGUE.map((item) => {
+    const haystack = (item.question + " " + item.answer + " " + item.categoryLabel).toLowerCase();
+    const score = terms.reduce((total, term) => total + (haystack.includes(term) ? (item.question.toLowerCase().includes(term) ? 3 : 1) : 0), 0);
+    return { item, score };
+  }).filter((entry) => entry.score > 0).sort((a, b) => b.score - a.score).slice(0, 5).map(({ item }) => ({
+    title: item.question,
+    snippet: item.answer,
+    url: "/faq",
+    category: item.categoryLabel,
+    sourceType: "u-gov" as const,
+  }));
+}
 
 // In-memory vote store (anonymous — maps faq_id → { helpful, notHelpful })
 const voteStore: Record<string, { helpful: number; notHelpful: number }> = {};
