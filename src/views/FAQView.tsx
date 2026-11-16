@@ -80,14 +80,14 @@ export const FAQView: React.FC = () => {
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BookOpen className="w-5 h-5 text-[#0b1f3a]" />
-            <h1 className="text-2xl font-extrabold text-[#0b1f3a]">Help & FAQ</h1>
+            <BookOpen className="w-5 h-5 text-[#174EA6]" />
+            <h1 className="text-2xl font-extrabold text-[#174EA6]">Help & FAQ</h1>
           </div>
           <p className="text-slate-500 text-sm">Frequently asked questions about U-GOV. Can't find your answer? Ask G-Bot.</p>
         </div>
         <button
           onClick={() => openGBot("How do I use U-GOV?")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:brightness-110 shadow-sm transition-all shrink-0"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#174EA6] to-[#123B7A] text-white text-sm font-bold hover:brightness-110 shadow-sm transition-all shrink-0"
         >
           <Sparkles className="w-4 h-4 text-amber-300" />
           Ask G-Bot
@@ -102,7 +102,7 @@ export const FAQView: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search questions and answers…"
-          className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0b1f3a]/20 focus:border-[#0b1f3a]/40 transition-all"
+          className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#174EA6]/20 focus:border-[#174EA6]/40 transition-all"
         />
       </div>
 
@@ -114,7 +114,7 @@ export const FAQView: React.FC = () => {
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              activeCategory === cat.id ? "bg-[#0b1f3a] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              activeCategory === cat.id ? "bg-[#174EA6] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             {cat.label}
@@ -133,7 +133,7 @@ export const FAQView: React.FC = () => {
           <p className="text-slate-400 text-sm mt-1">Try a different search term or ask G-Bot for help.</p>
           <button
             onClick={() => openGBot(searchQuery || "How do I use U-GOV?")}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0b1f3a] text-white text-sm font-semibold"
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#174EA6] text-white text-sm font-semibold"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
             Ask G-Bot: "{searchQuery || "How do I use U-GOV?"}"
@@ -148,7 +148,7 @@ export const FAQView: React.FC = () => {
               <div
                 key={item.id}
                 className={`bg-white rounded-2xl border transition-all ${
-                  isExpanded ? "border-[#0b1f3a]/20 shadow-sm" : "border-slate-200/80"
+                  isExpanded ? "border-[#174EA6]/20 shadow-sm" : "border-slate-200/80"
                 }`}
               >
                 <button
@@ -165,7 +165,7 @@ export const FAQView: React.FC = () => {
                     >
                       {item.categoryLabel}
                     </span>
-                    <span className={`text-sm font-semibold ${isExpanded ? "text-[#0b1f3a]" : "text-slate-800"}`}>
+                    <span className={`text-sm font-semibold ${isExpanded ? "text-[#174EA6]" : "text-slate-800"}`}>
                       {item.question}
                     </span>
                   </div>
