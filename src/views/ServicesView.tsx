@@ -3,8 +3,7 @@ import { useGov } from "../context/GovContext";
 import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
-import { ServiceCategory } from "../types";
-import { Search, Sparkles, Filter, Clock, ArrowRight, CheckCircle2 } from "lucide-react";
+ import { Search, Sparkles, Filter, Clock, ArrowRight } from "lucide-react";
 
 export const ServicesView: React.FC = () => {
   const { services, openServiceModal, searchQuery, setSearchQuery, openGBot } = useGov();
@@ -57,7 +56,7 @@ export const ServicesView: React.FC = () => {
           <Button
             variant="saffron"
             size="sm"
-            onClick={() => openGBot("What government schemes am I eligible for?")}
+            onClick={() => openGBot("Help me discover relevant services in the U-GOV prototype catalogue.")}
             leftIcon={<Sparkles className="w-3.5 h-3.5" />}
           >
             Ask G-Bot about services
@@ -156,7 +155,7 @@ export const ServicesView: React.FC = () => {
               {/* Requirements summary */}
               <div className="pt-2">
                 <span className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Required Credentials ({service.requiredDocs.length}):
+                  Requirements listed in catalogue ({service.requiredDocs.length}):
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {service.requiredDocs.slice(0, 3).map((d, i) => (
