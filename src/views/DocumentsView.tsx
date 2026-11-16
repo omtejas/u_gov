@@ -236,7 +236,7 @@ export const DocumentsView: React.FC = () => {
       setIsShareOpen(false);
       setActionNotice({
         type: "success",
-        message: `Time-bound consent (${durationDays} days) granted to ${recipientEntity}. You can revoke access at any second.`,
+        message: `A time-bound U-GOV consent record (${durationDays} days) was created for ${recipientEntity}. You can revoke this permission from the Consent Center.`,
       });
       setTimeout(() => setActionNotice(null), 6000);
     } else {
@@ -250,7 +250,7 @@ export const DocumentsView: React.FC = () => {
     if (res.success) {
       setActionNotice({
         type: "success",
-        message: `Consent for ${recipientName} unilaterally revoked with immediate effect. Department access is now blocked.`,
+        message: `Consent for ${recipientName} was revoked in U-GOV. This prototype has no live external department connection.`,
       });
     } else {
       setActionNotice({
@@ -303,12 +303,12 @@ export const DocumentsView: React.FC = () => {
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               U-DOCS Sovereign Digital Vault & Consent Center
             </h1>
-            <Badge variant="success" size="sm" dot>
-              DPDP Act 2023 Compliant
+            <Badge variant="info" size="sm">
+              Prototype privacy controls
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Citizen-controlled digital vault backed by mathematical SHA-256 integrity, private filesystem isolation, and real-time unilateral consent revocation.
+            Citizen-controlled prototype vault with private file storage, on-demand SHA-256 integrity checks, and consent records managed inside U-GOV.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -361,22 +361,22 @@ export const DocumentsView: React.FC = () => {
         </div>
       )}
 
-      {/* Sovereign Guarantee Box */}
+      {/* Vault safeguards */}
       <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex items-start gap-3">
         <ShieldCheck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-700 leading-relaxed space-y-1">
           <div>
-            <strong>Sovereign Vault Principle:</strong> Documents are stored strictly in private, unexposed vault storage with randomized UUID keys. No direct URL access is possible.
+            <strong>Vault storage safeguards:</strong> Files use private storage keys and authenticated application routes rather than public static URLs.
           </div>
           <div className="text-[11px] text-slate-500 flex items-center gap-2 flex-wrap pt-0.5">
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <strong>Stored:</strong> Private encrypted binary
+              <strong>Stored:</strong> Private vault file (not encrypted at rest)
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              <strong>Integrity:</strong> Real-time SHA-256 match
+              <strong>Integrity:</strong> On-demand SHA-256 checksum verification
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
@@ -409,7 +409,7 @@ export const DocumentsView: React.FC = () => {
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
-          <span>Active Department Consents ({activeConsents.length})</span>
+          <span>Active Sharing Consents ({activeConsents.length})</span>
         </button>
       </div>
 
@@ -500,7 +500,7 @@ export const DocumentsView: React.FC = () => {
                             Cryptographic SHA-256 Checksum
                           </span>
                           <span className="text-[11px] font-mono text-slate-600 block truncate mt-0.5 select-all">
-                            {doc.sha256Checksum || "a7c91e84...calculated_at_vault"}
+                            {doc.sha256Checksum || "Checksum unavailable"}
                           </span>
                         </div>
                       </div>
