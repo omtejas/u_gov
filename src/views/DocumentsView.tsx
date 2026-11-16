@@ -393,7 +393,7 @@ export const DocumentsView: React.FC = () => {
           onClick={() => setActiveTab("documents")}
           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-2 ${
             activeTab === "documents"
-              ? "bg-[#0b1f3a] text-white shadow-xs"
+              ? "bg-[#174EA6] text-white shadow-xs"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
@@ -404,7 +404,7 @@ export const DocumentsView: React.FC = () => {
           onClick={() => setActiveTab("consents")}
           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-2 ${
             activeTab === "consents"
-              ? "bg-[#0b1f3a] text-white shadow-xs"
+              ? "bg-[#174EA6] text-white shadow-xs"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
@@ -447,7 +447,7 @@ export const DocumentsView: React.FC = () => {
                       {/* Doc Header */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#0b1f3a] text-white flex items-center justify-center shadow-xs shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-[#174EA6] text-white flex items-center justify-center shadow-xs shrink-0">
                             <FileText className="w-5 h-5 text-amber-300" />
                           </div>
                           <div className="min-w-0">
@@ -752,7 +752,7 @@ export const DocumentsView: React.FC = () => {
             <select
               value={docTypeId}
               onChange={(e) => setDocTypeId(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#0b1f3a]"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#174EA6]"
               required
             >
               {documentTypes.map((dt) => (
@@ -788,7 +788,7 @@ export const DocumentsView: React.FC = () => {
                 type="file"
                 accept=".pdf,image/png,image/jpeg"
                 onChange={handleFileChange}
-                className="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#0b1f3a] file:text-white hover:file:bg-[#16355d] cursor-pointer"
+                className="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#174EA6] file:text-white hover:file:bg-[#16355d] cursor-pointer"
                 required
               />
               {selectedFile ? (
@@ -850,7 +850,7 @@ export const DocumentsView: React.FC = () => {
             <select
               value={recipientEntity}
               onChange={(e) => setRecipientEntity(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#0b1f3a]"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#174EA6]"
               required
             >
               <option value="Department of Higher Education (NSP Portal)">
@@ -886,7 +886,7 @@ export const DocumentsView: React.FC = () => {
             <select
               value={durationDays}
               onChange={(e) => setDurationDays(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#0b1f3a]"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#174EA6]"
             >
               <option value={7}>7 Days (Single Verification)</option>
               <option value={15}>15 Days (Application Processing)</option>
