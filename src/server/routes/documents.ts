@@ -154,7 +154,7 @@ documentsRouter.get("/:id/verify-integrity", requireAuth, async (req: Authentica
 documentsRouter.delete("/:id", requireAuth, csrfProtection, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const deleted = await documentService.deleteDocument(req.params.id, req.user!.id, req.ip);
-    return res.json({ success: true, deleted, message: "Document deleted successfully." });
+    return res.json({ success: true, deleted, message: "Document record and consent records were removed; storage cleanup status is recorded in U-AUDIT." });
   } catch (err: any) {
     const statusCode = err.statusCode || 500;
     return res.status(statusCode).json({ success: false, error: err.message || "Deletion failed." });
