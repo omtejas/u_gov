@@ -579,7 +579,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                   <div className="space-y-0.5">
                     <strong className="block">Sandbox Prototype Gateway Notice</strong>
                     <p className="text-[11px] text-amber-800 leading-relaxed">
-                      This application will be dispatched to the U-GOV Sandbox Gateway. No real government department APIs or external state servers are contacted during this demonstration.
+                      This action records the application in the U-GOV sandbox only. No real government department APIs or external state servers are contacted during this demonstration.
                     </p>
                   </div>
                 </div>
@@ -651,7 +651,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 <div className="flex items-center gap-2.5 text-emerald-800">
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                   <div>
-                    <h4 className="text-sm font-bold">Application Formally Submitted</h4>
+                    <h4 className="text-sm font-bold">Application Recorded in Sandbox</h4>
                     <span className="text-xs text-emerald-700 font-medium">
                       Recorded by the U-GOV sandbox • Listed estimate: {app.service?.slaDays || 15} days
                     </span>
