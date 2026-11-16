@@ -86,3 +86,18 @@
   box-shadow: 0 8px 28px rgba(25, 48, 82, .045);
 }
 .ugov-soft-shadow { box-shadow: 0 12px 36px rgba(23, 59, 112, .09); }
+
+/* Accessibility refinements: keep dense metadata readable without changing hierarchy. */
+[class~="text-[10px]"] { font-size: .6875rem !important; line-height: 1.45 !important; }
+[class~="text-[11px]"] { font-size: .75rem !important; line-height: 1.5 !important; }
+[class~="text-[9px]"] { font-size: .625rem !important; line-height: 1.4 !important; }
+[class~="text-xs"] { font-size: .8125rem !important; line-height: 1.55 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
