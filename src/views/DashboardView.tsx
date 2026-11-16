@@ -67,8 +67,8 @@ export const DashboardView: React.FC = () => {
                 <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
                   {displayName}
                 </h1>
-                <Badge variant="success" size="sm" dot>
-                  {kycLevel}
+                <Badge variant="info" size="sm" dot>
+                  Profile: {kycLevel}
                 </Badge>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-mono">
@@ -79,16 +79,9 @@ export const DashboardView: React.FC = () => {
             </div>
           </div>
 
-          {/* Linked Statutory Tokens */}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 text-xs flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Aadhaar Seeded</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 text-xs flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>PAN 2.0 Verified</span>
-            </div>
+          {/* Prototype identity disclosure */}
+          <div className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 text-xs text-slate-200">
+            Prototype identity • Not government-verified
           </div>
         </div>
       </div>
@@ -103,7 +96,7 @@ export const DashboardView: React.FC = () => {
                 Action Required on {pendingActions.length} Application(s)
               </h4>
               <p className="text-xs text-amber-800 mt-0.5">
-                {(pendingActions[0] as any)?.actionRequiredText || "Additional document verification or biometric confirmation required."}
+                {(pendingActions[0] as any)?.actionRequiredText || "Review the application details and complete any outstanding steps."}
               </p>
             </div>
           </div>
@@ -127,7 +120,7 @@ export const DashboardView: React.FC = () => {
             {activeApplications.length}
           </div>
           <span className="text-[11px] text-blue-600 font-medium mt-1 block">
-            {applications.filter((a) => a.status === "under_review").length} under SLA review
+            {pendingActions.length} require attention
           </span>
         </Card>
 
@@ -139,7 +132,7 @@ export const DashboardView: React.FC = () => {
             {documents.length}
           </div>
           <span className="text-[11px] text-emerald-600 font-medium mt-1 block">
-            100% Cryptographically Sealed
+            Stored in your private vault
           </span>
         </Card>
 
@@ -157,13 +150,13 @@ export const DashboardView: React.FC = () => {
 
         <Card variant="flat" padding="md">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            SLA Compliance Rate
+            Applications Requiring Action
           </span>
-          <div className="text-2xl font-black text-emerald-600 mt-1">
-            100%
+          <div className="text-2xl font-black text-amber-600 mt-1">
+            {pendingActions.length}
           </div>
           <span className="text-[11px] text-slate-500 font-medium mt-1 block">
-            Zero SLA breach across services
+            Based on your current application records
           </span>
         </Card>
       </div>
@@ -271,7 +264,7 @@ export const DashboardView: React.FC = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 <FolderLock className="w-4 h-4 text-blue-600" />
-                <span>Verified Credentials</span>
+                <span>Recent Vault Documents</span>
               </h3>
               <button
                 onClick={() => setActiveTab("documents")}
@@ -294,12 +287,12 @@ export const DashboardView: React.FC = () => {
                       <span className="text-xs font-bold text-slate-800 block truncate">
                         {doc.name}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {doc.docNumber}
+                      <span className="text-[10px] text-slate-500">
+                        Stored in your private vault
                       </span>
                     </div>
                   </div>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Clock className="w-4 h-4 text-slate-400 shrink-0" />
                 </div>
               ))}
             </div>
