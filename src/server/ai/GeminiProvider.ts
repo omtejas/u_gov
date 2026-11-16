@@ -103,8 +103,7 @@ Rules:
 9. Use friendly language and avoid repeating answer templates. Ask a follow-up only when necessary.
 10. This is informational prototype guidance, not an official eligibility decision.`;
 
-      // Do not forward prior chat history because it may contain personal details.
-      // Redact common Indian identity/contact patterns from the current question.
+      // Forward bounded conversation context after redacting common Indian identity/contact patterns.
       const safeMessage = request.message
         .replace(/\b\d{12}\b/g, "[REDACTED ID]")
         .replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]")
@@ -112,7 +111,7 @@ Rules:
         .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]")
         .replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]");
 
-      const history = (request.conversationHistory || []).slice(-12).map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\\b\\d{12}\\b/g, "[REDACTED ID]").slice(0, 1600) }] }));
+      const history = (request.conversationHistory || []).slice(-12).map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
       const response = await Promise.race([
