@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGov } from "../../context/GovContext";
-import { X, Send, Bot, User, Sparkles, RefreshCw, ShieldCheck } from "lucide-react";
+import { X, Send, Bot, User, Sparkles, RefreshCw } from "lucide-react";
 
 interface Message {
   id: string;
@@ -20,10 +20,10 @@ export const GBotModal: React.FC = () => {
       text: "Namaste! I am **Bharat G-Bot**, the AI-assisted guide in the U-GOV prototype.\n\nI can help you explore the demo service catalogue, understand the requirements listed there, and navigate the application workflow. Some responses may use Google Gemini when it is configured; otherwise, the prototype uses a deterministic demo assistant.\n\nI cannot make official eligibility decisions or verify live government records. Please confirm current requirements with the issuing department.\n\nHow can I help you today?",
       source: "U-GOV Prototype Assistant",
       suggestions: [
-        "What schemes am I eligible for?",
-        "How to update mobile in Aadhaar?",
-        "Check PM-Kisan e-KYC status",
-        "Driving licence documents required",
+        "Find education services in the catalogue",
+        "Find agriculture services in the catalogue",
+        "What documents are listed for driving licence renewal?",
+        "How does U-GOV application tracking work?",
       ],
       timestamp: "Just now",
     },
@@ -118,7 +118,7 @@ export const GBotModal: React.FC = () => {
         id: `msg-${Date.now() + 1}`,
         sender: "bot",
         text: `⚠️ ${err.message || "I am having trouble connecting to the live AI gateway."}\n\nYou can discover services directly in the Services Hub or inspect application progress in the Tracker.`,
-        source: "Offline Fallback Resolver",
+        source: "U-GOV guidance fallback",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
@@ -207,7 +207,7 @@ export const GBotModal: React.FC = () => {
                   {/* Attribution Source */}
                   {m.source && (
                     <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                       <span>{m.source}</span>
                     </div>
                   )}

@@ -107,7 +107,7 @@ export const ServiceDetailsModal: React.FC = () => {
               {selectedService.name}
             </span>
             <Badge variant="success" size="sm" dot>
-              {selectedService.status === "available" ? "Active DPI Service" : "Prototype"}
+              {selectedService.status === "available" ? "Catalogue Entry" : selectedService.status === "maintenance" ? "Maintenance" : "Sandbox Prototype"}
             </Badge>
           </div>
           <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1 font-medium">
@@ -134,10 +134,10 @@ export const ServiceDetailsModal: React.FC = () => {
             <Clock className="w-5 h-5 text-blue-600 shrink-0" />
             <div>
               <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
-                Processing SLA
+                Listed Processing Estimate
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-800">
-                {selectedService.slaDays} Working Days
+                {selectedService.slaDays} Days (indicative)
               </span>
             </div>
           </div>
@@ -146,10 +146,10 @@ export const ServiceDetailsModal: React.FC = () => {
             <CreditCard className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
               <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
-                Statutory Fee
+                Listed Catalogue Fee
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-800">
-                {selectedService.fee === 0 ? "100% Free" : `₹${selectedService.fee}`}
+                {selectedService.fee === 0 ? "No listed fee" : `₹${selectedService.fee}`}
               </span>
             </div>
           </div>
@@ -158,10 +158,10 @@ export const ServiceDetailsModal: React.FC = () => {
             <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
               <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
-                Verification
+                Document Readiness
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-800">
-                DigiVault e-KYC
+                U-DOCS checklist
               </span>
             </div>
           </div>
@@ -190,6 +190,11 @@ export const ServiceDetailsModal: React.FC = () => {
           </div>
         )}
 
+        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+          <strong className="block mb-1">U-GOV Prototype Catalogue Notice</strong>
+          Service descriptions, eligibility notes, listed fees, document requirements and processing estimates are demonstration catalogue information. U-GOV does not verify official eligibility or submit applications to a live government department.
+        </div>
+
         {/* Description */}
         <div>
           <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
@@ -203,7 +208,7 @@ export const ServiceDetailsModal: React.FC = () => {
         {/* Key Benefits */}
         <div>
           <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-            Citizen Benefits
+            Listed Catalogue Benefits
           </h5>
           <ul className="space-y-1.5">
             {selectedService.benefits.map((ben, idx) => (
@@ -219,7 +224,7 @@ export const ServiceDetailsModal: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-              Eligibility Parameters
+              Listed Eligibility Information
             </h5>
             <ul className="space-y-1.5 text-xs text-slate-600">
               {selectedService.eligibility.map((el, i) => (
@@ -294,7 +299,7 @@ export const ServiceDetailsModal: React.FC = () => {
             rel="noreferrer"
             className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1"
           >
-            <span>Visit Ministry Portal</span>
+            <span>Open Reference Portal</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
@@ -315,7 +320,7 @@ export const ServiceDetailsModal: React.FC = () => {
               leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-300" />}
               className="w-1/2 sm:w-auto"
             >
-              {existingApp ? "Continue Application" : "Apply via DigiVault"}
+              {existingApp ? "Continue Application" : "Start Prototype Application"}
             </Button>
           </div>
         </div>

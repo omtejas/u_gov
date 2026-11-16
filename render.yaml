@@ -11,6 +11,8 @@ services:
         value: production
       - key: UGOV_DATA_DIR
         value: /tmp/ugov-data
+      - key: UGOV_STORAGE_MODE
+        value: ephemeral-demo
       - key: SESSION_SECRET
         generateValue: true
       - key: GEMINI_API_KEY

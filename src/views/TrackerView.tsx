@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Layers,
+  Search,
 } from "lucide-react";
 import { GovernmentApplication } from "../types";
 
@@ -32,6 +33,7 @@ export const TrackerView: React.FC = () => {
   } = useGov();
 
   const [filter, setFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [copiedAppNumber, setCopiedAppNumber] = useState<string | null>(null);
 
   const handleCopy = (text: string) => {
@@ -41,12 +43,21 @@ export const TrackerView: React.FC = () => {
   };
 
   const filteredApps = governmentApplications.filter((app) => {
-    if (filter === "all") return true;
-    if (filter === "required") return app.status === "DOCUMENTS_REQUIRED" || app.status === "DRAFT";
-    if (filter === "ready") return app.status === "READY" || app.status === "CONSENT_REQUIRED";
-    if (filter === "submitted") return app.status === "SUBMITTED" || app.status === "PROCESSING";
-    if (filter === "cancelled") return app.status === "CANCELLED";
-    return true;
+    const statusMatches =
+      filter === "all" ||
+      (filter === "required" && ["DOCUMENTS_REQUIRED", "DRAFT", "ACTION_REQUIRED"].includes(app.status)) ||
+      (filter === "ready" && ["READY", "CONSENT_REQUIRED", "CONSENT_GRANTED"].includes(app.status)) ||
+      (filter === "submitted" && ["SUBMITTED", "PROCESSING"].includes(app.status)) ||
+      (filter === "completed" && ["APPROVED", "REJECTED"].includes(app.status)) ||
+      (filter === "cancelled" && app.status === "CANCELLED");
+    const query = searchQuery.trim().toLowerCase();
+    const searchable = [
+      app.applicationNumber,
+      app.service?.name || "",
+      app.service?.department || "",
+      app.status,
+    ].join(" ").toLowerCase();
+    return statusMatches && (!query || searchable.includes(query));
   });
 
   const getStatusBadge = (status: string) => {
@@ -78,8 +89,10 @@ export const TrackerView: React.FC = () => {
   };
 
   const submittedCount = governmentApplications.filter((a) => a.status === "SUBMITTED" || a.status === "PROCESSING").length;
-  const readyCount = governmentApplications.filter((a) => a.status === "READY").length;
-  const requiredCount = governmentApplications.filter((a) => a.status === "DOCUMENTS_REQUIRED" || a.status === "DRAFT").length;
+  const readyCount = governmentApplications.filter((a) => ["READY", "CONSENT_REQUIRED", "CONSENT_GRANTED"].includes(a.status)).length;
+  const requiredCount = governmentApplications.filter((a) => ["DOCUMENTS_REQUIRED", "DRAFT", "ACTION_REQUIRED"].includes(a.status)).length;
+  const completedCount = governmentApplications.filter((a) => ["APPROVED", "REJECTED"].includes(a.status)).length;
+  const cancelledCount = governmentApplications.filter((a) => a.status === "CANCELLED").length;
 
   return (
     <div className="space-y-6">
@@ -157,14 +170,27 @@ export const TrackerView: React.FC = () => {
         </div>
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search by application number, service, department, or status..."
+          aria-label="Search applications"
+          className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+        />
+      </div>
+
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
           { id: "all", label: `All Applications (${governmentApplications.length})` },
-          { id: "required", label: `Credentials Required (${requiredCount})` },
-          { id: "ready", label: `Ready for Consent (${readyCount})` },
-          { id: "submitted", label: `Submitted (${submittedCount})` },
-          { id: "cancelled", label: "Cancelled" },
+          { id: "required", label: `Required / Action (${requiredCount})` },
+          { id: "ready", label: `Ready / Consent (${readyCount})` },
+          { id: "submitted", label: `Submitted / Processing (${submittedCount})` },
+          { id: "completed", label: `Completed (${completedCount})` },
+          { id: "cancelled", label: `Cancelled (${cancelledCount})` },
         ].map((item) => (
           <button
             key={item.id}

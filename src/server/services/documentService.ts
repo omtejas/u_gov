@@ -5,6 +5,19 @@ import { getStorageDriver } from "../storage";
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB strict limit
 const ALLOWED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
+function detectDocumentMime(buffer: Buffer): string | null {
+  if (buffer.length >= 5 && buffer.subarray(0, 5).toString("ascii") === "%PDF-") return "application/pdf";
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "image/png";
+  return null;
+}
+
+function safeDisplayFileName(value: string): string {
+  const leaf = String(value || "document").replace(/\\/g, "/").split("/").pop() || "document";
+  const cleaned = leaf.replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, 120);
+  return cleaned || "document";
+}
+
 export interface DepositDocumentInput {
   documentTypeId: string;
   title: string;
@@ -34,20 +47,25 @@ export class DocumentService {
     if (!input.title || typeof input.title !== "string" || !input.title.trim()) {
       throw new Error("Document title is required.");
     }
-    if (!input.documentTypeId || typeof input.documentTypeId !== "string") {
+    if (input.title.trim().length > 120) throw new Error("Document title must be 120 characters or fewer.");
+    if (!input.documentTypeId || typeof input.documentTypeId !== "string" || input.documentTypeId.length > 64) {
       throw new Error("Valid document type is required.");
     }
-    if (!input.fileBuffer || input.fileBuffer.length === 0) {
-      throw new Error("Document binary payload is empty.");
+    if (!db.findDocumentTypeById(input.documentTypeId)) {
+      throw new Error("Selected document type is not present in the U-DOCS catalogue.");
+    }
+    if (!Buffer.isBuffer(input.fileBuffer) || input.fileBuffer.length === 0) {
+      throw new Error("Document binary payload is empty or invalid.");
     }
     if (input.fileBuffer.length > MAX_FILE_SIZE_BYTES) {
       throw new Error(`File size exceeds strict 5MB limit (${(input.fileBuffer.length / 1024 / 1024).toFixed(2)} MB).`);
     }
 
-    const cleanMime = input.mimeType.toLowerCase().trim();
-    if (!ALLOWED_MIME_TYPES.includes(cleanMime)) {
-      throw new Error(`Unsupported document format: ${cleanMime}. Allowed formats: PDF, JPEG, PNG.`);
-    }
+    const cleanMime = typeof input.mimeType === "string" ? input.mimeType.toLowerCase().trim() : "";
+    if (!ALLOWED_MIME_TYPES.includes(cleanMime)) throw new Error("Unsupported document format. Allowed formats: PDF, JPEG, PNG.");
+    const detectedMime = detectDocumentMime(input.fileBuffer);
+    if (!detectedMime || detectedMime !== cleanMime) throw new Error("The file contents do not match the selected document format.");
+    if (typeof ownerUserId !== "string" || !ownerUserId.trim()) throw new Error("An authenticated document owner is required.");
 
     // 2. Save file via StorageDriver into private vault (UUID key generated internally)
     const { key, sha256, size } = await this.storage.save(input.fileBuffer, {
@@ -67,8 +85,8 @@ export class DocumentService {
       ownerUserId,
       documentTypeId: input.documentTypeId,
       title: input.title.trim(),
-      documentNumber: input.documentNumber?.trim() || "XXXX-XXXX",
-      fileName: input.fileName?.trim() || "credential.pdf",
+      documentNumber: typeof input.documentNumber === "string" ? input.documentNumber.trim().slice(0, 80) : "XXXX-XXXX",
+      fileName: safeDisplayFileName(input.fileName || "document"),
       mimeType: cleanMime,
       fileSizeBytes: size,
       storageKey: key,
@@ -78,7 +96,12 @@ export class DocumentService {
       updatedAt: now,
     };
 
-    db.createDocument(docRecord);
+    try {
+      db.createDocument(docRecord);
+    } catch (error) {
+      await this.storage.delete(key).catch(() => false);
+      throw error;
+    }
 
     // 4. Record audit event
     const profile = db.getProfileByUserId(ownerUserId);
@@ -91,7 +114,7 @@ export class DocumentService {
       action: "DOCUMENT_UPLOADED",
       resource: `Document ${docRecord.title} (${docRecord.id})`,
       result: "SUCCESS",
-      context: `Citizen deposited credential to private DigiVault. SHA-256: ${sha256.slice(0, 16)}...`,
+      context: `Citizen uploaded a document to private U-DOCS storage. SHA-256: ${sha256.slice(0, 16)}...`,
       ipAddress: ip,
     });
 
@@ -110,21 +133,14 @@ export class DocumentService {
       throw err;
     }
 
-    // Ownership check
+    // Consent records express a citizen's prototype preference; they do not
+    // authenticate an external department. Until department identities and
+    // service-to-service credentials exist, only the owner can retrieve files.
     if (doc.ownerUserId === requestingUserId) {
       return doc;
     }
 
-    // Check if recipient has active consent grant
-    if (recipientEntity) {
-      const activeConsent = db.checkActiveConsent(documentId, recipientEntity);
-      if (activeConsent) {
-        return doc;
-      }
-    }
-
-    // IDOR Protection: Caller is neither owner nor authorized recipient
-    const err: any = new Error("Access denied: you do not have permission to view this document.");
+    const err: any = new Error("Access denied: document sharing is recorded in U-GOV, but no authenticated external recipient integration is connected.");
     err.statusCode = 403;
     throw err;
   }
@@ -175,7 +191,7 @@ export class DocumentService {
       action: "DOCUMENT_DOWNLOADED",
       resource: `Document ${doc.title} (${doc.id})`,
       result: "SUCCESS",
-      context: `Streamed encrypted private vault binary with verified SHA-256 integrity.`,
+      context: `Downloaded private storage binary after successful SHA-256 integrity verification.`,
       ipAddress: ip,
     });
 
@@ -230,13 +246,23 @@ export class DocumentService {
       throw err;
     }
 
-    // 1. Delete private binary
-    await this.storage.delete(doc.storageKey);
-
-    // 2. Delete database record & associated consents
+    // Persist the metadata/consent removal first. If the database write fails,
+    // the binary remains intact and the citizen can safely retry.
     const deleted = db.deleteDocument(documentId);
+    if (!deleted) return false;
 
-    // 3. Emit audit event
+    // Once metadata is removed, the binary is no longer addressable through
+    // the API. A failed purge is recorded for operational cleanup rather than
+    // restoring a document record that could point to a missing file.
+    let cleanupComplete = false;
+    try {
+      const existed = await this.storage.exists(doc.storageKey);
+      const removed = await this.storage.delete(doc.storageKey);
+      cleanupComplete = !existed || removed;
+    } catch {
+      cleanupComplete = false;
+    }
+
     const profile = db.getProfileByUserId(requestingUserId);
     db.recordAuditEvent({
       id: `aud-${Date.now()}-docdel`,
@@ -244,10 +270,12 @@ export class DocumentService {
       actorId: requestingUserId,
       actorName: profile?.displayName || "Citizen",
       actorRole: "Owner",
-      action: "DOCUMENT_DELETED",
+      action: cleanupComplete ? "DOCUMENT_DELETED" : "DOCUMENT_DELETED_STORAGE_CLEANUP_PENDING",
       resource: `Document ${doc.title} (${doc.id})`,
-      result: "SUCCESS",
-      context: `Citizen permanently deleted document and purged binary from private vault.`,
+      result: cleanupComplete ? "SUCCESS" : "WARNING",
+      context: cleanupComplete
+        ? "Document metadata, associated consent records and private storage binary were deleted."
+        : "Document metadata and consent records were deleted; binary cleanup requires operational follow-up.",
       ipAddress: ip,
     });
 
@@ -271,12 +299,9 @@ export class DocumentService {
       throw err;
     }
 
-    if (!recipientEntity || !recipientEntity.trim()) {
-      throw new Error("Recipient government department/entity is required.");
-    }
-    if (!purpose || !purpose.trim()) {
-      throw new Error("Explicit purpose for consent is required.");
-    }
+    if (typeof recipientEntity !== "string" || !recipientEntity.trim() || recipientEntity.trim().length > 160) throw new Error("Recipient must be provided and limited to 160 characters.");
+    if (typeof purpose !== "string" || !purpose.trim() || purpose.trim().length > 240) throw new Error("Consent purpose must be provided and limited to 240 characters.");
+    if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 90) throw new Error("Consent duration must be a whole number between 1 and 90 days.");
 
     const consentId = `cst-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
     const now = new Date();

@@ -17,7 +17,7 @@ export const GrievanceView: React.FC = () => {
   const [grievances, setGrievances] = useState([
     {
       id: "grv-1",
-      ticketId: "CPGRAMS-2026-99214",
+      ticketId: "UGV-DEMO-0001",
       title: "Contaminated Municipal Tap Water Supply in Ward 14",
       department: "Municipal Corporation & Public Health Engineering",
       location: "Kothrud, Pune, Maharashtra",
@@ -28,7 +28,7 @@ export const GrievanceView: React.FC = () => {
     },
     {
       id: "grv-2",
-      ticketId: "CPGRAMS-2026-88120",
+      ticketId: "UGV-DEMO-0002",
       title: "Broken Streetlights along National Highway 48 Service Road",
       department: "National Highways Authority of India (NHAI)",
       location: "Warje Bypass, Pune",
@@ -39,7 +39,7 @@ export const GrievanceView: React.FC = () => {
     },
     {
       id: "grv-3",
-      ticketId: "CPGRAMS-2026-77312",
+      ticketId: "UGV-DEMO-0003",
       title: "Delay in DBT Scholarship Disbursement after College Approval",
       department: "Social Justice & Special Assistance Department",
       location: "District Collectorate, Haveli",
@@ -56,14 +56,14 @@ export const GrievanceView: React.FC = () => {
 
     const newTicket = {
       id: `grv-${Date.now()}`,
-      ticketId: `CPGRAMS-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+      ticketId: `UGV-DEMO-${Date.now().toString().slice(-8)}`,
       title: title.trim(),
       department: department.trim() || "District Grievance Redressal Cell",
       location: location.trim() || "Pune District",
       status: "Open",
       filedAt: "Just now",
       upvotes: 1,
-      description: description.trim() || "Filed via U-GOV Sovereign Grievance Engine",
+      description: description.trim() || "Created in the local U-GOV demonstration only.",
     };
 
     setGrievances([newTicket, ...grievances]);
@@ -87,10 +87,10 @@ export const GrievanceView: React.FC = () => {
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
             <ShieldAlert className="w-6 h-6 text-amber-600" />
-            <span>Civic Issue Solver & CPGRAMS Community Board</span>
+            <span>Civic Issue Board — Demo</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            File statutory citizen grievances with 30-day time-bound SLA resolution under DARPG guidelines.
+            Explore sample civic issues or create a local demo entry. Nothing is transmitted to a government authority.
           </p>
         </div>
         <Button
@@ -99,7 +99,7 @@ export const GrievanceView: React.FC = () => {
           onClick={() => setIsNewOpen(true)}
           leftIcon={<Plus className="w-3.5 h-3.5" />}
         >
-          File New Grievance
+          Create Demo Issue
         </Button>
       </div>
 
@@ -157,7 +157,7 @@ export const GrievanceView: React.FC = () => {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200 font-bold transition-colors cursor-pointer self-start sm:self-auto"
               >
                 <ThumbsUp className="w-3.5 h-3.5 text-amber-600" />
-                <span>Citizen Boost ({g.upvotes})</span>
+                <span>Demo reactions ({g.upvotes})</span>
               </button>
             </div>
           </Card>
@@ -168,8 +168,8 @@ export const GrievanceView: React.FC = () => {
       <Modal
         isOpen={isNewOpen}
         onClose={() => setIsNewOpen(false)}
-        title="File Statutory Public Grievance"
-        subtitle="Forwarded directly to the designated Central/State Nodal Grievance Officer"
+        title="Create Demo Civic Issue"
+        subtitle="Prototype only — this entry is not sent to CPGRAMS or any government department."
         maxWidth="md"
       >
         <form onSubmit={handleCreateGrievance} className="space-y-4">
@@ -219,7 +219,7 @@ export const GrievanceView: React.FC = () => {
               Cancel
             </Button>
             <Button variant="saffron" size="sm" type="submit">
-              Submit Grievance
+              Save Demo Issue
             </Button>
           </div>
         </form>

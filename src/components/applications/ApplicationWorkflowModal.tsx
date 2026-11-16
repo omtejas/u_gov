@@ -90,7 +90,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
     if (res.success && res.review) {
       setReviewData(res.review);
     } else {
-      setActionError(res.error || "Failed to load statutory review disclosures.");
+      setActionError(res.error || "Could not load the application review. Please try again.");
     }
   };
 
@@ -117,7 +117,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!consentConfirmed) {
-      setActionError("Please confirm statutory data sharing consent before submitting.");
+      setActionError("Please confirm the U-GOV prototype data-sharing consent before submitting.");
       return;
     }
     setActionError(null);
@@ -261,7 +261,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                    SLA: <strong>{app.service?.slaDays || 15} Days</strong>
+                    Listed estimate: <strong>{app.service?.slaDays || 15} Days</strong>
                   </span>
                   <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">
                     {app.service?.fee === 0 ? "100% Free" : `₹${app.service?.fee}`}
@@ -290,8 +290,8 @@ export const ApplicationWorkflowModal: React.FC = () => {
                     <strong className="text-slate-800">{app.status}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Applicant Citizen Reference:</span>
-                    <strong className="text-slate-800 font-mono">{app.userId}</strong>
+                    <span className="text-slate-400 block">Application Channel:</span>
+                    <strong className="text-slate-800">U-GOV Citizen Portal</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Initiated Timestamp:</span>
@@ -301,10 +301,9 @@ export const ApplicationWorkflowModal: React.FC = () => {
 
                 {app.formData && Object.keys(app.formData).length > 0 && (
                   <div className="pt-2 mt-2 border-t border-slate-200">
-                    <span className="text-slate-400 block mb-1">Additional Application Parameters:</span>
-                    <pre className="text-[11px] bg-white p-2 rounded-lg border border-slate-200 text-slate-700 overflow-x-auto">
-                      {JSON.stringify(app.formData, null, 2)}
-                    </pre>
+                    <span className="text-slate-400 block">Application Details:</span>
+                    <strong className="text-slate-800">{Object.keys(app.formData).length} detail field(s) recorded</strong>
+                    <p className="text-[11px] text-slate-500 mt-1">Personal field values are not repeated in this summary.</p>
                   </div>
                 )}
               </div>
@@ -343,12 +342,12 @@ export const ApplicationWorkflowModal: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Prerequisite Verification Status
+                    Document Readiness Status
                   </h4>
                   <span className="text-sm font-extrabold text-slate-900">
                     {app.status === "READY"
-                      ? "All Mandatory Credentials Attached — Application Ready"
-                      : "Credentials Required — Please Select Documents Below"}
+                      ? "All listed document types are attached"
+                      : "Some listed document types are still required"}
                   </span>
                 </div>
                 {getStatusBadge(app.status)}
@@ -366,7 +365,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
             {/* Credential Selection List */}
             <div className="space-y-3">
               <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between">
-                <span>Available Credentials in Your Sovereign DigiVault</span>
+                <span>Available Documents in Your U-DOCS Vault</span>
                 <span className="text-[10px] text-slate-500 font-normal">
                   Vault Document Selection (Never Shared Silently)
                 </span>
@@ -377,7 +376,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                   <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
                   <p className="text-xs font-bold text-slate-700">No documents found in your DigiVault.</p>
                   <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
-                    Please deposit your required credentials (Aadhaar, Income Certificate, etc.) in your DigiVault before attaching.
+                    Add the document types listed for this service to your U-DOCS vault before attaching them here.
                   </p>
                   <Button
                     variant="primary"
@@ -507,7 +506,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
           <div className="space-y-5">
             {isLoadingReview ? (
               <div className="py-12 text-center text-xs text-slate-500">
-                Generating statutory data-sharing review disclosures...
+                Preparing the U-GOV prototype sharing summary...
               </div>
             ) : reviewData ? (
               <div className="space-y-4">
@@ -515,13 +514,13 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-900 to-[#0b1f3a] text-white space-y-2">
                   <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Statutory Data Sharing Authorization</span>
+                    <span>U-GOV Prototype Data-Sharing Consent</span>
                   </div>
                   <h4 className="text-base font-bold">
-                    Review Credentials Disclosed for Statutory Processing
+                    Review the documents selected for this application
                   </h4>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Under sovereign data protection rules, U-GOV requires your explicit authorization before granting time-bound access to your attached DigiVault credentials.
+                    Review the recipient label, purpose, validity period and selected documents below. Your confirmation records consent within this U-GOV prototype; it does not authorize or contact an external government department.
                   </p>
                 </div>
 
@@ -529,11 +528,11 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <span className="text-slate-400 block font-semibold">Statutory Recipient Department:</span>
+                      <span className="text-slate-400 block font-semibold">Prototype Recipient Label:</span>
                       <strong className="text-slate-900 text-sm">{reviewData.dataSharingDisclosure.recipientEntity}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block font-semibold">Consent Validity Period:</span>
+                      <span className="text-slate-400 block font-semibold">Prototype Consent Validity:</span>
                       <strong className="text-slate-900 text-sm">{reviewData.dataSharingDisclosure.validityDays} Days (Time-Bound)</strong>
                     </div>
                   </div>
@@ -549,7 +548,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 {/* Attached Credentials Disclosed */}
                 <div>
                   <h5 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                    Credentials to be Shared ({reviewData.attachedDocuments.length})
+                    Documents selected for this prototype ({reviewData.attachedDocuments.length})
                   </h5>
                   <div className="space-y-2">
                     {reviewData.attachedDocuments.map((doc) => (
@@ -562,7 +561,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                           <div>
                             <strong className="text-slate-800 block">{doc.title}</strong>
                             <span className="text-[11px] text-slate-500 font-mono">
-                              Type: {doc.documentTypeId} • No: {doc.documentNumber}
+                              Document type: {doc.documentTypeId}
                             </span>
                           </div>
                         </div>
@@ -580,7 +579,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                   <div className="space-y-0.5">
                     <strong className="block">Sandbox Prototype Gateway Notice</strong>
                     <p className="text-[11px] text-amber-800 leading-relaxed">
-                      This application will be dispatched to the U-GOV Sandbox Gateway. No real government department APIs or external state servers are contacted during this demonstration.
+                      This action records the application in the U-GOV sandbox only. No real government department APIs or external state servers are contacted during this demonstration.
                     </p>
                   </div>
                 </div>
@@ -595,8 +594,8 @@ export const ApplicationWorkflowModal: React.FC = () => {
                       className="w-4 h-4 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
                     <span className="text-xs text-slate-800 font-medium leading-relaxed">
-                      I understand what data will be shared, who will receive it (
-                      <strong>{reviewData.dataSharingDisclosure.recipientEntity}</strong>), why it is required, and that the authorization expires in <strong>30 days</strong>. I hereby authorize U-GOV to generate statutory U-CONSENT tokens for this application.
+                      I understand that this prototype records the selected documents, recipient label (
+                      <strong>{reviewData.dataSharingDisclosure.recipientEntity}</strong>) and stated purpose for this application. This U-GOV consent record is valid for <strong>{reviewData.dataSharingDisclosure.validityDays} days</strong>; no external government department is contacted.
                     </span>
                   </label>
                 </div>
@@ -652,9 +651,9 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 <div className="flex items-center gap-2.5 text-emerald-800">
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                   <div>
-                    <h4 className="text-sm font-bold">Application Formally Submitted</h4>
+                    <h4 className="text-sm font-bold">Application Recorded in Sandbox</h4>
                     <span className="text-xs text-emerald-700 font-medium">
-                      Dispatched to U-GOV Sandbox Gateway • SLA: {app.service?.slaDays || 15} Working Days
+                      Recorded by the U-GOV sandbox • Listed estimate: {app.service?.slaDays || 15} days
                     </span>
                   </div>
                 </div>
@@ -687,7 +686,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5">
               <div className="flex items-center justify-between">
                 <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                  Application & Integration Gateway Metadata
+                  Application & Sandbox Metadata
                 </h5>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                   U-INTEGRATIONS Sandbox
@@ -725,7 +724,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                 <div>
                   <span className="text-slate-400 block">Active Consent Tokens:</span>
                   <span className="text-slate-900 font-medium">
-                    {app.consentIds.length} statutory token(s) granted
+                    {app.consentIds.length} U-GOV prototype consent record(s)
                   </span>
                 </div>
                 <div>
@@ -764,7 +763,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
                       app.attachedDocumentIds.length > 0 ? "text-slate-900" : "text-slate-400"
                     }`}
                   >
-                    DigiVault Credentials Attached ({app.attachedDocumentIds.length})
+                    U-DOCS Documents Attached ({app.attachedDocumentIds.length})
                   </span>
                 </div>
 
@@ -838,7 +837,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
               </div>
 
               <p className="text-xs text-slate-600 leading-relaxed">
-                Are you sure you want to cancel application <strong>{app.applicationNumber}</strong>? This will permanently mark the application as CANCELLED and withdraw statutory processing.
+                Are you sure you want to cancel application <strong>{app.applicationNumber}</strong>? This marks the U-GOV prototype record as cancelled. No government department is notified.
               </p>
 
               <div>

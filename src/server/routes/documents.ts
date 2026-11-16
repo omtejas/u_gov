@@ -40,12 +40,25 @@ documentsRouter.post(
         return res.status(400).json({ success: false, error: "fileData (base64 encoded binary) is required" });
       }
 
-      // Convert Base64 string to Buffer
-      let cleanBase64 = fileData;
-      if (cleanBase64.includes(";base64,")) {
-        cleanBase64 = cleanBase64.split(";base64,")[1];
+      // Accept only canonical Base64 (optionally wrapped in a data URL).
+      // Bound encoded size before allocating the decoded buffer.
+      let cleanBase64 = fileData.trim();
+      if (cleanBase64.startsWith("data:")) {
+        const dataUrlMatch = /^data:[^;,]+;base64,([A-Za-z0-9+/]*={0,2})$/.exec(cleanBase64);
+        if (!dataUrlMatch) {
+          return res.status(400).json({ success: false, error: "Invalid document data URL." });
+        }
+        cleanBase64 = dataUrlMatch[1];
+      }
+      const maxEncodedLength = Math.ceil((5 * 1024 * 1024) / 3) * 4;
+      if (!cleanBase64 || cleanBase64.length > maxEncodedLength || cleanBase64.length % 4 !== 0 ||
+          !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(cleanBase64)) {
+        return res.status(400).json({ success: false, error: "Document payload must be valid Base64 and no larger than 5MB." });
       }
       const fileBuffer = Buffer.from(cleanBase64, "base64");
+      if (!fileBuffer.length || fileBuffer.toString("base64") !== cleanBase64) {
+        return res.status(400).json({ success: false, error: "Document payload is empty or malformed." });
+      }
 
       const doc = await documentService.depositDocument(
         req.user!.id,
@@ -62,7 +75,7 @@ documentsRouter.post(
 
       return res.status(201).json({
         success: true,
-        message: "Credential deposited successfully into private DigiVault.",
+        message: "Document uploaded to the private U-DOCS storage area.",
         document: doc,
       });
     } catch (err: any) {
@@ -141,7 +154,7 @@ documentsRouter.get("/:id/verify-integrity", requireAuth, async (req: Authentica
 documentsRouter.delete("/:id", requireAuth, csrfProtection, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const deleted = await documentService.deleteDocument(req.params.id, req.user!.id, req.ip);
-    return res.json({ success: true, deleted, message: "Document deleted successfully." });
+    return res.json({ success: true, deleted, message: "Document record and consent records were removed; storage cleanup status is recorded in U-AUDIT." });
   } catch (err: any) {
     const statusCode = err.statusCode || 500;
     return res.status(statusCode).json({ success: false, error: err.message || "Deletion failed." });

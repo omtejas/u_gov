@@ -3,6 +3,7 @@ import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { hashPassword, computeAuditHash } from "../auth/crypto";
+import { assertProductionStorageReady } from "../storage/storageHealth";
 
 export interface UserRecord {
   id: string;
@@ -218,13 +219,21 @@ class Database {
   private data: DatabaseSchema;
 
   constructor() {
-    // Production Safety Guard: Do not allow silent fallback to JSON store in production
-    if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
-      if (!process.env.DATABASE_URL && !process.env.UGOV_DATA_DIR) {
-        throw new Error(
-          "[CRITICAL SECURITY GUARD] Production requires DATABASE_URL or an explicitly configured persistent UGOV_DATA_DIR."
-        );
+    // The current metadata engine is a single-process JSON file store.
+    // Production must prove that UGOV_DATA_DIR is covered by a writable,
+    // dedicated non-root filesystem mount; a path string alone is not proof.
+    const storageMode = process.env.UGOV_STORAGE_MODE || "persistent";
+    if (process.env.NODE_ENV === "production" && storageMode !== "ephemeral-demo") {
+      if (!process.env.UGOV_DATA_DIR) {
+        throw new Error("[CRITICAL STORAGE GUARD] Production requires UGOV_DATA_DIR to point inside a configured persistent volume.");
       }
+      assertProductionStorageReady(process.env.UGOV_DATA_DIR);
+    }
+    if (process.env.NODE_ENV === "production" && storageMode === "ephemeral-demo") {
+      if (!process.env.UGOV_DATA_DIR || !path.resolve(process.env.UGOV_DATA_DIR).startsWith("/tmp/")) {
+        throw new Error("[STORAGE CONFIGURATION ERROR] Ephemeral demo mode is restricted to an explicit /tmp data directory.");
+      }
+      console.warn("[U-GOV STORAGE WARNING] Running in EPHEMERAL DEMO mode. Uploaded documents and application data can be lost on restart or redeploy. Do not use real citizen data.");
     }
     this.data = this.loadOrInitialize();
   }
@@ -514,6 +523,42 @@ class Database {
     }
   }
 
+  private writeSnapshotAtomically(snapshot: DatabaseSchema): void {
+    const directory = path.dirname(DB_FILE);
+    fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    const temporaryFile = `${DB_FILE}.${process.pid}.${crypto.randomUUID()}.tmp`;
+    let descriptor: number | undefined;
+
+    try {
+      descriptor = fs.openSync(temporaryFile, "wx", 0o600);
+      fs.writeFileSync(descriptor, JSON.stringify(snapshot, null, 2), "utf-8");
+      fs.fsyncSync(descriptor);
+      fs.closeSync(descriptor);
+      descriptor = undefined;
+      fs.renameSync(temporaryFile, DB_FILE);
+
+      // Sync the containing directory so the rename itself is durable on
+      // filesystems that support directory fsync.
+      let directoryDescriptor: number | undefined;
+      try {
+        directoryDescriptor = fs.openSync(directory, "r");
+        fs.fsyncSync(directoryDescriptor);
+      } catch {
+        // Some platforms/filesystems do not allow fsync on directory handles.
+      } finally {
+        if (directoryDescriptor !== undefined) {
+          try { fs.closeSync(directoryDescriptor); } catch { /* best effort */ }
+        }
+      }
+    } catch (error) {
+      if (descriptor !== undefined) {
+        try { fs.closeSync(descriptor); } catch { /* best effort */ }
+      }
+      try { if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile); } catch { /* best effort */ }
+      throw error;
+    }
+  }
+
   private loadOrInitialize(): DatabaseSchema {
     try {
       if (fs.existsSync(DB_FILE)) {
@@ -522,11 +567,9 @@ class Database {
         if (!parsed.documentTypes || parsed.documentTypes.length === 0) {
           parsed.documentTypes = this.getDefaultDocumentTypes();
         }
-        if (!parsed.citizenDocuments || parsed.citizenDocuments.length === 0) {
-          const seeded = this.seedDefaultCitizenDocuments("usr-citizen-01");
-          parsed.citizenDocuments = seeded.documents;
-          parsed.documentConsents = seeded.consents;
-        }
+        // An intentionally empty vault is valid; never recreate sample documents
+        // after a citizen has deleted their final document.
+        if (!parsed.citizenDocuments) parsed.citizenDocuments = [];
         if (!parsed.documentConsents) parsed.documentConsents = [];
         if (!parsed.governmentServices || parsed.governmentServices.length === 0) {
           parsed.governmentServices = this.getDefaultGovernmentServices();
@@ -542,7 +585,7 @@ class Database {
             
             // Also write the update back to the persistent disk right away
             try {
-              fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+              this.writeSnapshotAtomically(parsed);
             } catch (e) {
               console.warn("Failed to save migrated name to disk:", e);
             }
@@ -552,33 +595,21 @@ class Database {
         return parsed;
       }
     } catch (err) {
-      console.warn("Could not load database file, re-initializing store:", err);
+      // Never replace an unreadable existing store with demo seed data.
+      if (fs.existsSync(DB_FILE)) {
+        throw new Error("U-GOV data store could not be read safely. Startup stopped to prevent data loss.");
+      }
+      throw err;
     }
     return this.initializeSeed();
   }
 
   private save(): void {
-    const temporaryFile = DB_FILE + "." + process.pid + "." + crypto.randomUUID() + ".tmp";
     try {
-      const dir = path.dirname(DB_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-      }
-
-      // Write a complete snapshot first, then atomically replace the prior file.
-      // This reduces the chance of leaving a truncated JSON store after a crash.
-      fs.writeFileSync(temporaryFile, JSON.stringify(this.data, null, 2), {
-        encoding: "utf-8",
-        mode: 0o600,
-      });
-      fs.renameSync(temporaryFile, DB_FILE);
+      this.writeSnapshotAtomically(this.data);
     } catch (err) {
-      try {
-        if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile);
-      } catch {
-        // Preserve the original persistence error for diagnostics.
-      }
       console.error("Failed to write to database file:", err);
+      throw new Error("U-GOV data store write failed; the requested change was not confirmed.");
     }
   }
 
@@ -723,13 +754,9 @@ class Database {
     };
 
     try {
-      const dir = path.dirname(DB_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(DB_FILE, JSON.stringify(initialDb, null, 2), "utf-8");
+      this.writeSnapshotAtomically(initialDb);
     } catch (e) {
-      console.warn("Could not save initial DB seed to disk:", e);
+      throw new Error("U-GOV could not initialize its data store; startup stopped rather than running without persistence.");
     }
 
     return initialDb;
@@ -918,28 +945,47 @@ class Database {
       this.data.citizenDocuments = [];
     }
     this.data.citizenDocuments.push(doc);
-    this.save();
+    try {
+      this.save();
+    } catch (error) {
+      this.data.citizenDocuments = this.data.citizenDocuments.filter((item) => item.id !== doc.id);
+      throw error;
+    }
   }
 
   public updateDocument(id: string, updates: Partial<CitizenDocumentRecord>): void {
     const index = (this.data.citizenDocuments || []).findIndex((d) => d.id === id);
     if (index !== -1) {
+      const previous = this.data.citizenDocuments[index];
       this.data.citizenDocuments[index] = {
-        ...this.data.citizenDocuments[index],
+        ...previous,
         ...updates,
         updatedAt: new Date().toISOString(),
       };
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        this.data.citizenDocuments[index] = previous;
+        throw error;
+      }
     }
   }
 
   public deleteDocument(id: string): boolean {
     const initialLen = (this.data.citizenDocuments || []).length;
-    this.data.citizenDocuments = (this.data.citizenDocuments || []).filter((d) => d.id !== id);
-    this.data.documentConsents = (this.data.documentConsents || []).filter((c) => c.documentId !== id);
+    const previousDocuments = this.data.citizenDocuments || [];
+    const previousConsents = this.data.documentConsents || [];
+    this.data.citizenDocuments = previousDocuments.filter((d) => d.id !== id);
+    this.data.documentConsents = previousConsents.filter((c) => c.documentId !== id);
     const deleted = this.data.citizenDocuments.length < initialLen;
     if (deleted) {
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        this.data.citizenDocuments = previousDocuments;
+        this.data.documentConsents = previousConsents;
+        throw error;
+      }
     }
     return deleted;
   }
@@ -951,14 +997,33 @@ class Database {
       this.data.documentConsents = [];
     }
     this.data.documentConsents.push(consent);
-    this.save();
+    try {
+      this.save();
+    } catch (error) {
+      this.data.documentConsents = this.data.documentConsents.filter((item) => item.id !== consent.id);
+      throw error;
+    }
+  }
+
+  private expireElapsedConsents(): void {
+    const now = new Date().toISOString();
+    let changed = false;
+    for (const consent of this.data.documentConsents || []) {
+      if (consent.status === "ACTIVE" && consent.expiresAt <= now) {
+        consent.status = "EXPIRED";
+        changed = true;
+      }
+    }
+    if (changed) this.save();
   }
 
   public getConsentsByDocumentId(documentId: string): DocumentConsentRecord[] {
+    this.expireElapsedConsents();
     return (this.data.documentConsents || []).filter((c) => c.documentId === documentId);
   }
 
   public getConsentsByOwner(ownerUserId: string): DocumentConsentRecord[] {
+    this.expireElapsedConsents();
     return (this.data.documentConsents || []).filter((c) => c.ownerUserId === ownerUserId);
   }
 
@@ -971,15 +1036,24 @@ class Database {
       (c) => c.id === consentId && c.ownerUserId === ownerUserId
     );
     if (consent && consent.status === "ACTIVE") {
+      const previousStatus = consent.status;
+      const previousRevokedAt = consent.revokedAt;
       consent.status = "REVOKED";
       consent.revokedAt = new Date().toISOString();
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        consent.status = previousStatus;
+        consent.revokedAt = previousRevokedAt;
+        throw error;
+      }
       return true;
     }
     return false;
   }
 
   public checkActiveConsent(documentId: string, recipientEntity: string): DocumentConsentRecord | undefined {
+    this.expireElapsedConsents();
     const now = new Date().toISOString();
     return (this.data.documentConsents || []).find(
       (c) =>

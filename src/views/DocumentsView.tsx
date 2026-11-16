@@ -158,7 +158,7 @@ export const DocumentsView: React.FC = () => {
       setFileBase64("");
       setActionNotice({
         type: "success",
-        message: "Credential deposited successfully into your private DigiVault with cryptographic SHA-256 seal.",
+        message: "Document uploaded to private U-DOCS storage with a SHA-256 integrity checksum.",
       });
       setTimeout(() => setActionNotice(null), 6000);
     } else {
@@ -236,7 +236,7 @@ export const DocumentsView: React.FC = () => {
       setIsShareOpen(false);
       setActionNotice({
         type: "success",
-        message: `Time-bound consent (${durationDays} days) granted to ${recipientEntity}. You can revoke access at any second.`,
+        message: `A time-bound U-GOV consent record (${durationDays} days) was created for ${recipientEntity}. You can revoke this permission from the Consent Center.`,
       });
       setTimeout(() => setActionNotice(null), 6000);
     } else {
@@ -250,7 +250,7 @@ export const DocumentsView: React.FC = () => {
     if (res.success) {
       setActionNotice({
         type: "success",
-        message: `Consent for ${recipientName} unilaterally revoked with immediate effect. Department access is now blocked.`,
+        message: `Consent for ${recipientName} was revoked in U-GOV. This prototype has no live external department connection.`,
       });
     } else {
       setActionNotice({
@@ -272,7 +272,7 @@ export const DocumentsView: React.FC = () => {
     if (res.success) {
       setActionNotice({
         type: "success",
-        message: `Document "${deleteConfirmDoc.name}" and its private binary purged from vault disk.`,
+        message: `Document "${deleteConfirmDoc.name}" and its consent records were removed. Storage cleanup status is recorded in U-AUDIT.`,
       });
     } else {
       setActionNotice({
@@ -301,14 +301,14 @@ export const DocumentsView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              U-DOCS Sovereign Digital Vault & Consent Center
+              U-DOCS Document Vault & Consent Records
             </h1>
-            <Badge variant="success" size="sm" dot>
-              DPDP Act 2023 Compliant
+            <Badge variant="info" size="sm">
+              Prototype privacy controls
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Citizen-controlled digital vault backed by mathematical SHA-256 integrity, private filesystem isolation, and real-time unilateral consent revocation.
+            Citizen-controlled prototype vault with private file storage, on-demand SHA-256 integrity checks, and consent records managed inside U-GOV.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -361,22 +361,22 @@ export const DocumentsView: React.FC = () => {
         </div>
       )}
 
-      {/* Sovereign Guarantee Box */}
+      {/* Vault safeguards */}
       <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex items-start gap-3">
         <ShieldCheck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-700 leading-relaxed space-y-1">
           <div>
-            <strong>Sovereign Vault Principle:</strong> Documents are stored strictly in private, unexposed vault storage with randomized UUID keys. No direct URL access is possible.
+            <strong>Vault storage safeguards:</strong> Files use private storage keys and authenticated application routes rather than public static URLs.
           </div>
           <div className="text-[11px] text-slate-500 flex items-center gap-2 flex-wrap pt-0.5">
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <strong>Stored:</strong> Private encrypted binary
+              <strong>Stored:</strong> Private vault file (not encrypted at rest)
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              <strong>Integrity:</strong> Real-time SHA-256 match
+              <strong>Integrity:</strong> On-demand SHA-256 checksum verification
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
@@ -409,7 +409,7 @@ export const DocumentsView: React.FC = () => {
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
-          <span>Active Department Consents ({activeConsents.length})</span>
+          <span>Consent Records ({allConsents.length})</span>
         </button>
       </div>
 
@@ -421,7 +421,7 @@ export const DocumentsView: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-slate-800">Your DigiVault is Empty</h3>
+              <h3 className="text-base font-bold text-slate-800">Your U-DOCS vault is empty</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 No credentials have been deposited yet. Deposit your identity documents, marksheets, or certificates to protect them with cryptographic SHA-256 integrity.
               </p>
@@ -500,7 +500,7 @@ export const DocumentsView: React.FC = () => {
                             Cryptographic SHA-256 Checksum
                           </span>
                           <span className="text-[11px] font-mono text-slate-600 block truncate mt-0.5 select-all">
-                            {doc.sha256Checksum || "a7c91e84...calculated_at_vault"}
+                            {doc.sha256Checksum || "Checksum unavailable"}
                           </span>
                         </div>
                       </div>
@@ -659,7 +659,7 @@ export const DocumentsView: React.FC = () => {
               </div>
               <h3 className="text-base font-bold text-slate-800">Zero Active Consents</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                No third-party department currently holds an active consent grant to access your credentials. Your digital data remains 100% private and sovereign.
+                Consent records are stored within U-GOV. No external department identity or document-retrieval integration is connected in this prototype.
               </p>
             </div>
           ) : (
@@ -702,7 +702,7 @@ export const DocumentsView: React.FC = () => {
                     <div className="text-[11px] text-slate-400 flex items-center gap-2">
                       <Clock className="w-3.5 h-3.5" />
                       <span>
-                        Granted: {consent.grantedAt} • Access Expires: <strong>{consent.expiresAt}</strong>
+                        Granted: {consent.grantedAt} • Consent Expires: <strong>{consent.expiresAt}</strong>
                       </span>
                     </div>
                   </div>
@@ -719,7 +719,7 @@ export const DocumentsView: React.FC = () => {
                         )
                       }
                     >
-                      Revoke Access Immediately
+                      Revoke Consent Record
                     </Button>
                   </div>
                 </div>
@@ -733,7 +733,7 @@ export const DocumentsView: React.FC = () => {
       <Modal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        title="Deposit Credential into Private DigiVault"
+        title="Upload Document to U-DOCS"
         subtitle="Binary will be sealed in an unexposed filesystem vault with randomized UUID keys"
         maxWidth="md"
       >
@@ -831,7 +831,7 @@ export const DocumentsView: React.FC = () => {
       <Modal
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        title="Grant Time-Bound Department Consent"
+        title="Record Time-Bound Consent"
         subtitle={`Authorize access to "${targetDoc?.name}" under explicit DPDP terms`}
         maxWidth="md"
       >
@@ -881,7 +881,7 @@ export const DocumentsView: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Consent Expiry Window (Time-Bound Access)
+              Consent Record Duration
             </label>
             <select
               value={durationDays}
@@ -901,7 +901,7 @@ export const DocumentsView: React.FC = () => {
               <span>Sovereign Unilateral Revocation Guarantee</span>
             </div>
             <p className="text-[10px] leading-relaxed">
-              In accordance with DPDP framework, you maintain the unconditional right to revoke this consent at any time. When revoked, the recipient department will be immediately blocked from accessing this document.
+              You can revoke this U-GOV consent record at any time. No external department is connected to retrieve document files in this prototype.
             </p>
           </div>
 
@@ -916,7 +916,7 @@ export const DocumentsView: React.FC = () => {
               Cancel
             </Button>
             <Button variant="primary" size="sm" type="submit" disabled={isSharing}>
-              {isSharing ? "Recording Consent..." : "Grant Time-Bound Access"}
+              {isSharing ? "Recording Consent..." : "Record Time-Bound Consent"}
             </Button>
           </div>
         </form>
@@ -927,12 +927,12 @@ export const DocumentsView: React.FC = () => {
         isOpen={Boolean(deleteConfirmDoc)}
         onClose={() => setDeleteConfirmDoc(null)}
         title="Permanently Delete Credential?"
-        subtitle="This action will permanently purge the binary from the private disk vault"
+        subtitle="This permanently removes the document record and its private stored file"
         maxWidth="sm"
       >
         <div className="space-y-4">
           <p className="text-xs text-slate-600 leading-relaxed">
-            Are you sure you want to delete <strong>{deleteConfirmDoc?.name}</strong>? All associated department consents will be automatically invalidated, and the encrypted binary will be unlinked from the vault.
+            Are you sure you want to delete <strong>{deleteConfirmDoc?.name}</strong>? Its U-GOV consent records will also be invalidated. The file is not encrypted at rest.
           </p>
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <Button
