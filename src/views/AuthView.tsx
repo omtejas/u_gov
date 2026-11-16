@@ -69,7 +69,7 @@ export const AuthView: React.FC = () => {
   return (
     <div className="w-full flex flex-col lg:flex-row min-h-[calc(100vh-10rem)] rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white my-2">
       {/* Left Branding Panel: Deep Navy Public Infrastructure Canvas */}
-      <div className="relative w-full lg:w-[44%] bg-[#0b1f3a] text-white p-8 lg:p-12 flex flex-col justify-between overflow-hidden">
+      <div className="relative w-full lg:w-[44%] bg-[#174EA6] text-white p-8 lg:p-12 flex flex-col justify-between overflow-hidden">
         {/* Subtle Sovereign Motifs */}
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 -right-24 w-80 h-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
@@ -85,7 +85,7 @@ export const AuthView: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-[#0b1f3a] p-1 flex items-center justify-center border border-white/20 shadow-md overflow-hidden shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-[#174EA6] p-1 flex items-center justify-center border border-white/20 shadow-md overflow-hidden shrink-0">
               <img src="/logo.png" alt="U-GOV Emblem" className="w-full h-full object-contain" />
             </div>
             <div>
