@@ -99,8 +99,8 @@
 - **Provider Abstraction**: Vendor-agnostic `AIProvider` interface with `MockAIProvider` (deterministic, zero external API keys) and `GeminiProvider` (bounded timeouts, zero secret leakage).
 - **Controlled Tool Gateway**:
   - `searchServices`: Discovers public services without unrestricted database access.
-  - `getServiceDetails`: Retrieves statutory SLAs, fees, and eligibility criteria.
-  - `checkRequirements`: Returns statutory document checklists.
+  - `getServiceDetails`: Retrieves service metadata from the U-GOV prototype catalogue; it does not independently validate statutory rules.
+  - `checkRequirements`: Returns document lists configured in the prototype catalogue.
   - `getCitizenApplicationStatus`: Citizen-scoped application status lookup with strict IDOR protection.
   - `getCitizenDocumentReadiness`: Evaluates vault readiness without exposing raw filesystem paths or document content.
 - **AI Safety & Honesty**: Clearly displays `"AI-generated guidance. Verify important information before submission."` Never performs autonomous submissions or consent authorizations.
@@ -161,6 +161,16 @@ npm run dev
 ```
 
 ---
+
+
+### G-Bot AI Provider and Demo Boundaries
+
+- The backend selects Google Gemini when `GEMINI_API_KEY` is configured and `NODE_ENV` is not `test`; otherwise it uses the deterministic `MockAIProvider`.
+- Gemini receives only the current bounded citizen question and public service-catalogue facts. Common Aadhaar, PAN, phone, email, and application-number patterns are redacted before the request.
+- Citizen-specific application tracking and document-readiness checks are routed to the local U-GOV tool gateway and are not sent to Gemini.
+- The catalogue, document vault, and government integration adapters in this prototype are demo/sandbox data. They are not live connections to government registries, Aadhaar, DigiLocker, or National Portals.
+- AI guidance is informational, may be incorrect, and must be checked with the issuing authority. G-Bot does not grant eligibility, approve applications, or submit an application autonomously.
+- Keep `GEMINI_API_KEY` in Render's backend environment settings only. Never commit it, expose it in frontend variables, or paste it into source control.
 
 ### Render Storage and Runtime Status
 
