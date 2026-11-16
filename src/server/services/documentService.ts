@@ -51,6 +51,9 @@ export class DocumentService {
     if (!input.documentTypeId || typeof input.documentTypeId !== "string" || input.documentTypeId.length > 64) {
       throw new Error("Valid document type is required.");
     }
+    if (!db.findDocumentTypeById(input.documentTypeId)) {
+      throw new Error("Selected document type is not present in the U-DOCS catalogue.");
+    }
     if (!Buffer.isBuffer(input.fileBuffer) || input.fileBuffer.length === 0) {
       throw new Error("Document binary payload is empty or invalid.");
     }
