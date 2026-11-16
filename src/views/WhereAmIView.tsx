@@ -184,7 +184,7 @@ export const WhereAmIView: React.FC = () => {
                   onClick={() => setSelectedAppId(app.id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     isSel
-                      ? "bg-[#0b1f3a] text-white shadow-xs"
+                      ? "bg-[#174EA6] text-white shadow-xs"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                   }`}
                 >
