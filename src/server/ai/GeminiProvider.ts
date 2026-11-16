@@ -38,6 +38,7 @@ export class GeminiProvider implements AIProvider {
       // Keep private citizen lookups in U-GOV's authenticated, deterministic
       // tool gateway. Never send private vault or application data to Gemini.
       const lowerMessage = request.message.toLowerCase();
+      const contextualQuery = [...(request.conversationHistory || []).filter((m) => m.role === "user").slice(-2).map((m) => m.text), request.message].join(" ").slice(0, 700);
       const isPrivateLookup =
         /\b(status|track|tracking|application number|where is my application)\b/.test(lowerMessage) ||
         /\b(my documents|my document|document readiness|am i ready|what am i missing)\b/.test(lowerMessage);
@@ -47,7 +48,7 @@ export class GeminiProvider implements AIProvider {
 
       // Only public catalogue facts are supplied to the external AI provider.
       // This catalogue is prototype/demo data, not a live government registry.
-      const searchResults = await toolGateway.searchServices(request.message);
+      const searchResults = await toolGateway.searchServices(contextualQuery);
       const selectedService = searchResults[0];
       const serviceDetails = selectedService
         ? await toolGateway.getServiceDetails(selectedService.serviceCode)
@@ -78,7 +79,7 @@ export class GeminiProvider implements AIProvider {
 
       let webSources: WebSearchSource[] = [];
       if ((process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY) && !isPrivateLookup) {
-        try { webSources = await this.webSearch.search(request.message, 6); }
+        try { webSources = await this.webSearch.search(contextualQuery, 6); }
         catch (searchError: any) { console.warn("G-Bot web search unavailable:", searchError?.message || searchError); }
       }
 
