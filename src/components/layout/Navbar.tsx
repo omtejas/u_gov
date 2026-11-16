@@ -62,13 +62,13 @@ export const Navbar: React.FC = () => {
                 onClick={() => setActiveTab(item.id)}
                 className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? "bg-[#0b1f3a] text-white shadow-2xs"
+                    ? "bg-[#174EA6] text-white shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 <Icon
                   className={`w-3.5 h-3.5 ${
-                    isActive ? "text-amber-400" : "text-slate-400"
+                    isActive ? "text-[#F5C518]" : "text-slate-400"
                   }`}
                 />
                 <span>{item.label}</span>
@@ -100,7 +100,7 @@ export const Navbar: React.FC = () => {
               onClick={() => setMode("admin")}
               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 mode === "admin"
-                  ? "bg-white text-blue-700 shadow-2xs font-bold"
+                  ? "bg-white text-[#174EA6] shadow-2xs font-bold"
                   : "text-slate-500 hover:text-slate-900"
               }`}
             >
@@ -111,7 +111,7 @@ export const Navbar: React.FC = () => {
           {/* AI Guidance Pill */}
           <button
             onClick={() => openGBot()}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold hover:brightness-110 shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#174EA6] text-white text-xs font-bold hover:brightness-110 shadow-xs cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Ask G-Bot</span>
