@@ -55,12 +55,12 @@ export const AdminView: React.FC = () => {
   const [builderMsg, setBuilderMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const nodes = [
-    { name: "UIDAI Aadhaar 2.0 Auth Node", status: "Healthy", latency: "38 ms", uptime: "99.99%", load: "24%" },
-    { name: "DigiLocker DPI Credential Verifier", status: "Healthy", latency: "46 ms", uptime: "99.98%", load: "31%" },
-    { name: "PFMS Direct Benefit Transfer (DBT)", status: "Healthy", latency: "72 ms", uptime: "99.95%", load: "58%" },
-    { name: "State Revenue Land Registry (Bhulekh)", status: "Healthy", latency: "95 ms", uptime: "99.91%", load: "42%" },
-    { name: "CPGRAMS Statutory Grievance Gateway", status: "Healthy", latency: "52 ms", uptime: "99.97%", load: "19%" },
-    { name: "Bharat G-Bot Gemini 2.5 Reasoning Node", status: "Active", latency: "210 ms", uptime: "99.99%", load: "15%" },
+    { name: "U-GOV Citizen Interface", mode: "Application UI", status: "ACTIVE", scope: "Current web application" },
+    { name: "U-SERVICES Catalogue", mode: "Prototype data", status: "ACTIVE", scope: "Seeded service entries" },
+    { name: "U-DOCS Document Vault", mode: "Configured storage", status: "CONFIGURED", scope: "Private citizen-owned files" },
+    { name: "U-INTEGRATIONS Gateway", mode: "Sandbox adapters", status: "SANDBOX", scope: "Mock providers only; no live government APIs" },
+    { name: "U-AI Assistant", mode: "Server-selected provider", status: "CONFIGURED", scope: "See /api/v1/ai/health for active provider" },
+    { name: "U-AUDIT Ledger", mode: "SHA-256 hash chain", status: "CONFIGURED", scope: "Prototype audit events" },
   ];
 
   const resetForm = () => {
@@ -243,11 +243,11 @@ export const AdminView: React.FC = () => {
               <span>U-SYS Master Ecosystem Command Console</span>
             </h1>
             <Badge variant="info" size="sm">
-              Cluster Mode
+              Prototype Console
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Real-time public digital infrastructure telemetry, service mesh health, and No-Code Service Builder.
+            Prototype component overview, catalogue administration, and sandbox integration visibility.
           </p>
         </div>
 
@@ -286,31 +286,31 @@ export const AdminView: React.FC = () => {
                 {localServices.length}
               </div>
               <span className="text-[11px] text-emerald-600 font-semibold mt-0.5 block">
-                100% Operational
+                Prototype catalogue
               </span>
             </Card>
 
             <Card variant="flat" padding="md">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Total Handled Transactions
+                Application Records
               </span>
               <div className="text-2xl font-black text-slate-900 mt-1">
-                148,290
+                {applications.length}
               </div>
               <span className="text-[11px] text-blue-600 font-semibold mt-0.5 block">
-                +18.4% this week
+                Records in current application store
               </span>
             </Card>
 
             <Card variant="flat" padding="md">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                System Average Latency
+                Citizen Audit Events
               </span>
               <div className="text-2xl font-black text-slate-900 mt-1">
-                54 ms
+                {auditLogs.length}
               </div>
               <span className="text-[11px] text-emerald-600 font-semibold mt-0.5 block">
-                Sub-100ms Target Met
+                Visible in current prototype session
               </span>
             </Card>
 
@@ -319,10 +319,10 @@ export const AdminView: React.FC = () => {
                 Audit Ledger State
               </span>
               <div className="text-2xl font-black text-slate-900 mt-1">
-                Verified
+                Hash-chained
               </div>
               <span className="text-[11px] text-slate-500 font-semibold mt-0.5 block">
-                SHA-256 Hash-Chain Consistent
+                Verify integrity in the Audit view
               </span>
             </Card>
           </div>
@@ -331,11 +331,11 @@ export const AdminView: React.FC = () => {
           <Card variant="default" padding="none" className="space-y-0">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-900">
-                National Gateway Node Topology & Live Health
+                U-GOV Components & Integration Boundaries
               </h3>
               <span className="text-xs text-slate-400 flex items-center gap-1">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Telemetry updated every 5s</span>
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>Prototype status • Not live government telemetry</span>
               </span>
             </div>
 
@@ -343,11 +343,10 @@ export const AdminView: React.FC = () => {
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3 px-4">Node / Infrastructure Gateway</th>
+                    <th className="py-3 px-4">Component</th>
+                    <th className="py-3 px-4">Mode</th>
                     <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Avg Latency</th>
-                    <th className="py-3 px-4">Cluster Load</th>
-                    <th className="py-3 px-4">30-Day Uptime</th>
+                    <th className="py-3 px-4">Current scope</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -357,28 +356,13 @@ export const AdminView: React.FC = () => {
                         <Database className="w-4 h-4 text-blue-600 shrink-0" />
                         <span>{n.name}</span>
                       </td>
+                      <td className="py-3 px-4 text-slate-600">{n.mode}</td>
                       <td className="py-3 px-4">
-                        <Badge variant="success" size="sm" dot>
+                        <Badge variant={n.status === "ACTIVE" ? "success" : "info"} size="sm" dot>
                           {n.status}
                         </Badge>
                       </td>
-                      <td className="py-3 px-4 font-mono text-slate-600 font-bold">
-                        {n.latency}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 rounded-full bg-slate-200 overflow-hidden">
-                            <div
-                              className="h-full bg-blue-600 rounded-full"
-                              style={{ width: n.load }}
-                            />
-                          </div>
-                          <span className="text-slate-500 font-mono text-[11px]">{n.load}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 font-mono font-bold text-emerald-700">
-                        {n.uptime}
-                      </td>
+                      <td className="py-3 px-4 text-slate-600">{n.scope}</td>
                     </tr>
                   ))}
                 </tbody>
