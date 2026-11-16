@@ -102,7 +102,7 @@ async function runDocumentsTests() {
       headers: { "Content-Type": "application/json", Cookie: cookieA },
       body: JSON.stringify({
         title: "Malicious File",
-        documentTypeId: "dt-aadhaar",
+        documentTypeId: "AADHAAR",
         fileName: "virus.exe",
         mimeType: "application/x-msdownload",
         fileData: sampleBase64,
@@ -113,14 +113,14 @@ async function runDocumentsTests() {
     const malformedBase64Res = await fetch(`${baseUrl}/documents/deposit`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookieA },
-      body: JSON.stringify({ title: "Malformed", documentTypeId: "dt-aadhaar", fileName: "bad.pdf", mimeType: "application/pdf", fileData: "%%%not-base64%%%" }),
+      body: JSON.stringify({ title: "Malformed", documentTypeId: "AADHAAR", fileName: "bad.pdf", mimeType: "application/pdf", fileData: "%%%not-base64%%%" }),
     });
     assert(malformedBase64Res.status === 400, "Malformed Base64 payload is rejected before storage");
 
     const spoofedMimeRes = await fetch(`${baseUrl}/documents/deposit`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookieA },
-      body: JSON.stringify({ title: "Spoofed PDF", documentTypeId: "dt-aadhaar", fileName: "fake.pdf", mimeType: "application/pdf", fileData: Buffer.from("this is not a PDF").toString("base64") }),
+      body: JSON.stringify({ title: "Spoofed PDF", documentTypeId: "AADHAAR", fileName: "fake.pdf", mimeType: "application/pdf", fileData: Buffer.from("this is not a PDF").toString("base64") }),
     });
     assert(spoofedMimeRes.status === 400, "File extension and declared MIME cannot disguise non-PDF content");
 
@@ -130,7 +130,7 @@ async function runDocumentsTests() {
       headers: { "Content-Type": "application/json", Cookie: cookieA },
       body: JSON.stringify({
         title: "Aadhaar Card",
-        documentTypeId: "dt-aadhaar",
+        documentTypeId: "AADHAAR",
         documentNumber: "1234-5678-9012",
         fileName: "../../private/aadhaar_sample.pdf",
         mimeType: "application/pdf",
