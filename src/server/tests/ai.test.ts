@@ -58,7 +58,8 @@ async function runAITests() {
     const healthData = await healthRes.json();
     assert(healthRes.status === 200, "GET /api/v1/ai/health returns 200 OK");
     assert(healthData.status === "HEALTHY", "Health status is HEALTHY");
-    assert(healthData.mode === "SOVEREIGN_GROUNDED_ASSISTANT", "Mode indicates SOVEREIGN_GROUNDED_ASSISTANT");
+    assert(healthData.mode === "DETERMINISTIC_DEMO", "Health telemetry clearly identifies deterministic demo mode");
+    assert(healthData.liveAI === false, "Health telemetry does not claim live AI when the mock provider is active");
     assert(healthData.provider === "MockAIProvider", "Active provider is MockAIProvider");
 
     // 2. Unauthenticated chat call must be blocked
