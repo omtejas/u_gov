@@ -78,3 +78,14 @@ Limitations:
 - FAQ and service catalogue are the current internal knowledge sources; a complete crawler/index of every platform page is not yet implemented.
 - Several remaining modules still require a full visual redesign.
 - No build, lint, test suite, browser QA or preview deployment has been run for this increment. GitHub API acceptance is not proof of compilation or runtime correctness.
+
+
+## Verification update — 2026-11-17
+
+- GitHub Actions run: https://github.com/omtejas/u_gov/actions/runs/43934993087
+- Verified commit: `e7edc50a10c8c04f718cf1abdfb7f3b108d6fdde`
+- `npm ci`: passed
+- `npm run lint` (TypeScript): passed
+- `npm run build`: passed
+- `npm test`: passed
+- This does not verify external provider credentials, visual browser QA, responsive device testing or a deployed V6 preview.
