@@ -54,7 +54,7 @@ export class MockAIProvider implements AIProvider {
 
     // Follow-ups about a previously displayed private status stay local to U-GOV.
     const lastAssistantMessage = request.conversationHistory?.filter((m) => m.role === "model").slice(-1)[0]?.text || "";
-    if (/application status|current lifecycle state|tracking token/i.test(lastAssistantMessage) && /\\b(what does|what is|why|explain|meaning|next|pending)\\b/i.test(q)) {
+    if (/application status|current lifecycle state|tracking token/i.test(lastAssistantMessage) && /\b(what does|what is|why|explain|meaning|next|pending)\b/i.test(q)) {
       return {
         reply: "I can explain the status without sending your application details outside U-GOV. DRAFT means the application has not been submitted; DOCUMENTS_REQUIRED means required items are missing; READY means the checklist is satisfied; CONSENT_REQUIRED means you must authorize the requested document sharing; SUBMITTED or PROCESSING means the sandbox workflow has received the demo application; ACTION_REQUIRED means you need to review the Tracker for the next step; APPROVED or REJECTED are terminal demo outcomes. Open Tracker to see the exact action recorded for your application.",
         source: "U-GOV private application guidance",
