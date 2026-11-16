@@ -232,29 +232,29 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       {
         id: "stage-1",
         stageNumber: 1,
-        title: "Scheme Discovery & Eligibility Check",
-        department: service?.department || "National Portal",
-        desc: `Discovered statutory scheme ${service?.name || app.serviceId}. Verified initial criteria.`,
+        title: "Service Catalogue Review",
+        department: service?.department || "U-GOV Service Catalogue",
+        desc: `Discovered statutory scheme ${service?.name || app.serviceId}. This prototype does not verify official eligibility.`,
         status: "COMPLETED",
         timestamp: app.createdAt,
       },
       {
         id: "stage-2",
         stageNumber: 2,
-        title: "U-DOCS Vault Requirements Check",
-        department: "Citizen Sovereign Vault",
-        desc: `${app.attachedDocumentIds.length} required credential(s) attached from private digital vault.`,
+        title: "U-DOCS Document Readiness",
+        department: "U-GOV Document Vault",
+        desc: `${app.attachedDocumentIds.length} document(s) attached to this prototype application.`,
         status: (app.status === "DRAFT" || app.status === "DOCUMENTS_REQUIRED") ? "CURRENT" : "COMPLETED",
         timestamp: app.createdAt,
       },
       {
         id: "stage-3",
         stageNumber: 3,
-        title: "Sovereign DPDP Consent Authorization",
+        title: "U-GOV Prototype Consent Record",
         department: "U-CONSENT Engine",
         desc: app.consentIds && app.consentIds.length > 0
-          ? "Explicit purpose-bound consent granted for credential verification."
-          : "Awaiting explicit citizen data-sharing consent.",
+          ? "A consent record was created within U-GOV for the selected documents."
+          : "No U-GOV prototype consent record has been created yet.",
         status: (app.consentIds && app.consentIds.length > 0)
           ? "COMPLETED"
           : (app.status === "CONSENT_REQUIRED" ? "CURRENT" : (app.status === "DOCUMENTS_REQUIRED" ? "PENDING" : "COMPLETED")),
@@ -262,9 +262,9 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       {
         id: "stage-4",
         stageNumber: 4,
-        title: "Application Payload Generation",
+        title: "Application Record Preparation",
         department: "U-APPLICATIONS Engine",
-        desc: `Form payload serialized with statutory reference ${app.applicationNumber}.`,
+        desc: `Application data stored in the U-GOV prototype under reference ${app.applicationNumber}.`,
         status: (app.status === "DRAFT" || app.status === "DOCUMENTS_REQUIRED" || app.status === "READY" || app.status === "CONSENT_REQUIRED")
           ? "PENDING"
           : "COMPLETED",
@@ -275,8 +275,8 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
         title: "Sandbox Gateway Submission",
         department: "U-INTEGRATIONS Hub",
         desc: app.submittedAt
-          ? `Dispatched to department integration adapter at ${app.submittedAt}.`
-          : "Awaiting final citizen dispatch.",
+          ? `Accepted by the U-GOV sandbox adapter at ${app.submittedAt}.`
+          : "Awaiting citizen submission to the U-GOV sandbox.",
         status: ["SUBMITTED", "PROCESSING", "ACTION_REQUIRED", "APPROVED", "REJECTED"].includes(app.status)
           ? "COMPLETED"
           : "PENDING",
@@ -285,9 +285,9 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       {
         id: "stage-6",
         stageNumber: 6,
-        title: "Departmental Adapter Synchronization",
-        department: service?.department || "Department Gateway",
-        desc: `Synchronized with ${service?.serviceCode || "STATUTORY"} integration adapter.`,
+        title: "Sandbox Adapter Response",
+        department: service?.department || "U-GOV Sandbox Gateway",
+        desc: `Prototype adapter response only; no live government system synchronization is performed. // formerly synchronized with ${service?.serviceCode || "STATUTORY"} integration adapter.`,
         status: ["PROCESSING", "ACTION_REQUIRED", "APPROVED", "REJECTED"].includes(app.status)
           ? "COMPLETED"
           : (app.status === "SUBMITTED" ? "CURRENT" : "PENDING"),
@@ -295,13 +295,13 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       {
         id: "stage-7",
         stageNumber: 7,
-        title: "Caseworker Verification & Inspection",
-        department: `${service?.department || "State Directorate"} Desk`,
+        title: "Prototype Processing State",
+        department: `${service?.department || "U-GOV Demonstration Workflow"} Desk`,
         desc: app.status === "ACTION_REQUIRED"
-          ? (app.cancellationReason || "Caseworker requested additional document verification.")
+          ? (app.cancellationReason || "The prototype record is marked as requiring further action.")
           : (["APPROVED", "REJECTED"].includes(app.status)
-            ? "Caseworker completed credential inspection."
-            : "Assigned to departmental officer desk for credential inspection."),
+            ? "A terminal outcome is recorded in the prototype; it is not an official government decision."
+            : "No live caseworker assignment or departmental review is connected."),
         status: ["APPROVED", "REJECTED"].includes(app.status)
           ? "COMPLETED"
           : (app.status === "ACTION_REQUIRED" ? "ACTION_REQUIRED" : (["SUBMITTED", "PROCESSING"].includes(app.status) ? "CURRENT" : "PENDING")),
@@ -309,26 +309,26 @@ applicationsRouter.get("/:id/journey", (req: AuthenticatedRequest, res: Response
       {
         id: "stage-8",
         stageNumber: 8,
-        title: "Statutory Decision & Delivery",
+        title: "Prototype Outcome",
         department: service?.ministry || "Republic of India",
         desc: app.status === "APPROVED"
-          ? "Application officially APPROVED. Statutory certificate issued and anchored to U-DOCS Vault."
+          ? "Prototype status marked APPROVED. This is not an official government decision or certificate."
           : (app.status === "REJECTED"
             ? `Application REJECTED: ${app.cancellationReason || "Statutory criteria not met"}.`
-            : "Final statutory decision pending caseworker review."),
+            : "No official government decision or certificate is available through this prototype."),
         status: app.status === "APPROVED" ? "APPROVED" : (app.status === "REJECTED" ? "REJECTED" : "PENDING"),
       },
     ];
 
-    let nextAction = "No action needed. Application is progressing through statutory channels.";
+    let nextAction = "No citizen action is currently indicated by this U-GOV prototype record.";
     if (app.status === "DOCUMENTS_REQUIRED") {
-      nextAction = "Upload missing credentials to your Digital Vault and attach them.";
+      nextAction = "Add the listed missing document types to U-DOCS and attach them to this application.";
     } else if (app.status === "READY" || app.status === "CONSENT_REQUIRED") {
-      nextAction = "Grant DPDP consent to authorize credential sharing with the department.";
+      nextAction = "Review the selected documents and record consent within the U-GOV prototype.";
     } else if (app.status === "ACTION_REQUIRED") {
-      nextAction = `Action Required by Caseworker: ${app.cancellationReason || "Please review and re-submit the required documents."}`;
+      nextAction = `Review the prototype application record and follow any displayed document or form instructions. // ${app.cancellationReason || "Please review and re-submit the required documents."}`;
     } else if (app.status === "APPROVED") {
-      nextAction = "Application complete! Your approved certificate is available in your Digital Vault.";
+      nextAction = "The prototype record has a terminal status. No official certificate is issued by this demonstration.";
     }
 
     return res.json({
