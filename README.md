@@ -95,15 +95,24 @@
   - **Bounded Retries**: Circuit-breaking exponential backoff retrying transient faults only (`TIMEOUT`, `UNAVAILABLE`, `RATE_LIMITED`); non-retryable validation or auth errors fail immediately.
 - **Correlation IDs**: `UGOV-INT-xxxxxxxxxxxx` propagated across applications, provider adapters, and audit records.
 
-### 8. U-AI — Sovereign Citizen Assistance & Intelligence Layer
-- **Provider Abstraction**: Vendor-agnostic `AIProvider` interface with `MockAIProvider` (deterministic, zero external API keys) and `GeminiProvider` (bounded timeouts, zero secret leakage).
+### 8. U-AI — Bharat G-Bot Assistant (V6 increment)
+- **Provider Abstraction**: Configurable OpenAI-compatible and Google Gemini providers, with an offline deterministic fallback. Select models through environment configuration.
+- **Internet Research**: Optional Tavily page-content search or Brave web search. AI responses can return source titles, links and excerpts; external research requires provider credentials.
+- **Internal Knowledge**: Searches the public U-GOV FAQ catalogue and service catalogue through a controlled gateway.
+- **Conversation Context**: Bounded recent history is sent to hosted providers after common Indian identity/contact patterns are redacted.
+- **Personal Chat Workspace**: Browser-local conversation history is scoped by signed-in user ID on the same browser/device. It is not server-synchronized.
 - **Controlled Tool Gateway**:
-  - `searchServices`: Discovers public services without unrestricted database access.
-  - `getServiceDetails`: Retrieves service metadata from the U-GOV prototype catalogue; it does not independently validate statutory rules.
-  - `checkRequirements`: Returns document lists configured in the prototype catalogue.
-  - `getCitizenApplicationStatus`: Citizen-scoped application status lookup with strict IDOR protection.
-  - `getCitizenDocumentReadiness`: Evaluates vault readiness without exposing raw filesystem paths or document content.
-- **AI Safety & Honesty**: Clearly displays `"AI-generated guidance. Verify important information before submission."` Never performs autonomous submissions or consent authorizations.
+  - `searchServices` and `searchKnowledge`: Search public prototype services and FAQ knowledge.
+  - `getServiceDetails` and `checkRequirements`: Retrieve facts from the U-GOV prototype catalogue.
+  - `getCitizenApplicationStatus`: Citizen-scoped application status lookup with IDOR protection.
+  - `getCitizenDocumentReadiness`: Evaluate private vault readiness without sending document contents to hosted AI providers.
+- **AI Safety & Honesty**: Retrieved webpage text is untrusted; private lookups remain inside authenticated U-GOV tools; G-Bot never autonomously submits applications or authorizes consent. Prototype information must be verified with the issuing authority.
+
+### 9. U-GOV V6 visual system
+- **Palette**: Royal blue `#174EA6`, trust red `#D62828`, growth green `#16834A`, white `#FFFFFF`, deep black `#171717`, sunshine yellow `#F5C518`.
+- **Typography**: Plus Jakarta Sans for headings, Inter for UI copy, Noto Sans Devanagari and Noto Sans Kannada for regional scripts.
+- **Experience**: Updated landing page, chat workspace, navigation shell, dashboard accents, responsive surfaces, readable type scale and reduced-motion support.
+- **Status**: The full page-by-page redesign and server-side chat persistence are still in progress. See `docs/V6_GBOT_AND_DESIGN.md` for configuration and limitations.
 
 ---
 
