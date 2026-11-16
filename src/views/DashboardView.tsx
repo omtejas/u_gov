@@ -11,8 +11,7 @@ import {
   Sparkles,
   ArrowRight,
   Clock,
-  CheckCircle2,
-  AlertTriangle,
+   AlertTriangle,
   FileText,
 } from "lucide-react";
 
@@ -26,6 +25,7 @@ export const DashboardView: React.FC = () => {
     setActiveTab,
     openServiceModal,
     openApplicationModal,
+    openGBot,
     services,
   } = useGov();
 
@@ -109,6 +109,22 @@ export const DashboardView: React.FC = () => {
           </Button>
         </div>
       )}
+
+      {/* Citizen quick actions */}
+      <section aria-label="Quick actions" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Button variant="outline" className="justify-start" onClick={() => setActiveTab("services")}>
+          <FileText className="w-4 h-4 mr-2" /> Explore Services
+        </Button>
+        <Button variant="outline" className="justify-start" onClick={() => setActiveTab("documents")}>
+          <FolderLock className="w-4 h-4 mr-2" /> My Documents
+        </Button>
+        <Button variant="outline" className="justify-start" onClick={() => setActiveTab("tracker")}>
+          <Activity className="w-4 h-4 mr-2" /> Track Applications
+        </Button>
+        <Button variant="outline" className="justify-start" onClick={() => openGBot("Help me find a government service in the U-GOV prototype catalogue.")}>
+          <Sparkles className="w-4 h-4 mr-2" /> Ask G-Bot
+        </Button>
+      </section>
 
       {/* Key Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
