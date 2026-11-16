@@ -5,6 +5,19 @@ import { getStorageDriver } from "../storage";
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB strict limit
 const ALLOWED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
+function detectDocumentMime(buffer: Buffer): string | null {
+  if (buffer.length >= 5 && buffer.subarray(0, 5).toString("ascii") === "%PDF-") return "application/pdf";
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "image/png";
+  return null;
+}
+
+function safeDisplayFileName(value: string): string {
+  const leaf = String(value || "document").replace(/\\/g, "/").split("/").pop() || "document";
+  const cleaned = leaf.replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, 120);
+  return cleaned || "document";
+}
+
 export interface DepositDocumentInput {
   documentTypeId: string;
   title: string;
@@ -34,20 +47,22 @@ export class DocumentService {
     if (!input.title || typeof input.title !== "string" || !input.title.trim()) {
       throw new Error("Document title is required.");
     }
-    if (!input.documentTypeId || typeof input.documentTypeId !== "string") {
+    if (input.title.trim().length > 120) throw new Error("Document title must be 120 characters or fewer.");
+    if (!input.documentTypeId || typeof input.documentTypeId !== "string" || input.documentTypeId.length > 64) {
       throw new Error("Valid document type is required.");
     }
-    if (!input.fileBuffer || input.fileBuffer.length === 0) {
-      throw new Error("Document binary payload is empty.");
+    if (!Buffer.isBuffer(input.fileBuffer) || input.fileBuffer.length === 0) {
+      throw new Error("Document binary payload is empty or invalid.");
     }
     if (input.fileBuffer.length > MAX_FILE_SIZE_BYTES) {
       throw new Error(`File size exceeds strict 5MB limit (${(input.fileBuffer.length / 1024 / 1024).toFixed(2)} MB).`);
     }
 
-    const cleanMime = input.mimeType.toLowerCase().trim();
-    if (!ALLOWED_MIME_TYPES.includes(cleanMime)) {
-      throw new Error(`Unsupported document format: ${cleanMime}. Allowed formats: PDF, JPEG, PNG.`);
-    }
+    const cleanMime = typeof input.mimeType === "string" ? input.mimeType.toLowerCase().trim() : "";
+    if (!ALLOWED_MIME_TYPES.includes(cleanMime)) throw new Error("Unsupported document format. Allowed formats: PDF, JPEG, PNG.");
+    const detectedMime = detectDocumentMime(input.fileBuffer);
+    if (!detectedMime || detectedMime !== cleanMime) throw new Error("The file contents do not match the selected document format.");
+    if (typeof ownerUserId !== "string" || !ownerUserId.trim()) throw new Error("An authenticated document owner is required.");
 
     // 2. Save file via StorageDriver into private vault (UUID key generated internally)
     const { key, sha256, size } = await this.storage.save(input.fileBuffer, {
@@ -67,8 +82,8 @@ export class DocumentService {
       ownerUserId,
       documentTypeId: input.documentTypeId,
       title: input.title.trim(),
-      documentNumber: input.documentNumber?.trim() || "XXXX-XXXX",
-      fileName: input.fileName?.trim() || "credential.pdf",
+      documentNumber: typeof input.documentNumber === "string" ? input.documentNumber.trim().slice(0, 80) : "XXXX-XXXX",
+      fileName: safeDisplayFileName(input.fileName || "document"),
       mimeType: cleanMime,
       fileSizeBytes: size,
       storageKey: key,
@@ -78,7 +93,12 @@ export class DocumentService {
       updatedAt: now,
     };
 
-    db.createDocument(docRecord);
+    try {
+      db.createDocument(docRecord);
+    } catch (error) {
+      await this.storage.delete(key).catch(() => false);
+      throw error;
+    }
 
     // 4. Record audit event
     const profile = db.getProfileByUserId(ownerUserId);
@@ -271,12 +291,9 @@ export class DocumentService {
       throw err;
     }
 
-    if (!recipientEntity || !recipientEntity.trim()) {
-      throw new Error("Recipient government department/entity is required.");
-    }
-    if (!purpose || !purpose.trim()) {
-      throw new Error("Explicit purpose for consent is required.");
-    }
+    if (typeof recipientEntity !== "string" || !recipientEntity.trim() || recipientEntity.trim().length > 160) throw new Error("Recipient must be provided and limited to 160 characters.");
+    if (typeof purpose !== "string" || !purpose.trim() || purpose.trim().length > 240) throw new Error("Consent purpose must be provided and limited to 240 characters.");
+    if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 90) throw new Error("Consent duration must be a whole number between 1 and 90 days.");
 
     const consentId = `cst-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
     const now = new Date();
