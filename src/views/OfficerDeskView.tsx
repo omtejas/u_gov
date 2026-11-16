@@ -453,7 +453,7 @@ export const OfficerDeskView: React.FC = () => {
         isOpen={!!inspectingAppId}
         onClose={() => setInspectingAppId(null)}
         title={appDetails ? `Review: ${appDetails.applicationNumber}` : "Review Application"}
-        size="lg"
+        maxWidth="lg"
       >
         {isLoadingDetails || !appDetails ? (
           <div className="py-12 text-center text-xs text-slate-400">Inspecting credential disclosures...</div>
