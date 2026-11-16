@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  ShieldCheck, Clock, CheckCircle, XCircle, AlertTriangle, RefreshCw, ExternalLink, FileText, Building2
+  ShieldCheck, Clock, CheckCircle, XCircle, AlertTriangle, RefreshCw, ExternalLink, FileText, Building2, Search
 } from "lucide-react";
 import { useGov } from "../context/GovContext";
 
@@ -27,6 +27,8 @@ export const ConsentCenterView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "REVOKED" | "EXPIRED">("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "expiry">("newest");
 
   const fetchConsents = async () => {
     try {
@@ -60,7 +62,23 @@ export const ConsentCenterView: React.FC = () => {
     };
   });
 
-  const filtered = filter === "ALL" ? enriched : enriched.filter((c) => c.status === filter);
+  const filtered = enriched
+    .filter((consent) => {
+      const matchesStatus = filter === "ALL" || consent.status === filter;
+      const query = searchQuery.trim().toLowerCase();
+      const searchable = [
+        consent.recipientEntity,
+        consent.purpose,
+        consent.documentTitle,
+        consent.documentType,
+        consent.status,
+      ].join(" ").toLowerCase();
+      return matchesStatus && (!query || searchable.includes(query));
+    })
+    .sort((a, b) => sortBy === "expiry"
+      ? new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime()
+      : new Date(b.grantedAt).getTime() - new Date(a.grantedAt).getTime()
+    );
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -139,6 +157,32 @@ export const ConsentCenterView: React.FC = () => {
             {f === "ALL" ? `All (${consents.length})` : `${f} (${consents.filter((c) => c.status === f).length})`}
           </button>
         ))}
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search by document, recipient, purpose, or status..."
+            aria-label="Search consent records"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+        </div>
+        <label className="flex items-center gap-2 text-xs text-slate-600">
+          Sort
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs"
+          >
+            <option value="newest">Most recently granted</option>
+            <option value="expiry">Earliest expiry</option>
+          </select>
+        </label>
+        <span className="text-xs text-slate-500">Showing {filtered.length} of {consents.length}</span>
       </div>
 
       {/* Consent List */}
