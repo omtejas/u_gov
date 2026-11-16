@@ -30,7 +30,7 @@ export class OpenAIProvider implements AIProvider {
       }
 
       let sources: any[] = [];
-      if (process.env.BRAVE_SEARCH_API_KEY) {
+      if ((process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY)) {
         try { sources = await this.webSearch.search(request.message, 6); }
         catch (error: any) { console.warn("G-Bot web search unavailable:", error?.message || error); }
       }
