@@ -17,8 +17,8 @@ export const GBotModal: React.FC = () => {
     {
       id: "msg-0",
       sender: "bot",
-      text: "Namaste! I am **Bharat G-Bot**, your 24/7 Sovereign AI Public Services Assistant.\n\nI can help you navigate Indian Government schemes, eligibility criteria, required documents, application tracking, and statutory grievance redressals with zero hallucination.\n\nHow can I help you today?",
-      source: "U-GOV National AI Public Services Engine",
+      text: "Namaste! I am **Bharat G-Bot**, the AI-assisted guide in the U-GOV prototype.\n\nI can help you explore the demo service catalogue, understand the requirements listed there, and navigate the application workflow. Some responses may use Google Gemini when it is configured; otherwise, the prototype uses a deterministic demo assistant.\n\nI cannot make official eligibility decisions or verify live government records. Please confirm current requirements with the issuing department.\n\nHow can I help you today?",
+      source: "U-GOV Prototype Assistant",
       suggestions: [
         "What schemes am I eligible for?",
         "How to update mobile in Aadhaar?",
@@ -78,7 +78,7 @@ export const GBotModal: React.FC = () => {
         const authMsg: Message = {
           id: `msg-${Date.now() + 1}`,
           sender: "bot",
-          text: "🔒 **Authentication Required**\n\nPlease sign in with your U-GOV citizen account to access Bharat G-Bot sovereign assistance, document readiness evaluations, and live application status tracking.",
+          text: "🔒 **Authentication Required**\n\nPlease sign in with your U-GOV citizen account to access the prototype assistant and your account-scoped application or document information.",
           source: "U-IDENTITY Security Gate",
           suggestions: ["Sign In with Citizen ID", "Explore Public Services"],
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -91,7 +91,7 @@ export const GBotModal: React.FC = () => {
         const rateLimitMsg: Message = {
           id: `msg-${Date.now() + 1}`,
           sender: "bot",
-          text: "⏱️ **Rate Limit Exceeded**\n\nYou have submitted multiple AI inquiries in a short window. Please wait a few moments before submitting another question to preserve sovereign compute availability.",
+          text: "⏱️ **Rate Limit Exceeded**\n\nYou have submitted multiple AI inquiries in a short window. Please wait a few moments before submitting another question to keep the prototype service available.",
           source: "U-GOV Rate Limiter",
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
@@ -149,7 +149,7 @@ export const GBotModal: React.FC = () => {
                   Bharat G-Bot
                 </span>
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">
-                  AI Public Engine
+                  Prototype AI
                 </span>
               </div>
               <span className="text-[10px] text-slate-300">
@@ -254,7 +254,7 @@ export const GBotModal: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask anything about government schemes, eligibility, or documents..."
+            placeholder="Ask about a service in the U-GOV demo catalogue..."
             className="flex-1 px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 placeholder:text-slate-400"
           />
           <button
