@@ -41,10 +41,10 @@ export const ServicesView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            National Public Services Directory
+            U-GOV Service Catalogue
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Discover, check eligibility, and apply for Central and State citizen services with zero paper friction.
+            Explore prototype service entries, review listed requirements and continue through the U-GOV demo workflow. Confirm current rules with the issuing department.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export const ServicesView: React.FC = () => {
             onClick={() => openGBot("What government schemes am I eligible for?")}
             leftIcon={<Sparkles className="w-3.5 h-3.5" />}
           >
-            AI Scheme Matcher
+            Ask G-Bot about services
           </Button>
         </div>
       </div>
@@ -110,7 +110,7 @@ export const ServicesView: React.FC = () => {
                 </Badge>
                 <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
                   <Clock className="w-3 h-3 text-slate-400" />
-                  <span>SLA: {service.slaDays}d</span>
+                  <span>Catalogue estimate: {service.slaDays}d</span>
                 </div>
               </div>
 
@@ -152,7 +152,7 @@ export const ServicesView: React.FC = () => {
 
             <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs font-bold text-emerald-700">
-                {service.fee === 0 ? "100% Free" : `Fee: ₹${service.fee}`}
+                {service.fee === 0 ? "No fee listed in prototype" : `Prototype fee: ₹${service.fee}`}
               </span>
               <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
                 <span>View Details</span>
@@ -165,7 +165,7 @@ export const ServicesView: React.FC = () => {
 
       {filteredServices.length === 0 && (
         <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
-          <p className="text-sm font-semibold text-slate-700">No public services match your filter.</p>
+          <p className="text-sm font-semibold text-slate-700">No catalogue entries match your filter.</p>
           <p className="text-xs text-slate-500 mt-1">Try clearing your search query or ask Bharat G-Bot for assistance.</p>
           <Button
             variant="outline"
