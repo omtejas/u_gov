@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGov } from "../context/GovContext";
 import { useTranslation } from "../hooks/useTranslation";
 import { Card } from "../components/ui/Card";
@@ -32,6 +32,28 @@ export const AdminView: React.FC = () => {
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"telemetry" | "builder">("telemetry");
+  const [aiHealth, setAiHealth] = useState<{
+    provider?: string;
+    providerLabel?: string;
+    mode?: string;
+    liveAI?: boolean;
+    notice?: string;
+    timestamp?: string;
+  } | null>(null);
+
+  const refreshAIHealth = async () => {
+    try {
+      const response = await fetch("/api/v1/ai/health", { credentials: "include" });
+      if (!response.ok) throw new Error("AI health check failed");
+      setAiHealth(await response.json());
+    } catch {
+      setAiHealth(null);
+    }
+  };
+
+  useEffect(() => {
+    void refreshAIHealth();
+  }, []);
 
   // Service Builder State
   const [localServices, setLocalServices] = useState<GovService[]>(services);
@@ -59,7 +81,7 @@ export const AdminView: React.FC = () => {
     { name: "U-SERVICES Catalogue", mode: "Prototype data", status: "ACTIVE", scope: "Seeded service entries" },
     { name: "U-DOCS Document Vault", mode: "Configured storage", status: "CONFIGURED", scope: "Private citizen-owned files" },
     { name: "U-INTEGRATIONS Gateway", mode: "Sandbox adapters", status: "SANDBOX", scope: "Mock providers only; no live government APIs" },
-    { name: "U-AI Assistant", mode: "Server-selected provider", status: "CONFIGURED", scope: "See /api/v1/ai/health for active provider" },
+    { name: "U-AI Assistant", mode: aiHealth?.providerLabel || "Checking provider", status: aiHealth ? (aiHealth.liveAI ? "LIVE" : "DEMO") : "UNKNOWN", scope: aiHealth?.notice || "Provider health is not currently available" },
     { name: "U-AUDIT Ledger", mode: "SHA-256 hash chain", status: "CONFIGURED", scope: "Prototype audit events" },
   ];
 
@@ -333,10 +355,13 @@ export const AdminView: React.FC = () => {
               <h3 className="text-sm font-bold text-slate-900">
                 U-GOV Components & Integration Boundaries
               </h3>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>Prototype status • Not live government telemetry</span>
-              </span>
+              <button
+                onClick={() => void refreshAIHealth()}
+                className="text-xs text-slate-500 hover:text-blue-700 flex items-center gap-1.5"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>{aiHealth?.timestamp ? `AI checked ${new Date(aiHealth.timestamp).toLocaleTimeString()}` : "Check AI provider"}</span>
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -358,7 +383,7 @@ export const AdminView: React.FC = () => {
                       </td>
                       <td className="py-3 px-4 text-slate-600">{n.mode}</td>
                       <td className="py-3 px-4">
-                        <Badge variant={n.status === "ACTIVE" ? "success" : "info"} size="sm" dot>
+                        <Badge variant={n.status === "ACTIVE" || n.status === "LIVE" ? "success" : n.status === "DEMO" ? "warning" : "info"} size="sm" dot>
                           {n.status}
                         </Badge>
                       </td>
