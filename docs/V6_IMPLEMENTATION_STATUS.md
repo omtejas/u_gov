@@ -82,8 +82,8 @@ Limitations:
 
 ## Verification update — 2026-11-17
 
-- GitHub Actions run: https://github.com/omtejas/u_gov/actions/runs/43934993087
-- Verified commit: `e7edc50a10c8c04f718cf1abdfb7f3b108d6fdde`
+- GitHub Actions run: https://github.com/omtejas/u_gov/actions/runs/43934816288
+- Verified commit: `6a09030c95e48521a371fa6c90e0a1a4f120c12b`
 - `npm ci`: passed
 - `npm run lint` (TypeScript): passed
 - `npm run build`: passed
