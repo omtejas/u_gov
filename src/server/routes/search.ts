@@ -20,9 +20,9 @@ const FAQ_ITEMS = [
 
 const FEATURE_ITEMS = [
   { id: "feat-dashboard", label: "My Dashboard", tab: "dashboard", description: "View your citizen workspace and activity summary", keywords: ["dashboard", "home", "workspace", "overview"] },
-  { id: "feat-docs", label: "DigiVault — Documents", tab: "documents", description: "Upload and manage your government credentials", keywords: ["documents", "vault", "digivault", "upload", "credentials"] },
-  { id: "feat-services", label: "Services Catalogue", tab: "services", description: "Browse all available government services", keywords: ["services", "catalogue", "browse", "government"] },
-  { id: "feat-tracker", label: "Application Tracker", tab: "tracker", description: "Track your submitted applications in real time", keywords: ["tracker", "application", "status", "progress"] },
+  { id: "feat-docs", label: "DigiVault — Documents", tab: "documents", description: "Upload and manage documents in your U-GOV prototype vault", keywords: ["documents", "vault", "digivault", "upload", "credentials"] },
+  { id: "feat-services", label: "Services Catalogue", tab: "services", description: "Browse service entries in the U-GOV prototype catalogue", keywords: ["services", "catalogue", "browse", "government"] },
+  { id: "feat-tracker", label: "Application Tracker", tab: "tracker", description: "Review application records and their latest U-GOV prototype status", keywords: ["tracker", "application", "status", "progress"] },
   { id: "feat-consent", label: "Consent Center", tab: "consent", description: "Manage your document sharing permissions", keywords: ["consent", "sharing", "permissions", "manage"] },
   { id: "feat-data", label: "My Data Center", tab: "mydata", description: "View and control all your data in U-GOV", keywords: ["data", "center", "control", "privacy"] },
   { id: "feat-notifications", label: "Notifications", tab: "notifications", description: "View all your alerts and updates", keywords: ["notifications", "alerts", "updates", "messages"] },
@@ -30,7 +30,7 @@ const FEATURE_ITEMS = [
   { id: "feat-audit", label: "Audit Ledger", tab: "audit", description: "Inspect the SHA-256 Hash-Chained Audit Ledger", keywords: ["audit", "ledger", "logs", "security", "sha256"] },
   { id: "feat-grievance", label: "Grievance", tab: "grievance", description: "Report an issue or file a complaint", keywords: ["grievance", "complaint", "report", "issue", "problem"] },
   { id: "feat-whereami", label: "Where Am I? — Citizen Journey Tracer", tab: "whereami", description: "Trace active application progress, requirements, milestones, and next actions", keywords: ["where", "journey", "tracer", "progress", "milestone", "stage", "timeline"] },
-  { id: "feat-officer", label: "Officer Desk — Verification Workspace", tab: "officer", description: "Secure government case officer review and verification portal", keywords: ["officer", "desk", "review", "verify", "case", "workflow", "approve", "reject"] },
+  { id: "feat-officer", label: "Officer Desk — Verification Workspace", tab: "officer", description: "Prototype workspace for authorized case-review workflows", keywords: ["officer", "desk", "review", "verify", "case", "workflow", "approve", "reject"] },
 ];
 
 /**
@@ -63,7 +63,7 @@ searchRouter.get("/", requireAuth, async (req: AuthenticatedRequest, res: Respon
           type: "service",
           id: svc.id,
           title: svc.name,
-          subtitle: `${svc.department} · ${svc.category} · ${svc.status === "SANDBOX_PROTOTYPE" ? "Sandbox" : "Available"}`,
+          subtitle: `${svc.department} · ${svc.category} · ${svc.status === "SANDBOX_PROTOTYPE" ? "Sandbox prototype" : "Catalogue entry"}`,
           tab: "services",
           relevance: svc.name.toLowerCase().startsWith(rawQuery) ? 3 : 2,
         });
