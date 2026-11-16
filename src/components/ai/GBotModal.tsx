@@ -28,6 +28,25 @@ interface Conversation {
   messages: Message[];
 }
 
+const renderInline = (line: string) => line.split(/(\\*\\*[^*]+\\*\\*|\\*[^*]+\\*|`[^`]+`)/g).map((part, index) => {
+  if (part.startsWith("**") && part.endsWith("**")) return <strong key={index} className="font-bold">{part.slice(2, -2)}</strong>;
+  if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
+  if (part.startsWith("`") && part.endsWith("`")) return <code key={index} className="rounded bg-slate-100 px-1.5 py-0.5 text-[.9em] text-[#174EA6]">{part.slice(1, -1)}</code>;
+  return <React.Fragment key={index}>{part}</React.Fragment>;
+});
+const renderMessageBody = (text: string) => (
+  <div className="space-y-1.5">
+    {text.split("\\n").map((line, index) => {
+      const trimmed = line.trim();
+      if (!trimmed) return <div key={index} className="h-1" />;
+      if (trimmed.startsWith("### ")) return <h3 key={index} className="pt-2 font-display text-base font-bold text-[#171717]">{renderInline(trimmed.slice(4))}</h3>;
+      if (trimmed.startsWith("## ")) return <h3 key={index} className="pt-2 font-display text-lg font-bold text-[#171717]">{renderInline(trimmed.slice(3))}</h3>;
+      if (/^(•|- )/.test(trimmed)) return <div key={index} className="flex gap-2"><span className="text-[#16834A]">•</span><span>{renderInline(trimmed.replace(/^(•|- )/, ""))}</span></div>;
+      return <p key={index}>{renderInline(line)}</p>;
+    })}
+  </div>
+);
+
 const STORAGE_KEY = "ugov_gbot_conversations_v2";
 const makeWelcome = (): Message => ({
   id: "welcome-" + Date.now(),
@@ -256,7 +275,7 @@ export const GBotModal: React.FC = () => {
                   </div>
                   <div className={`min-w-0 max-w-[88%] sm:max-w-[84%] ${m.sender === "user" ? "text-right" : ""}`}>
                     <div className={`inline-block rounded-2xl px-4 py-3.5 text-left text-[14px] leading-7 shadow-sm sm:px-5 ${m.sender === "user" ? "rounded-tr-md bg-[#174EA6] text-white" : "rounded-tl-md border border-slate-200/80 bg-white text-[#252B35]"}`}>
-                      <div className="whitespace-pre-wrap break-words">{m.text}</div>
+                      <div className="break-words">{renderMessageBody(m.text)}</div>
                       {m.source && <div className={`mt-3 flex items-center gap-1.5 border-t pt-2 text-[10px] font-medium ${m.sender === "user" ? "border-white/20 text-blue-100" : "border-slate-100 text-slate-500"}`}><Sparkles size={12} /> {m.source}</div>}
                     </div>
                     {m.citations && m.citations.length > 0 && (
