@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [u_gov_v3]
+    branches: [u_gov_v3, u_gov_v4]
 
 permissions:
   contents: read
