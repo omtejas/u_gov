@@ -659,7 +659,7 @@ export const DocumentsView: React.FC = () => {
               </div>
               <h3 className="text-base font-bold text-slate-800">Zero Active Consents</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                No third-party department currently holds an active consent grant to access your credentials. Your digital data remains 100% private and sovereign.
+                Consent records are stored within U-GOV. No external department identity or document-retrieval integration is connected in this prototype.
               </p>
             </div>
           ) : (
@@ -702,7 +702,7 @@ export const DocumentsView: React.FC = () => {
                     <div className="text-[11px] text-slate-400 flex items-center gap-2">
                       <Clock className="w-3.5 h-3.5" />
                       <span>
-                        Granted: {consent.grantedAt} • Access Expires: <strong>{consent.expiresAt}</strong>
+                        Granted: {consent.grantedAt} • Consent Expires: <strong>{consent.expiresAt}</strong>
                       </span>
                     </div>
                   </div>
@@ -719,7 +719,7 @@ export const DocumentsView: React.FC = () => {
                         )
                       }
                     >
-                      Revoke Access Immediately
+                      Revoke Consent Record
                     </Button>
                   </div>
                 </div>
@@ -733,7 +733,7 @@ export const DocumentsView: React.FC = () => {
       <Modal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        title="Deposit Credential into Private DigiVault"
+        title="Upload Document to U-DOCS"
         subtitle="Binary will be sealed in an unexposed filesystem vault with randomized UUID keys"
         maxWidth="md"
       >
@@ -831,7 +831,7 @@ export const DocumentsView: React.FC = () => {
       <Modal
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        title="Grant Time-Bound Department Consent"
+        title="Record Time-Bound Consent"
         subtitle={`Authorize access to "${targetDoc?.name}" under explicit DPDP terms`}
         maxWidth="md"
       >
@@ -881,7 +881,7 @@ export const DocumentsView: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Consent Expiry Window (Time-Bound Access)
+              Consent Record Duration
             </label>
             <select
               value={durationDays}
