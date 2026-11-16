@@ -9,6 +9,7 @@ export const ServicesView: React.FC = () => {
   const { services, openServiceModal, searchQuery, setSearchQuery, openGBot } = useGov();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"relevance" | "name" | "processing" | "fee">("relevance");
+  const [statusFilter, setStatusFilter] = useState<"all" | "available" | "prototype" | "maintenance">("all");
 
   const categories: { id: string; label: string }[] = [
     { id: "all", label: "All Services" },
@@ -30,7 +31,9 @@ export const ServicesView: React.FC = () => {
       s.name, s.description, s.department, s.ministry, s.shortCode, s.category,
       ...(s.requiredDocs || []),
     ].join(" ").toLowerCase();
-    return matchesCategory && (!q || searchableText.includes(q));
+    const normalizedStatus = String(s.status || "available").toLowerCase();
+    const matchesStatus = statusFilter === "all" || normalizedStatus === statusFilter;
+    return matchesCategory && matchesStatus && (!q || searchableText.includes(q));
   });
 
   const sortedServices = [...filteredServices].sort((a, b) => {
@@ -82,6 +85,20 @@ export const ServicesView: React.FC = () => {
         <p className="text-xs text-slate-500" aria-live="polite">
           Showing <strong className="text-slate-800">{sortedServices.length}</strong> of {services.length} catalogue entries
         </p>
+        <div className="flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2 text-xs text-slate-600">
+          Status
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
+            className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700"
+          >
+            <option value="all">All entries</option>
+            <option value="available">Catalogue entries</option>
+            <option value="prototype">Sandbox prototypes</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </label>
         <label className="flex items-center gap-2 text-xs text-slate-600">
           <Filter className="w-3.5 h-3.5" />
           Sort by
@@ -96,6 +113,7 @@ export const ServicesView: React.FC = () => {
             <option value="fee">Lowest listed fee</option>
           </select>
         </label>
+        </div>
       </div>
 
       {/* Category Pills */}
@@ -130,9 +148,15 @@ export const ServicesView: React.FC = () => {
           >
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-2">
-                <Badge variant="info" size="sm">
-                  {service.shortCode}
-                </Badge>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge variant="info" size="sm">{service.shortCode}</Badge>
+                  <Badge
+                    variant={service.status === "available" ? "success" : service.status === "maintenance" ? "warning" : "info"}
+                    size="sm"
+                  >
+                    {service.status === "available" ? "Catalogue entry" : service.status === "maintenance" ? "Maintenance" : "Sandbox"}
+                  </Badge>
+                </div>
                 <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
                   <Clock className="w-3 h-3 text-slate-400" />
                   <span>Catalogue estimate: {service.slaDays}d</span>
@@ -200,6 +224,7 @@ export const ServicesView: React.FC = () => {
               setSearchQuery("");
               setSelectedCategory("all");
               setSortBy("relevance");
+              setStatusFilter("all");
             }}
           >
             Reset Filters
