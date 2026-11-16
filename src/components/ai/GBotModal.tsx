@@ -81,6 +81,7 @@ export const GBotModal: React.FC = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [aiHealth, setAiHealth] = useState<{ provider?: string; liveAI?: boolean; internetSearchConfigured?: boolean } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
   const messages = activeConversation?.messages || [];
@@ -110,6 +111,14 @@ export const GBotModal: React.FC = () => {
   useEffect(() => {
     if (activeConversation && activeConversation.id !== activeId) setActiveId(activeConversation.id);
   }, [activeConversation, activeId]);
+
+  useEffect(() => {
+    if (!isGBotOpen) return;
+    fetch("/api/v1/ai/health", { credentials: "include" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => { if (data) setAiHealth(data); })
+      .catch(() => setAiHealth(null));
+  }, [isGBotOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -264,7 +273,7 @@ export const GBotModal: React.FC = () => {
 
           <div className="flex items-center gap-2 border-b border-[#E6ECF4] bg-[#F8FAFD] px-4 py-2.5 text-[11px] text-slate-600 sm:px-6">
             <Globe2 size={14} className="text-[#174EA6]" />
-            <span>U-GOV knowledge</span><span className="text-slate-300">•</span><span>Internet research when configured</span>
+            <span>U-GOV knowledge</span><span className="text-slate-300">•</span><span>{aiHealth?.liveAI ? "Hosted AI ready" : "Offline demo assistant"}</span><span className="text-slate-300">•</span><span>{aiHealth?.internetSearchConfigured ? "Internet search ready" : "Internet search not configured"}</span>
             <span className="ml-auto hidden items-center gap-1 text-[#16834A] sm:flex"><ShieldCheck size={13} /> Citizen data protected</span>
           </div>
 
