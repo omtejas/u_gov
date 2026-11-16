@@ -9,6 +9,7 @@ import { Search, Sparkles, Filter, Clock, ArrowRight, CheckCircle2 } from "lucid
 export const ServicesView: React.FC = () => {
   const { services, openServiceModal, searchQuery, setSearchQuery, openGBot } = useGov();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"relevance" | "name" | "processing" | "fee">("relevance");
 
   const categories: { id: string; label: string }[] = [
     { id: "all", label: "All Services" },
@@ -26,13 +27,18 @@ export const ServicesView: React.FC = () => {
     const matchesCategory =
       selectedCategory === "all" || s.category === selectedCategory;
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !q ||
-      s.name.toLowerCase().includes(q) ||
-      s.description.toLowerCase().includes(q) ||
-      s.department.toLowerCase().includes(q) ||
-      s.shortCode.toLowerCase().includes(q);
-    return matchesCategory && matchesSearch;
+    const searchableText = [
+      s.name, s.description, s.department, s.ministry, s.shortCode, s.category,
+      ...(s.requiredDocs || []),
+    ].join(" ").toLowerCase();
+    return matchesCategory && (!q || searchableText.includes(q));
+  });
+
+  const sortedServices = [...filteredServices].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "processing") return a.slaDays - b.slaDays;
+    if (sortBy === "fee") return a.fee - b.fee;
+    return 0;
   });
 
   return (
@@ -73,6 +79,26 @@ export const ServicesView: React.FC = () => {
         </div>
       </div>
 
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="text-xs text-slate-500" aria-live="polite">
+          Showing <strong className="text-slate-800">{sortedServices.length}</strong> of {services.length} catalogue entries
+        </p>
+        <label className="flex items-center gap-2 text-xs text-slate-600">
+          <Filter className="w-3.5 h-3.5" />
+          Sort by
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
+            className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          >
+            <option value="relevance">Default order</option>
+            <option value="name">Service name</option>
+            <option value="processing">Shortest catalogue estimate</option>
+            <option value="fee">Lowest listed fee</option>
+          </select>
+        </label>
+      </div>
+
       {/* Category Pills */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
         {categories.map((cat) => {
@@ -95,7 +121,7 @@ export const ServicesView: React.FC = () => {
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredServices.map((service) => (
+        {sortedServices.map((service) => (
           <Card
             key={service.id}
             variant="hoverable"
@@ -163,7 +189,7 @@ export const ServicesView: React.FC = () => {
         ))}
       </div>
 
-      {filteredServices.length === 0 && (
+      {sortedServices.length === 0 && (
         <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
           <p className="text-sm font-semibold text-slate-700">No catalogue entries match your filter.</p>
           <p className="text-xs text-slate-500 mt-1">Try clearing your search query or ask Bharat G-Bot for assistance.</p>
@@ -174,6 +200,7 @@ export const ServicesView: React.FC = () => {
             onClick={() => {
               setSearchQuery("");
               setSelectedCategory("all");
+              setSortBy("relevance");
             }}
           >
             Reset Filters
