@@ -328,7 +328,7 @@ export const OfficerDeskView: React.FC = () => {
                 onClick={() => setSelectedDept(dept)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                   selectedDept === dept
-                    ? "bg-[#0b1f3a] text-white"
+                    ? "bg-[#174EA6] text-white"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
