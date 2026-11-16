@@ -16,6 +16,7 @@ import { feedbackRouter } from "./src/server/routes/feedback";
 import { faqRouter } from "./src/server/routes/faq";
 import { officerRouter } from "./src/server/routes/officer";
 import { requireAuth } from "./src/server/middleware/auth";
+import { inspectStorageDirectory } from "./src/server/storage/storageHealth";
 import type { AuthenticatedRequest } from "./src/server/middleware/auth";
 
 dotenv.config();
@@ -98,22 +99,19 @@ app.patch("/api/v1/preferences", requireAuth as any, (req: AuthenticatedRequest,
   return res.json({ success: true, preferences: preferencesStore[userId] });
 });
 
-// Health Telemetry Endpoint
-// Reports configured modes honestly; a configured directory is not proof that
-// the host has mounted durable storage at that path.
+// Health endpoint reports storage readiness without treating a configured path
+// as proof of durability. Production startup separately enforces the mount guard.
 app.get("/api/v1/health", (_req: Request, res: Response) => {
   const dataDirectory = process.env.UGOV_DATA_DIR || path.join(process.cwd(), "storage");
-  const isEphemeralDirectory =
-    dataDirectory === "/tmp" ||
-    dataDirectory.startsWith("/tmp/") ||
-    dataDirectory.startsWith("/var/tmp/");
-
+  const storageReadiness = inspectStorageDirectory(dataDirectory);
   const geminiConfigured = Boolean(process.env.GEMINI_API_KEY);
-  res.json({
-    status: "ok",
+  const storageReady = process.env.NODE_ENV !== "production" || storageReadiness.persistentMountVerified;
+
+  res.status(storageReady ? 200 : 503).json({
+    status: storageReady ? "ok" : "degraded",
     timestamp: new Date().toISOString(),
     service: "U-GOV National Unified Governance Platform",
-    version: "3.2",
+    version: "4.0",
     environment: process.env.NODE_ENV || "development",
     aiEngineActive: geminiConfigured,
     ai: {
@@ -122,14 +120,18 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
     },
     storage: {
       engine: "json-file",
-      dataDirectory,
-      durability: isEphemeralDirectory
-        ? "ephemeral"
-        : "configured-directory; persistent mount must be verified",
+      directoryConfigured: Boolean(process.env.UGOV_DATA_DIR),
+      directoryExists: storageReadiness.directoryExists,
+      writable: storageReadiness.writable,
+      persistentMountVerified: storageReadiness.persistentMountVerified,
+      filesystem: storageReadiness.filesystem,
+      durability: storageReadiness.persistentMountVerified
+        ? "persistent-volume-mounted-and-writable"
+        : storageReadiness.ephemeralPath
+          ? "ephemeral"
+          : "not-verified",
+      warning: storageReadiness.reason,
     },
-    persistenceWarning: isEphemeralDirectory
-      ? "Data may be lost when the host restarts or redeploys because the configured directory is temporary."
-      : null,
   });
 });
 
