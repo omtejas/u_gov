@@ -110,6 +110,20 @@ async function runDocumentsTests() {
     });
     assert(badMimeRes.status === 400, "Deposit with unauthorized MIME type is rejected (400)");
 
+    const malformedBase64Res = await fetch(`${baseUrl}/documents/deposit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookieA },
+      body: JSON.stringify({ title: "Malformed", documentTypeId: "dt-aadhaar", fileName: "bad.pdf", mimeType: "application/pdf", fileData: "%%%not-base64%%%" }),
+    });
+    assert(malformedBase64Res.status === 400, "Malformed Base64 payload is rejected before storage");
+
+    const spoofedMimeRes = await fetch(`${baseUrl}/documents/deposit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookieA },
+      body: JSON.stringify({ title: "Spoofed PDF", documentTypeId: "dt-aadhaar", fileName: "fake.pdf", mimeType: "application/pdf", fileData: Buffer.from("this is not a PDF").toString("base64") }),
+    });
+    assert(spoofedMimeRes.status === 400, "File extension and declared MIME cannot disguise non-PDF content");
+
     // Test successful deposit
     const depositRes = await fetch(`${baseUrl}/documents/deposit`, {
       method: "POST",
@@ -118,7 +132,7 @@ async function runDocumentsTests() {
         title: "Aadhaar Card",
         documentTypeId: "dt-aadhaar",
         documentNumber: "1234-5678-9012",
-        fileName: "aadhaar_sample.pdf",
+        fileName: "../../private/aadhaar_sample.pdf",
         mimeType: "application/pdf",
         fileData: sampleBase64,
       }),
@@ -128,6 +142,7 @@ async function runDocumentsTests() {
     const docA = depositData.document;
     assert(Boolean(docA && docA.id), "Document assigned unique identifier");
     assert(docA.sha256Checksum === expectedSha256, "Cryptographic SHA-256 checksum matches input bytes exactly");
+    assert(docA.fileName === "aadhaar_sample.pdf", "Stored display filename is reduced to a safe basename");
 
     // Storage Key must be random UUID, not citizen name or original file name
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
