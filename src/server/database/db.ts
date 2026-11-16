@@ -516,6 +516,42 @@ class Database {
     }
   }
 
+  private writeSnapshotAtomically(snapshot: DatabaseSchema): void {
+    const directory = path.dirname(DB_FILE);
+    fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    const temporaryFile = `${DB_FILE}.${process.pid}.${crypto.randomUUID()}.tmp`;
+    let descriptor: number | undefined;
+
+    try {
+      descriptor = fs.openSync(temporaryFile, "wx", 0o600);
+      fs.writeFileSync(descriptor, JSON.stringify(snapshot, null, 2), "utf-8");
+      fs.fsyncSync(descriptor);
+      fs.closeSync(descriptor);
+      descriptor = undefined;
+      fs.renameSync(temporaryFile, DB_FILE);
+
+      // Sync the containing directory so the rename itself is durable on
+      // filesystems that support directory fsync.
+      let directoryDescriptor: number | undefined;
+      try {
+        directoryDescriptor = fs.openSync(directory, "r");
+        fs.fsyncSync(directoryDescriptor);
+      } catch {
+        // Some platforms/filesystems do not allow fsync on directory handles.
+      } finally {
+        if (directoryDescriptor !== undefined) {
+          try { fs.closeSync(directoryDescriptor); } catch { /* best effort */ }
+        }
+      }
+    } catch (error) {
+      if (descriptor !== undefined) {
+        try { fs.closeSync(descriptor); } catch { /* best effort */ }
+      }
+      try { if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile); } catch { /* best effort */ }
+      throw error;
+    }
+  }
+
   private loadOrInitialize(): DatabaseSchema {
     try {
       if (fs.existsSync(DB_FILE)) {
@@ -542,7 +578,7 @@ class Database {
             
             // Also write the update back to the persistent disk right away
             try {
-              fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+              this.writeSnapshotAtomically(parsed);
             } catch (e) {
               console.warn("Failed to save migrated name to disk:", e);
             }
@@ -562,26 +598,9 @@ class Database {
   }
 
   private save(): void {
-    const temporaryFile = DB_FILE + "." + process.pid + "." + crypto.randomUUID() + ".tmp";
     try {
-      const dir = path.dirname(DB_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-      }
-
-      // Write a complete snapshot first, then atomically replace the prior file.
-      // This reduces the chance of leaving a truncated JSON store after a crash.
-      fs.writeFileSync(temporaryFile, JSON.stringify(this.data, null, 2), {
-        encoding: "utf-8",
-        mode: 0o600,
-      });
-      fs.renameSync(temporaryFile, DB_FILE);
+      this.writeSnapshotAtomically(this.data);
     } catch (err) {
-      try {
-        if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile);
-      } catch {
-        // Preserve the original persistence error for diagnostics.
-      }
       console.error("Failed to write to database file:", err);
       throw new Error("U-GOV data store write failed; the requested change was not confirmed.");
     }
@@ -728,11 +747,7 @@ class Database {
     };
 
     try {
-      const dir = path.dirname(DB_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(DB_FILE, JSON.stringify(initialDb, null, 2), "utf-8");
+      this.writeSnapshotAtomically(initialDb);
     } catch (e) {
       throw new Error("U-GOV could not initialize its data store; startup stopped rather than running without persistence.");
     }
