@@ -99,7 +99,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ onComple
         {/* Progress bar */}
         <div className="h-1 bg-slate-100">
           <div
-            className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500"
+            className="h-1 bg-gradient-to-r from-[#174EA6] to-[#123B7A] transition-all duration-500"
             style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
           />
         </div>
@@ -126,7 +126,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ onComple
             {current.highlight && (
               <>
                 {" "}Look for the{" "}
-                <span className="font-bold text-[#0b1f3a] bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200">
+                <span className="font-bold text-[#174EA6] bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200">
                   {current.highlight}
                 </span>{" "}
                 button in the navigation bar.
@@ -141,7 +141,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ onComple
                 key={i}
                 onClick={() => setStep(i)}
                 className={`rounded-full transition-all ${
-                  i === step ? "w-6 h-2 bg-[#0b1f3a]" : "w-2 h-2 bg-slate-200 hover:bg-slate-300"
+                  i === step ? "w-6 h-2 bg-[#174EA6]" : "w-2 h-2 bg-slate-200 hover:bg-slate-300"
                 }`}
                 aria-label={`Go to step ${i + 1}`}
               />
@@ -163,7 +163,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ onComple
           {isLast ? (
             <button
               onClick={onComplete}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0b1f3a] text-white text-sm font-bold hover:bg-[#163158] transition-colors shadow-sm"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#174EA6] text-white text-sm font-bold hover:bg-[#123B7A] transition-colors shadow-sm"
             >
               <CheckCircle className="w-4 h-4 text-emerald-400" />
               Get Started
@@ -171,7 +171,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ onComple
           ) : (
             <button
               onClick={() => setStep((s) => s + 1)}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#0b1f3a] text-white text-sm font-bold hover:bg-[#163158] transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#174EA6] text-white text-sm font-bold hover:bg-[#123B7A] transition-colors shadow-sm"
             >
               Next
               <ChevronRight className="w-4 h-4" />
