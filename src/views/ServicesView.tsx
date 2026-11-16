@@ -19,8 +19,11 @@ export const ServicesView: React.FC = () => {
     { id: "healthcare", label: "Healthcare & AYUSH" },
     { id: "identity", label: "Identity & Passport" },
     { id: "finance", label: "Finance & Tax" },
-    { id: "welfare", label: "Certificates & Social Welfare" },
+    { id: "revenue", label: "Revenue & Certificates" },
+    { id: "welfare", label: "Social Welfare" },
     { id: "housing", label: "Housing & PMAY" },
+    { id: "employment", label: "Employment & Skills" },
+    { id: "civic", label: "Civic Services" },
   ];
 
   const filteredServices = services.filter((s) => {
