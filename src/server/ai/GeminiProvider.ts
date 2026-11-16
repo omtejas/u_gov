@@ -38,7 +38,7 @@ export class GeminiProvider implements AIProvider {
       // Keep private citizen lookups in U-GOV's authenticated, deterministic
       // tool gateway. Never send private vault or application data to Gemini.
       const lowerMessage = request.message.toLowerCase();
-      const privateConversationContext = (request.conversationHistory || []).some((item) => /\\b(where is my application|application status|tracking token|my documents|document readiness|readiness score|verified in vault|missing documents|UGOV-\\d{4})\\b/i.test(item.text));
+      const privateConversationContext = (request.conversationHistory || []).some((item) => /\b(where is my application|application status|tracking token|my documents|document readiness|readiness score|verified in vault|missing documents|UGOV-\d{4})\b/i.test(item.text));
       const contextualQuery = [...(request.conversationHistory || []).filter((m) => m.role === "user").slice(-2).map((m) => m.text), request.message].join(" ").slice(0, 700);
       const isPrivateLookup =
         /\b(status|track|tracking|application number|where is my application)\b/.test(lowerMessage) ||
