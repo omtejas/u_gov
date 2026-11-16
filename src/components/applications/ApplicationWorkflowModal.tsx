@@ -594,8 +594,8 @@ export const ApplicationWorkflowModal: React.FC = () => {
                       className="w-4 h-4 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
                     <span className="text-xs text-slate-800 font-medium leading-relaxed">
-                      I understand what data will be shared, who will receive it (
-                      <strong>{reviewData.dataSharingDisclosure.recipientEntity}</strong>), why it is required, This U-GOV consent record is valid for <strong>{reviewData.dataSharingDisclosure.validityDays} days</strong>; no external government department is contacted.
+                      I understand that this prototype records the selected documents, recipient label (
+                      <strong>{reviewData.dataSharingDisclosure.recipientEntity}</strong>) and stated purpose for this application. This U-GOV consent record is valid for <strong>{reviewData.dataSharingDisclosure.validityDays} days</strong>; no external government department is contacted.
                     </span>
                   </label>
                 </div>
