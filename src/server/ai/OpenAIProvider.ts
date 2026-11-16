@@ -16,10 +16,11 @@ export class OpenAIProvider implements AIProvider {
     if (!apiKey) return this.fallback.generateResponse(request, tools);
 
     const q = request.message.toLowerCase();
+    const privateConversationContext = (request.conversationHistory || []).some((item) => /\\b(where is my application|application status|tracking token|my documents|document readiness|readiness score|verified in vault|missing documents|UGOV-\\d{4})\\b/i.test(item.text));
     const contextualQuery = [...(request.conversationHistory || []).filter((m) => m.role === "user").slice(-2).map((m) => m.text), request.message].join(" ").slice(0, 700);
     const privateLookup = /\b(status|track|tracking|application number|where is my application)\b/.test(q)
       || /\b(my documents|my document|document readiness|am i ready|what am i missing)\b/.test(q);
-    if (privateLookup) return this.fallback.generateResponse(request, tools);
+    if (privateLookup || privateConversationContext) return this.fallback.generateResponse(request, tools);
 
     try {
       const catalogue = await tools.searchServices(contextualQuery);
