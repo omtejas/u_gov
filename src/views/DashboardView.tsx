@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useGov } from "../context/GovContext";
 import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
@@ -13,6 +13,11 @@ import {
   Clock,
   AlertTriangle,
   FileText,
+  Server,
+  RefreshCw,
+  Wifi,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
 export const DashboardView: React.FC = () => {
@@ -26,6 +31,54 @@ export const DashboardView: React.FC = () => {
      openApplicationModal,
     openGBot,
    } = useGov();
+
+  const [providerHealth, setProviderHealth] = useState<Array<{ providerCode: string; displayName: string; status: string; latencyMs?: number; environment?: string }>>([]);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthError, setHealthError] = useState("");
+  const [healthCheckedAt, setHealthCheckedAt] = useState("");
+
+  const runCloudDiagnostics = useCallback(async () => {
+    setHealthLoading(true);
+    setHealthError("");
+    try {
+      const response = await fetch("/api/v1/integrations/providers", { credentials: "include" });
+      const payload = await response.json();
+      if (!response.ok || !payload.success || !Array.isArray(payload.providers)) {
+        throw new Error(payload.error || "Unable to load integration gateway registry.");
+      }
+      const results = await Promise.all(payload.providers.map(async (provider: any) => {
+        try {
+          const probe = await fetch(`/api/v1/integrations/providers/${encodeURIComponent(provider.providerCode)}/health`, { credentials: "include" });
+          const data = await probe.json();
+          if (!probe.ok || !data.success || !data.health) throw new Error("Health probe failed");
+          return {
+            providerCode: provider.providerCode,
+            displayName: provider.displayName,
+            status: data.health.status || "UNKNOWN",
+            latencyMs: data.health.latencyMs,
+            environment: data.health.environment || provider.environment,
+          };
+        } catch {
+          return {
+            providerCode: provider.providerCode,
+            displayName: provider.displayName,
+            status: "UNAVAILABLE",
+            environment: provider.environment,
+          };
+        }
+      }));
+      setProviderHealth(results);
+      setHealthCheckedAt(new Date().toLocaleTimeString());
+    } catch (error: any) {
+      setHealthError(error?.message || "Cloud diagnostics could not be completed.");
+    } finally {
+      setHealthLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void runCloudDiagnostics();
+  }, [runCloudDiagnostics]);
 
   const activeGovernmentApps = governmentApplications.filter(
     (a) => !["APPROVED", "REJECTED", "CANCELLED"].includes(a.status)
@@ -174,6 +227,89 @@ export const DashboardView: React.FC = () => {
           </span>
         </Card>
       </div>
+
+      {/* U-GOV Cloud Interoperability Control Tower */}
+      <section className="rounded-3xl overflow-hidden border border-slate-800 bg-[#071426] text-white shadow-xl">
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#0b1f3a] via-[#102b4d] to-[#0b1f3a] relative">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-white to-emerald-400" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-cyan-300 text-[10px] font-black tracking-[0.22em] uppercase">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                U-GOV / CLOUD OPERATIONS
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight mt-2">Interoperability Control Tower</h2>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                Live health probes across the U-GOV sandbox gateway network. One interface, multiple departmental adapters.
+              </p>
+            </div>
+            <Button onClick={() => void runCloudDiagnostics()} disabled={healthLoading} className="shrink-0">
+              <RefreshCw className={`w-4 h-4 mr-2 ${healthLoading ? "animate-spin" : ""}`} />
+              {healthLoading ? "Probing Gateways..." : "Run Live Diagnostics"}
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Registered Gateways</div>
+              <div className="text-2xl font-black mt-1">{providerHealth.length || "—"}</div>
+            </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Healthy Adapters</div>
+              <div className="text-2xl font-black text-emerald-300 mt-1">{providerHealth.filter((p) => p.status === "HEALTHY").length}</div>
+            </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Gateway Environment</div>
+              <div className="text-lg font-black text-cyan-300 mt-2">SANDBOX</div>
+            </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Last Diagnostics</div>
+              <div className="text-sm font-bold mt-2">{healthCheckedAt || (healthLoading ? "Running..." : "Not run")}</div>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 sm:p-6">
+          {healthError && (
+            <div className="mb-3 rounded-xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-xs text-rose-200">{healthError}</div>
+          )}
+          {providerHealth.length === 0 && healthLoading ? (
+            <div className="py-8 text-center text-sm text-slate-300"><RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />Contacting sandbox gateways...</div>
+          ) : providerHealth.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              {providerHealth.map((provider) => {
+                const healthy = provider.status === "HEALTHY";
+                const degraded = provider.status === "DEGRADED";
+                return (
+                  <div key={provider.providerCode} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${healthy ? "bg-emerald-400/15 text-emerald-300" : degraded ? "bg-amber-400/15 text-amber-300" : "bg-rose-400/15 text-rose-300"}`}>
+                          <Server className="w-4 h-4" />
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-400 truncate">{provider.providerCode}</span>
+                      </div>
+                      {healthy ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <XCircle className="w-4 h-4 text-rose-300" />}
+                    </div>
+                    <h3 className="text-sm font-bold leading-snug mt-3 min-h-[2.5rem]">{provider.displayName}</h3>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                      <span className={`text-[10px] font-bold tracking-wider ${healthy ? "text-emerald-300" : degraded ? "text-amber-300" : "text-rose-300"}`}>{provider.status}</span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-1"><Wifi className="w-3 h-3" />{typeof provider.latencyMs === "number" ? `${provider.latencyMs} ms` : "—"}</span>
+                    </div>
+                    <div className="text-[9px] text-slate-500 mt-2">{provider.environment || "SANDBOX"} • Adapter health probe</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5 text-center text-xs text-slate-300">
+              Gateway health is not available yet. Run diagnostics to retry.
+            </div>
+          )}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 text-[10px] text-slate-400">
+            <span>Architecture: Citizen UI → U-GOV API → Adapter Gateway → Department Sandbox</span>
+            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-300" /> No live government system is contacted</span>
+          </div>
+        </div>
+      </section>
 
       {/* Main 2-Column Split: Active Applications & DigiVault Quick Access */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
