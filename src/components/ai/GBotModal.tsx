@@ -60,6 +60,7 @@ export const GBotModal: React.FC = () => {
     } catch { return [newConversation()]; }
   });
   const [activeId, setActiveId] = useState(() => conversations[0]?.id || "");
+  const [loadedStorageKey, setLoadedStorageKey] = useState(storageKey);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -68,9 +69,26 @@ export const GBotModal: React.FC = () => {
   const messages = activeConversation?.messages || [];
 
   useEffect(() => {
+    if (loadedStorageKey === storageKey) return;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      const parsed = saved ? JSON.parse(saved) : [];
+      const next = Array.isArray(parsed) && parsed.length ? parsed : [newConversation()];
+      setConversations(next);
+      setActiveId(next[0].id);
+    } catch {
+      const next = [newConversation()];
+      setConversations(next);
+      setActiveId(next[0].id);
+    }
+    setLoadedStorageKey(storageKey);
+  }, [storageKey, loadedStorageKey]);
+
+  useEffect(() => {
+    if (loadedStorageKey !== storageKey) return;
     try { localStorage.setItem(storageKey, JSON.stringify(conversations.slice(0, 30))); }
     catch { /* Browser storage may be unavailable or full; chat remains usable in memory. */ }
-  }, [conversations, storageKey]);
+  }, [conversations, storageKey, loadedStorageKey]);
 
   useEffect(() => {
     if (activeConversation && activeConversation.id !== activeId) setActiveId(activeConversation.id);
@@ -118,7 +136,7 @@ export const GBotModal: React.FC = () => {
       text: query,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     };
-    const history = messages.filter((m) => m.id !== "welcome-" + m.id).slice(-20);
+    const history = messages.slice(-20);
     updateActive((c) => ({
       ...c,
       title: c.title === "New conversation" ? query.slice(0, 42) : c.title,
