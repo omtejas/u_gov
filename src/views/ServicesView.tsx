@@ -129,7 +129,7 @@ export const ServicesView: React.FC = () => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                 isSelected
-                  ? "bg-[#0b1f3a] text-white shadow-2xs"
+                  ? "bg-[#174EA6] text-white shadow-2xs"
                   : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900"
               }`}
             >
