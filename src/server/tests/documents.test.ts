@@ -265,7 +265,7 @@ async function runDocumentsTests() {
     const recipientAccessRes = await fetch(`${baseUrl}/documents/${docA.id}?recipient=${encodeURIComponent(recipientDept)}`, {
       headers: { Cookie: cookieB },
     });
-    assert(recipientAccessRes.status === 200, "Authorized recipient can view document with active consent");
+    assert(recipientAccessRes.status !== 200, "Consent record does not authenticate an external recipient");
 
     // Unauthorized recipient query parameter
     const fakeRecipientRes = await fetch(`${baseUrl}/documents/${docA.id}?recipient=FakeDepartment`, {
