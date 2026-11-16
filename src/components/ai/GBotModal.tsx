@@ -50,7 +50,7 @@ const newConversation = (): Conversation => {
 };
 
 export const GBotModal: React.FC = () => {
-  const { isGBotOpen, closeGBot, gBotInitialPrompt, language, user } = useGov();
+  const { isGBotOpen, closeGBot, gBotInitialPrompt, language, user, setActiveTab } = useGov();
   const storageKey = STORAGE_KEY + "_" + ((user as any)?.id || "guest");
   const [conversations, setConversations] = useState<Conversation[]>(() => {
     try {
@@ -263,9 +263,9 @@ export const GBotModal: React.FC = () => {
                       <div className="mt-3 space-y-2 text-left">
                         <p className="flex items-center gap-1.5 px-1 text-[11px] font-bold uppercase tracking-wide text-slate-500"><Globe2 size={13} /> Sources used</p>
                         {m.citations.map((citation, index) => (
-                          <a key={citation.url + index} href={citation.url} target="_blank" rel="noopener noreferrer" className="block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-[#174EA6]/40 hover:shadow-sm">
+                          <a key={citation.url + index} href={citation.url} target={citation.sourceType === "internet" ? "_blank" : undefined} rel="noopener noreferrer" onClick={(event) => { if (citation.sourceType === "u-gov") { event.preventDefault(); setActiveTab("faq"); closeGBot(); } }} className="block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-[#174EA6]/40 hover:shadow-sm">
                             <div className="flex items-start justify-between gap-2">
-                              <span className="text-xs font-semibold leading-5 text-[#174EA6]">{citation.title}</span>
+                              <span className="text-xs font-semibold leading-5 text-[#174EA6]">{citation.title}<span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">{citation.sourceType === "u-gov" ? "U-GOV" : "Internet"}</span></span>
                               <ExternalLink size={13} className="mt-0.5 shrink-0 text-slate-400" />
                             </div>
                             {citation.snippet && <p className="mt-1 line-clamp-2 text-[11px] leading-5 text-slate-600">{citation.snippet}</p>}
