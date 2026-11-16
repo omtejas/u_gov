@@ -105,7 +105,8 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
   const dataDirectory = process.env.UGOV_DATA_DIR || path.join(process.cwd(), "storage");
   const storageReadiness = inspectStorageDirectory(dataDirectory);
   const geminiConfigured = Boolean(process.env.GEMINI_API_KEY);
-  const storageReady = process.env.NODE_ENV !== "production" || storageReadiness.persistentMountVerified;
+  const ephemeralDemoMode = process.env.NODE_ENV === "production" && process.env.UGOV_STORAGE_MODE === "ephemeral-demo";
+  const storageReady = process.env.NODE_ENV !== "production" || storageReadiness.persistentMountVerified || ephemeralDemoMode;
 
   res.status(storageReady ? 200 : 503).json({
     status: storageReady ? "ok" : "degraded",
@@ -127,9 +128,12 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
       filesystem: storageReadiness.filesystem,
       durability: storageReadiness.persistentMountVerified
         ? "persistent-volume-mounted-and-writable"
-        : storageReadiness.ephemeralPath
-          ? "ephemeral"
-          : "not-verified",
+        : ephemeralDemoMode
+          ? "ephemeral-demo-non-durable"
+          : storageReadiness.ephemeralPath
+            ? "ephemeral"
+            : "not-verified",
+      mode: ephemeralDemoMode ? "ephemeral-demo" : "persistent-required",
       warning: storageReadiness.reason,
     },
   });
