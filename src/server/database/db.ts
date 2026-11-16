@@ -218,11 +218,17 @@ class Database {
   private data: DatabaseSchema;
 
   constructor() {
-    // Production Safety Guard: Do not allow silent fallback to JSON store in production
+    // This codebase currently uses a JSON file store, not PostgreSQL.
+    // A DATABASE_URL alone does not make that store durable. Refuse known
+    // ephemeral temporary directories in production unless explicitly overridden.
     if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
-      if (!process.env.DATABASE_URL && !process.env.UGOV_DATA_DIR) {
+      const dataDirectory = process.env.UGOV_DATA_DIR ? path.resolve(process.env.UGOV_DATA_DIR) : "";
+      const isEphemeralDirectory = !dataDirectory || dataDirectory === "/tmp" ||
+        dataDirectory.startsWith("/tmp/") || dataDirectory === "/var/tmp" ||
+        dataDirectory.startsWith("/var/tmp/");
+      if (isEphemeralDirectory) {
         throw new Error(
-          "[CRITICAL SECURITY GUARD] Production requires DATABASE_URL or an explicitly configured persistent UGOV_DATA_DIR."
+          "[CRITICAL STORAGE GUARD] Production JSON storage requires a persistent mounted UGOV_DATA_DIR (for example /var/data/ugov-data). Temporary directories such as /tmp are not accepted."
         );
       }
     }
@@ -732,7 +738,7 @@ class Database {
       }
       fs.writeFileSync(DB_FILE, JSON.stringify(initialDb, null, 2), "utf-8");
     } catch (e) {
-      console.warn("Could not save initial DB seed to disk:", e);
+      throw new Error("U-GOV could not initialize its data store; startup stopped rather than running without persistence.");
     }
 
     return initialDb;
