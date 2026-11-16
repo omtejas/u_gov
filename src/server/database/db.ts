@@ -3,6 +3,7 @@ import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { hashPassword, computeAuditHash } from "../auth/crypto";
+import { assertProductionStorageReady } from "../storage/storageHealth";
 
 export interface UserRecord {
   id: string;
@@ -218,19 +219,14 @@ class Database {
   private data: DatabaseSchema;
 
   constructor() {
-    // This codebase currently uses a JSON file store, not PostgreSQL.
-    // A DATABASE_URL alone does not make that store durable. Refuse known
-    // ephemeral temporary directories in production unless explicitly overridden.
+    // The current metadata engine is a single-process JSON file store.
+    // Production must prove that UGOV_DATA_DIR is covered by a writable,
+    // dedicated non-root filesystem mount; a path string alone is not proof.
     if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
-      const dataDirectory = process.env.UGOV_DATA_DIR ? path.resolve(process.env.UGOV_DATA_DIR) : "";
-      const isEphemeralDirectory = !dataDirectory || dataDirectory === "/tmp" ||
-        dataDirectory.startsWith("/tmp/") || dataDirectory === "/var/tmp" ||
-        dataDirectory.startsWith("/var/tmp/");
-      if (isEphemeralDirectory) {
-        throw new Error(
-          "[CRITICAL STORAGE GUARD] Production JSON storage requires a persistent mounted UGOV_DATA_DIR (for example /var/data/ugov-data). Temporary directories such as /tmp are not accepted."
-        );
+      if (!process.env.UGOV_DATA_DIR) {
+        throw new Error("[CRITICAL STORAGE GUARD] Production requires UGOV_DATA_DIR to point inside a configured persistent volume.");
       }
+      assertProductionStorageReady(process.env.UGOV_DATA_DIR);
     }
     this.data = this.loadOrInitialize();
   }
