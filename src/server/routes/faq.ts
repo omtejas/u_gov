@@ -131,7 +131,7 @@ export const FAQ_CATALOGUE = [
     categoryLabel: "G-Bot AI Assistant",
     question: "What can G-Bot help me with?",
     answer:
-      "G-Bot is powered by Google Gemini AI and can help you: find the right government scheme, check your eligibility for services, explain complex government terminology, guide you through application steps, and answer questions about your documents and consents.",
+      "G-Bot can use a configurable hosted AI provider (OpenAI-compatible or Google Gemini) and optional Internet search when configured. It can help explore U-GOV services and FAQs, explain public information, summarize web research with citations, and guide users through prototype workflows. Private document and application lookups remain subject to citizen authentication and U-GOV access controls.",
     helpful: 0,
     notHelpful: 0,
   },
@@ -151,7 +151,7 @@ export const FAQ_CATALOGUE = [
     categoryLabel: "General",
     question: "Is U-GOV available in regional languages?",
     answer:
-      "U-GOV currently fully supports English. Hindi, Marathi, and Kannada language support is actively being developed. The language selector is available in the top navigation bar. All government service names, document types, and official references follow standardized Government of India nomenclature.",
+      "U-GOV provides a language selector for English, Hindi, Marathi and Kannada. Translation coverage may vary across modules and prototype content; official service names and statutory references should be checked with the issuing authority.",
     helpful: 0,
     notHelpful: 0,
   },
