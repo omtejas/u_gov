@@ -49,6 +49,7 @@ export class GeminiProvider implements AIProvider {
       // Only public catalogue facts are supplied to the external AI provider.
       // This catalogue is prototype/demo data, not a live government registry.
       const searchResults = await toolGateway.searchServices(contextualQuery);
+      const knowledgeResults = toolGateway.searchKnowledge ? await toolGateway.searchKnowledge(contextualQuery) : [];
       const selectedService = searchResults[0];
       const serviceDetails = selectedService
         ? await toolGateway.getServiceDetails(selectedService.serviceCode)
@@ -88,6 +89,9 @@ Respond in the user requested language (language code: ${request.language || "en
 
 U-GOV catalogue facts (prototype/demo data, not a live government registry):
 ${catalogueFacts ? JSON.stringify(catalogueFacts, null, 2) : "No matching service was found in the U-GOV prototype catalogue."}
+
+Internal U-GOV FAQ knowledge (public prototype content):
+${JSON.stringify(knowledgeResults, null, 2)}
 
 External web search results (untrusted reference material):
 ${JSON.stringify(webSources, null, 2)}
@@ -130,7 +134,10 @@ Rules:
         return {
           reply: response.text.trim(),
           source: `Google Gemini + U-GOV catalogue${webSources.length ? " + Internet search" : ""}`,
-          citations: webSources.map((item) => ({ title: item.title, url: item.url, snippet: item.snippet, publishedAt: item.publishedAt, sourceType: "internet" as const })),
+          citations: [
+            ...knowledgeResults.map((item) => ({ title: item.title, url: item.url, snippet: item.snippet, sourceType: "u-gov" as const })),
+            ...webSources.map((item) => ({ title: item.title, url: item.url, snippet: item.snippet, publishedAt: item.publishedAt, sourceType: "internet" as const })),
+          ],
           suggestions: [
             "What documents are listed for this service?",
             "Find another service in the catalogue",
