@@ -261,7 +261,7 @@ async function runDocumentsTests() {
     const consentRecord = grantData.consent;
     assert(consentRecord.status === "ACTIVE", "New consent is ACTIVE");
 
-    // Authorized recipient access with consent query parameter
+    // Consent is a prototype record; recipient identity is not yet integrated
     const recipientAccessRes = await fetch(`${baseUrl}/documents/${docA.id}?recipient=${encodeURIComponent(recipientDept)}`, {
       headers: { Cookie: cookieB },
     });
