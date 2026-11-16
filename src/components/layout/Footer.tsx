@@ -3,14 +3,14 @@ import { ShieldCheck, PhoneCall, ExternalLink } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#071529] text-slate-300 border-t border-slate-800 pt-10 pb-20 md:pb-10 mt-16">
+    <footer className="bg-[#123B7A] text-slate-300 border-t border-white/15 pt-10 pb-20 md:pb-10 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-white/15/80">
           {/* Col 1: Platform Overview */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#0b1f3a] p-0.5 flex items-center justify-center overflow-hidden border border-slate-700">
+              <div className="w-8 h-8 rounded-lg bg-[#174EA6] p-0.5 flex items-center justify-center overflow-hidden border border-slate-700">
                 <img src="/logo.png" alt="U-GOV Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-base text-white tracking-tight">
