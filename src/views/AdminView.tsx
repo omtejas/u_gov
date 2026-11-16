@@ -504,7 +504,7 @@ export const AdminView: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title={editingService ? t("builder.editService") : t("builder.createNew")}
-        size="md"
+        maxWidth="md"
       >
         <div className="space-y-4">
           {builderMsg && (
