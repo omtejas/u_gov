@@ -51,9 +51,7 @@ const STORAGE_KEY = "ugov_gbot_conversations_v2";
 const makeWelcome = (): Message => ({
   id: "welcome-" + Date.now(),
   sender: "bot",
-  text: "Namaste! I’m **Bharat G-Bot**, your U-GOV assistant. Ask me about public services, government processes, scholarships, documents or general topics. When web research is configured, I can search the Internet and show the sources I used. I can also help you navigate U-GOV.
-
-What would you like to explore?",
+  text: `Namaste! I’m **Bharat G-Bot**, your U-GOV assistant. Ask me about public services, government processes, scholarships, documents or general topics. When web research is configured, I can search the Internet and show the sources I used. I can also help you navigate U-GOV.\n\nWhat would you like to explore?`,
   source: "Bharat G-Bot • U-GOV V6",
   suggestions: [
     "Find scholarships for college students",
