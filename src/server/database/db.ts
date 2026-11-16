@@ -577,6 +577,8 @@ class Database {
     const citizenUserId = "usr-citizen-01";
     const adminUserId = "usr-admin-01";
     const auditorUserId = "usr-auditor-01";
+    // Seed once so document metadata and consent reference the same vault files.
+    const seededCitizenData = this.seedDefaultCitizenDocuments(citizenUserId);
 
     const initialDb: DatabaseSchema = {
       users: [
@@ -700,8 +702,8 @@ class Database {
         },
       ],
       documentTypes: this.getDefaultDocumentTypes(),
-      citizenDocuments: this.seedDefaultCitizenDocuments(citizenUserId).documents,
-      documentConsents: this.seedDefaultCitizenDocuments(citizenUserId).consents,
+      citizenDocuments: seededCitizenData.documents,
+      documentConsents: seededCitizenData.consents,
       governmentServices: this.getDefaultGovernmentServices(),
       governmentApplications: [],
       applicationIntegrations: [],
