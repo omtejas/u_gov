@@ -51,6 +51,7 @@ export interface AIChatResponse {
 
 export interface IAIToolGateway {
   searchServices(query: string, category?: string): Promise<any[]>;
+  searchKnowledge?(query: string): Promise<any[]>;
   getServiceDetails(serviceCode: string): Promise<any>;
   checkRequirements(serviceCode: string): Promise<any>;
   getCitizenApplicationStatus(applicationNumberOrId: string, context: AIToolContext): Promise<any>;
