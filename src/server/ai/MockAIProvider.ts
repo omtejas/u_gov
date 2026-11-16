@@ -308,15 +308,19 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
       };
     }
 
-    // 7. General Fallback Guidance
+    // 7. Honest fallback when no hosted model is configured or a provider is unavailable.
+    const recentContext = request.conversationHistory?.filter((m) => m.role === "user").slice(-1)[0]?.text;
     return {
-      reply: `Namaste! I am **Bharat G-Bot**, your Sovereign AI Public Services Guide.\n\nI can assist you with:\n• **Service Discovery**: Ask about scholarships, driving licences, domicile certificates, PM-KISAN, or Ayushman Bharat.\n• **Document Requirements**: Ask what documents are required for any government service.\n• **Vault Readiness**: Ask *"Am I ready for scholarship?"* to evaluate your U-DOCS vault.\n• **Application Tracking**: Ask *"Where is my application?"* to track submitted services.\n\nHow can I help you today?`,
-      source: "U-GOV National AI Public Services Engine (MockAIProvider)",
+      reply: `I understood your question: “${request.message.slice(0, 180)}”.
+
+I checked the local U-GOV service catalogue, but could not find enough verified information to answer this accurately. This environment is currently using the offline demo assistant, not a general-purpose hosted AI model.
+
+You can still ask me to find a service, explain a catalogue entry, check your own application status, or assess your document readiness. For open-ended questions and current Internet research, configure a hosted AI provider and web-search provider on the V6 preview environment.${recentContext ? "\n\nYour previous topic was: " + recentContext.slice(0, 120) : ""}`,
+      source: "U-GOV offline demo assistant",
       suggestions: [
-        "What scholarships can I apply for?",
-        "Driving licence documents required",
-        "Check my application status",
-        "Am I ready for scholarship?",
+        "Search the U-GOV service catalogue",
+        "Show me the U-GOV help topics",
+        "How do I check my application status?",
       ],
       toolCalls,
       disclaimer,
