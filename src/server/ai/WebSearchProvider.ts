@@ -16,6 +16,27 @@ export interface IWebSearchProvider {
 
 export class BraveWebSearchProvider implements IWebSearchProvider {
   async search(query: string, count = 5): Promise<WebSearchSource[]> {
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    if (tavilyKey) {
+      const response = await fetch("https://api.tavily.com/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ api_key: tavilyKey, query: query.slice(0, 400), search_depth: "advanced", max_results: Math.min(Math.max(count, 1), 8), include_raw_content: true }),
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!response.ok) throw new Error(`Tavily search provider returned ${response.status}`);
+      const payload: any = await response.json();
+      return (Array.isArray(payload?.results) ? payload.results : []).flatMap((item: any) => {
+        if (typeof item?.url !== "string" || !/^https?:\/\//i.test(item.url)) return [];
+        return [{
+          title: String(item.title || "Web result").slice(0, 240),
+          url: item.url,
+          snippet: String(item.raw_content || item.content || "").slice(0, 5000),
+          publishedAt: item.published_date || undefined,
+          sourceType: "internet" as const,
+        }];
+      });
+    }
     const apiKey = process.env.BRAVE_SEARCH_API_KEY;
     if (!apiKey) return [];
     const url = new URL("https://api.search.brave.com/res/v1/web/search");
