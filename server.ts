@@ -124,7 +124,7 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
       engine: "json-file",
       dataDirectory,
       durability: isEphemeralDirectory
-        ? "ephemeral",
+        ? "ephemeral"
         : "configured-directory; persistent mount must be verified",
     },
     persistenceWarning: isEphemeralDirectory
