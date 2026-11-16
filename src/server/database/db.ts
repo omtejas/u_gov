@@ -522,11 +522,9 @@ class Database {
         if (!parsed.documentTypes || parsed.documentTypes.length === 0) {
           parsed.documentTypes = this.getDefaultDocumentTypes();
         }
-        if (!parsed.citizenDocuments || parsed.citizenDocuments.length === 0) {
-          const seeded = this.seedDefaultCitizenDocuments("usr-citizen-01");
-          parsed.citizenDocuments = seeded.documents;
-          parsed.documentConsents = seeded.consents;
-        }
+        // An intentionally empty vault is valid; never recreate sample documents
+        // after a citizen has deleted their final document.
+        if (!parsed.citizenDocuments) parsed.citizenDocuments = [];
         if (!parsed.documentConsents) parsed.documentConsents = [];
         if (!parsed.governmentServices || parsed.governmentServices.length === 0) {
           parsed.governmentServices = this.getDefaultGovernmentServices();
@@ -552,7 +550,11 @@ class Database {
         return parsed;
       }
     } catch (err) {
-      console.warn("Could not load database file, re-initializing store:", err);
+      // Never replace an unreadable existing store with demo seed data.
+      if (fs.existsSync(DB_FILE)) {
+        throw new Error("U-GOV data store could not be read safely. Startup stopped to prevent data loss.");
+      }
+      throw err;
     }
     return this.initializeSeed();
   }
@@ -579,6 +581,7 @@ class Database {
         // Preserve the original persistence error for diagnostics.
       }
       console.error("Failed to write to database file:", err);
+      throw new Error("U-GOV data store write failed; the requested change was not confirmed.");
     }
   }
 
