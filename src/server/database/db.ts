@@ -222,11 +222,18 @@ class Database {
     // The current metadata engine is a single-process JSON file store.
     // Production must prove that UGOV_DATA_DIR is covered by a writable,
     // dedicated non-root filesystem mount; a path string alone is not proof.
-    if (process.env.NODE_ENV === "production" && !process.env.ALLOW_JSON_DB_IN_PROD) {
+    const storageMode = process.env.UGOV_STORAGE_MODE || "persistent";
+    if (process.env.NODE_ENV === "production" && storageMode !== "ephemeral-demo") {
       if (!process.env.UGOV_DATA_DIR) {
         throw new Error("[CRITICAL STORAGE GUARD] Production requires UGOV_DATA_DIR to point inside a configured persistent volume.");
       }
       assertProductionStorageReady(process.env.UGOV_DATA_DIR);
+    }
+    if (process.env.NODE_ENV === "production" && storageMode === "ephemeral-demo") {
+      if (!process.env.UGOV_DATA_DIR || !path.resolve(process.env.UGOV_DATA_DIR).startsWith("/tmp/")) {
+        throw new Error("[STORAGE CONFIGURATION ERROR] Ephemeral demo mode is restricted to an explicit /tmp data directory.");
+      }
+      console.warn("[U-GOV STORAGE WARNING] Running in EPHEMERAL DEMO mode. Uploaded documents and application data can be lost on restart or redeploy. Do not use real citizen data.");
     }
     this.data = this.loadOrInitialize();
   }
