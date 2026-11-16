@@ -921,28 +921,47 @@ class Database {
       this.data.citizenDocuments = [];
     }
     this.data.citizenDocuments.push(doc);
-    this.save();
+    try {
+      this.save();
+    } catch (error) {
+      this.data.citizenDocuments = this.data.citizenDocuments.filter((item) => item.id !== doc.id);
+      throw error;
+    }
   }
 
   public updateDocument(id: string, updates: Partial<CitizenDocumentRecord>): void {
     const index = (this.data.citizenDocuments || []).findIndex((d) => d.id === id);
     if (index !== -1) {
+      const previous = this.data.citizenDocuments[index];
       this.data.citizenDocuments[index] = {
-        ...this.data.citizenDocuments[index],
+        ...previous,
         ...updates,
         updatedAt: new Date().toISOString(),
       };
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        this.data.citizenDocuments[index] = previous;
+        throw error;
+      }
     }
   }
 
   public deleteDocument(id: string): boolean {
     const initialLen = (this.data.citizenDocuments || []).length;
-    this.data.citizenDocuments = (this.data.citizenDocuments || []).filter((d) => d.id !== id);
-    this.data.documentConsents = (this.data.documentConsents || []).filter((c) => c.documentId !== id);
+    const previousDocuments = this.data.citizenDocuments || [];
+    const previousConsents = this.data.documentConsents || [];
+    this.data.citizenDocuments = previousDocuments.filter((d) => d.id !== id);
+    this.data.documentConsents = previousConsents.filter((c) => c.documentId !== id);
     const deleted = this.data.citizenDocuments.length < initialLen;
     if (deleted) {
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        this.data.citizenDocuments = previousDocuments;
+        this.data.documentConsents = previousConsents;
+        throw error;
+      }
     }
     return deleted;
   }
@@ -954,14 +973,33 @@ class Database {
       this.data.documentConsents = [];
     }
     this.data.documentConsents.push(consent);
-    this.save();
+    try {
+      this.save();
+    } catch (error) {
+      this.data.documentConsents = this.data.documentConsents.filter((item) => item.id !== consent.id);
+      throw error;
+    }
+  }
+
+  private expireElapsedConsents(): void {
+    const now = new Date().toISOString();
+    let changed = false;
+    for (const consent of this.data.documentConsents || []) {
+      if (consent.status === "ACTIVE" && consent.expiresAt <= now) {
+        consent.status = "EXPIRED";
+        changed = true;
+      }
+    }
+    if (changed) this.save();
   }
 
   public getConsentsByDocumentId(documentId: string): DocumentConsentRecord[] {
+    this.expireElapsedConsents();
     return (this.data.documentConsents || []).filter((c) => c.documentId === documentId);
   }
 
   public getConsentsByOwner(ownerUserId: string): DocumentConsentRecord[] {
+    this.expireElapsedConsents();
     return (this.data.documentConsents || []).filter((c) => c.ownerUserId === ownerUserId);
   }
 
@@ -974,15 +1012,24 @@ class Database {
       (c) => c.id === consentId && c.ownerUserId === ownerUserId
     );
     if (consent && consent.status === "ACTIVE") {
+      const previousStatus = consent.status;
+      const previousRevokedAt = consent.revokedAt;
       consent.status = "REVOKED";
       consent.revokedAt = new Date().toISOString();
-      this.save();
+      try {
+        this.save();
+      } catch (error) {
+        consent.status = previousStatus;
+        consent.revokedAt = previousRevokedAt;
+        throw error;
+      }
       return true;
     }
     return false;
   }
 
   public checkActiveConsent(documentId: string, recipientEntity: string): DocumentConsentRecord | undefined {
+    this.expireElapsedConsents();
     const now = new Date().toISOString();
     return (this.data.documentConsents || []).find(
       (c) =>
