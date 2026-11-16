@@ -109,7 +109,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f9fc] text-[#191c1e]">
+    <div className="min-h-screen flex flex-col bg-[#F6F8FC] text-[#191c1e]">
       {/* Sovereign Top Header */}
       <Header />
 
