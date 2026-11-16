@@ -253,6 +253,10 @@ export const GBotModal: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <select value={activeId} onChange={(event) => setActiveId(event.target.value)} aria-label="Choose conversation" className="max-w-[118px] rounded-lg border border-slate-200 bg-white px-2 py-2 text-[11px] text-slate-600 md:hidden">
+                {conversations.map((chat) => <option key={chat.id} value={chat.id}>{chat.title}</option>)}
+              </select>
+              <button onClick={() => deleteConversation(activeId)} className="rounded-xl p-2 text-slate-400 hover:bg-red-50 hover:text-[#D62828] md:hidden" aria-label="Delete current chat"><Trash2 size={17} /></button>
               <button onClick={startNewChat} className="rounded-xl p-2 text-[#174EA6] hover:bg-[#EAF1FC] md:hidden" aria-label="New chat"><Plus size={19} /></button>
               <button onClick={closeGBot} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-[#171717]" aria-label="Close G-Bot"><X size={20} /></button>
             </div>
