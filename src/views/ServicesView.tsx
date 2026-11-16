@@ -82,7 +82,7 @@ export const ServicesView: React.FC = () => {
 
         {sortedServices.length ? <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {sortedServices.map((service) => (
-            <Card key={service.id} variant="hoverable" padding="none" className="flex h-full flex-col">
+            <Card key={service.id} variant="hoverable" padding="none" className="group flex h-full flex-col">
               <button onClick={() => openServiceModal(service)} className="flex h-full flex-col p-5 text-left">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge variant="info" size="sm">{service.shortCode}</Badge>
