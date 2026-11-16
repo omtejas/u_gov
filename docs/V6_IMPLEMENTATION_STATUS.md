@@ -57,3 +57,24 @@ The repository lockfile currently has no PostgreSQL client dependency. Add the s
 ## Verification
 
 A code checkout and test execution could not be run in the current execution environment because outbound GitHub network access is unavailable. GitHub branch writes were accepted by the repository API; this is not equivalent to a successful build or test run. Re-run `npm ci`, `npm run lint`, and `npm test` in CI before deployment.
+
+
+## Additional V6 increment — Bharat G-Bot and visual refresh
+
+Implemented on `u_gov_v6`:
+- Added configurable OpenAI-compatible and Gemini provider selection.
+- Added Tavily page-content search and Brave web search adapters.
+- Added bounded recent-chat context and contextual follow-up search queries.
+- Added public FAQ knowledge retrieval to the controlled AI gateway.
+- Added source citations in the AI API response, distinguishing U-GOV FAQ and Internet sources.
+- Replaced generic offline fallback messaging with an honest explanation of missing hosted AI configuration.
+- Redesigned G-Bot as a conversation workspace with per-user browser-local chat history, conversation switching and deletion.
+- Established the V6 blue/red/green/white/black/yellow design tokens and multilingual font stack.
+- Refreshed the citizen landing page, dashboard accents, header, navigation, footer and floating G-Bot entry point.
+
+Limitations:
+- Internet search and extracted webpage content require Tavily or Brave credentials; hosted AI requires an OpenAI-compatible or Gemini key.
+- Browser-local chat history is not server-side and does not synchronize across devices.
+- FAQ and service catalogue are the current internal knowledge sources; a complete crawler/index of every platform page is not yet implemented.
+- Several remaining modules still require a full visual redesign.
+- No build, lint, test suite, browser QA or preview deployment has been run for this increment. GitHub API acceptance is not proof of compilation or runtime correctness.
