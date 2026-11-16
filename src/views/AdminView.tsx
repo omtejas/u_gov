@@ -57,6 +57,10 @@ export const AdminView: React.FC = () => {
 
   // Service Builder State
   const [localServices, setLocalServices] = useState<GovService[]>(services);
+  useEffect(() => {
+    setLocalServices(services);
+  }, [services]);
+
   const [searchFilter, setSearchFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
@@ -135,6 +139,32 @@ export const AdminView: React.FC = () => {
       return;
     }
 
+    const slaValue = Number(formSla);
+    const feeValue = Number(formFee);
+    if (!Number.isInteger(slaValue) || slaValue < 1 || slaValue > 365) {
+      setBuilderMsg({ type: "error", text: "Catalogue processing estimate must be a whole number from 1 to 365 days." });
+      return;
+    }
+    if (!Number.isFinite(feeValue) || feeValue < 0 || feeValue > 100000) {
+      setBuilderMsg({ type: "error", text: "Listed fee must be between ₹0 and ₹100,000." });
+      return;
+    }
+    if (!editingService && !/^[A-Z0-9_-]{2,32}$/i.test(formCode.trim())) {
+      setBuilderMsg({ type: "error", text: "Service code must use 2–32 letters, numbers, hyphens, or underscores." });
+      return;
+    }
+
+    const allowedDocumentTypes = new Set(["AADHAAR", "PAN", "DRIVING_LICENCE", "DOMICILE", "INCOME_CERT", "MARKSHEET"]);
+    const requestedDocumentTypes = formDocs
+      .split(",")
+      .map((value) => value.trim().toUpperCase().replace(/\s+/g, "_"))
+      .filter(Boolean);
+    const invalidDocumentTypes = requestedDocumentTypes.filter((value) => !allowedDocumentTypes.has(value));
+    if (invalidDocumentTypes.length > 0) {
+      setBuilderMsg({ type: "error", text: `Unknown document type ID(s): ${invalidDocumentTypes.join(", ")}.` });
+      return;
+    }
+
     setIsSubmitting(true);
     setBuilderMsg(null);
 
@@ -156,8 +186,8 @@ export const AdminView: React.FC = () => {
             ministry: formMinistry.trim() || formDept.trim(),
             category: formCategory,
             description: formDesc.trim(),
-            slaDays: Number(formSla) || 15,
-            fee: Number(formFee) || 0,
+            slaDays: slaValue,
+            fee: feeValue,
             requiredDocumentTypeIds: docTypeIds,
             status: formStatus,
           }),
@@ -167,7 +197,7 @@ export const AdminView: React.FC = () => {
         if (res.ok && data.success) {
           setBuilderMsg({ type: "success", text: "Scheme updated successfully and recorded to U-AUDIT." });
           setLocalServices((prev) =>
-            prev.map((s) => (s.id === editingService.id ? { ...s, name: formName, department: formDept, slaDays: Number(formSla), fee: Number(formFee) } : s))
+            prev.map((s) => (s.id === editingService.id ? { ...s, name: formName, department: formDept, slaDays: slaValue, fee: feeValue } : s))
           );
           setTimeout(() => setIsCreateModalOpen(false), 800);
         } else {
