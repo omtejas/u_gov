@@ -16,12 +16,13 @@ export class OpenAIProvider implements AIProvider {
     if (!apiKey) return this.fallback.generateResponse(request, tools);
 
     const q = request.message.toLowerCase();
+    const contextualQuery = [...(request.conversationHistory || []).filter((m) => m.role === "user").slice(-2).map((m) => m.text), request.message].join(" ").slice(0, 700);
     const privateLookup = /\b(status|track|tracking|application number|where is my application)\b/.test(q)
       || /\b(my documents|my document|document readiness|am i ready|what am i missing)\b/.test(q);
     if (privateLookup) return this.fallback.generateResponse(request, tools);
 
     try {
-      const catalogue = await tools.searchServices(request.message);
+      const catalogue = await tools.searchServices(contextualQuery);
       let catalogueFacts: any = null;
       if (catalogue[0]) {
         const details = await tools.getServiceDetails(catalogue[0].serviceCode);
@@ -31,7 +32,7 @@ export class OpenAIProvider implements AIProvider {
 
       let sources: any[] = [];
       if ((process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY)) {
-        try { sources = await this.webSearch.search(request.message, 6); }
+        try { sources = await this.webSearch.search(contextualQuery, 6); }
         catch (error: any) { console.warn("G-Bot web search unavailable:", error?.message || error); }
       }
 
