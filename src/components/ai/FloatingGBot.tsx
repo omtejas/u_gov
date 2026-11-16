@@ -11,10 +11,10 @@ export const FloatingGBot: React.FC = () => {
     <div className="fixed bottom-20 md:bottom-8 right-5 z-40">
       <button
         onClick={() => openGBot()}
-        className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#0b1f3a] text-white shadow-xl hover:shadow-2xl hover:bg-[#163158] hover:scale-105 active:scale-95 transition-all duration-200 border border-blue-400/30 cursor-pointer"
+        className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#174EA6] text-white shadow-xl hover:shadow-2xl hover:bg-[#123B7A] hover:scale-105 active:scale-95 transition-all duration-200 border border-blue-400/30 cursor-pointer"
         aria-label="Ask G-Bot AI"
       >
-        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full bg-[#123B7A] flex items-center justify-center">
           <Bot className="w-4 h-4 text-amber-300" />
         </div>
         <div className="flex flex-col text-left">
