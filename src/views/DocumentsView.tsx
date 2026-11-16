@@ -297,10 +297,10 @@ export const DocumentsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(25,48,82,.04)]">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#171717]">
               U-DOCS Document Vault & Consent Records
             </h1>
             <Badge variant="info" size="sm">
