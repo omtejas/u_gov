@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGov } from "../../context/GovContext";
-import { X, Send, Bot, User, Sparkles, RefreshCw, ShieldCheck } from "lucide-react";
+import { X, Send, Bot, User, Sparkles, RefreshCw } from "lucide-react";
 
 interface Message {
   id: string;
