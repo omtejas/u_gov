@@ -99,7 +99,7 @@ export const GrievanceView: React.FC = () => {
           onClick={() => setIsNewOpen(true)}
           leftIcon={<Plus className="w-3.5 h-3.5" />}
         >
-          File New Grievance
+          Create Demo Issue
         </Button>
       </div>
 
