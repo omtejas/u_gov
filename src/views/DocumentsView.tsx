@@ -158,7 +158,7 @@ export const DocumentsView: React.FC = () => {
       setFileBase64("");
       setActionNotice({
         type: "success",
-        message: "Credential deposited successfully into your private DigiVault with cryptographic SHA-256 seal.",
+        message: "Document uploaded to private U-DOCS storage with a SHA-256 integrity checksum.",
       });
       setTimeout(() => setActionNotice(null), 6000);
     } else {
@@ -272,7 +272,7 @@ export const DocumentsView: React.FC = () => {
     if (res.success) {
       setActionNotice({
         type: "success",
-        message: `Document "${deleteConfirmDoc.name}" and its private binary purged from vault disk.`,
+        message: `Document "${deleteConfirmDoc.name}" and its private storage binary were deleted.`,
       });
     } else {
       setActionNotice({
@@ -301,7 +301,7 @@ export const DocumentsView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              U-DOCS Sovereign Digital Vault & Consent Center
+              U-DOCS Document Vault & Consent Records
             </h1>
             <Badge variant="info" size="sm">
               Prototype privacy controls
@@ -409,7 +409,7 @@ export const DocumentsView: React.FC = () => {
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
-          <span>Active Sharing Consents ({activeConsents.length})</span>
+          <span>Consent Records ({allConsents.length})</span>
         </button>
       </div>
 
@@ -421,7 +421,7 @@ export const DocumentsView: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-slate-800">Your DigiVault is Empty</h3>
+              <h3 className="text-base font-bold text-slate-800">Your U-DOCS vault is empty</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 No credentials have been deposited yet. Deposit your identity documents, marksheets, or certificates to protect them with cryptographic SHA-256 integrity.
               </p>
@@ -901,7 +901,7 @@ export const DocumentsView: React.FC = () => {
               <span>Sovereign Unilateral Revocation Guarantee</span>
             </div>
             <p className="text-[10px] leading-relaxed">
-              In accordance with DPDP framework, you maintain the unconditional right to revoke this consent at any time. When revoked, the recipient department will be immediately blocked from accessing this document.
+              You can revoke this U-GOV consent record at any time. No external department is connected to retrieve document files in this prototype.
             </p>
           </div>
 
@@ -916,7 +916,7 @@ export const DocumentsView: React.FC = () => {
               Cancel
             </Button>
             <Button variant="primary" size="sm" type="submit" disabled={isSharing}>
-              {isSharing ? "Recording Consent..." : "Grant Time-Bound Access"}
+              {isSharing ? "Recording Consent..." : "Record Time-Bound Consent"}
             </Button>
           </div>
         </form>
@@ -927,12 +927,12 @@ export const DocumentsView: React.FC = () => {
         isOpen={Boolean(deleteConfirmDoc)}
         onClose={() => setDeleteConfirmDoc(null)}
         title="Permanently Delete Credential?"
-        subtitle="This action will permanently purge the binary from the private disk vault"
+        subtitle="This permanently removes the document record and its private stored file"
         maxWidth="sm"
       >
         <div className="space-y-4">
           <p className="text-xs text-slate-600 leading-relaxed">
-            Are you sure you want to delete <strong>{deleteConfirmDoc?.name}</strong>? All associated department consents will be automatically invalidated, and the encrypted binary will be unlinked from the vault.
+            Are you sure you want to delete <strong>{deleteConfirmDoc?.name}</strong>? Its U-GOV consent records will also be invalidated. The file is not encrypted at rest.
           </p>
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <Button
