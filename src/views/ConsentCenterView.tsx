@@ -106,7 +106,7 @@ export const ConsentCenterView: React.FC = () => {
             <h1 className="text-2xl font-extrabold text-[#0b1f3a]">Consent Center</h1>
           </div>
           <p className="text-slate-500 text-sm">
-            Full control over which government departments can access your documents. Revoke any consent instantly.
+            Review and manage document-sharing permissions recorded inside the U-GOV prototype. Revoke an active U-GOV consent when needed.
           </p>
         </div>
         <button
@@ -139,7 +139,7 @@ export const ConsentCenterView: React.FC = () => {
         <div>
           <p className="text-sm font-semibold text-blue-900">Your Data Sovereignty</p>
           <p className="text-xs text-blue-700 mt-0.5">
-            U-GOV never shares your documents without your explicit consent. Revoking a consent immediately prevents the recipient from accessing the document. All consent operations are permanently recorded in the SHA-256 Hash-Chained Audit Ledger.
+            U-GOV's prototype document-access routes check the recorded consent state. Revocation blocks access through those U-GOV routes. External government departments are not connected in this prototype; consent events are recorded in the U-AUDIT ledger.
           </p>
         </div>
       </div>
