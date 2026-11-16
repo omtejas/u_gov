@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
             onClick={() => setActiveTab("home")}
             className="flex items-center gap-3 cursor-pointer select-none group"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#0b1f3a] p-1 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-[#174EA6] p-1 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
               <img src="/logo.png" alt="U-GOV Sovereign Emblem" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col">
@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
             {/* 256-Bit SSL Status indicator */}
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/80 border border-slate-200/70">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#16834A]" />
               <span className="text-[11px] font-medium text-slate-700">
                 High-Assurance TLS 1.3
               </span>
@@ -115,14 +115,14 @@ export const Header: React.FC = () => {
                   onClick={() => setActiveTab("dashboard")}
                   className="flex items-center gap-2 cursor-pointer p-1 rounded-xl hover:bg-slate-50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#0b1f3a] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                  <div className="w-8 h-8 rounded-full bg-[#174EA6] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
                     {user.name.slice(0, 1)}
                   </div>
                   <div className="hidden sm:flex flex-col text-left">
                     <span className="text-xs font-bold text-slate-900 leading-tight">
                       {user.name.split(" ")[0]}
                     </span>
-                    <span className="text-[10px] text-emerald-600 font-semibold tracking-wide">
+                    <span className="text-[10px] text-[#16834A] font-semibold tracking-wide">
                       {user.kycLevel.split(" ")[0]}
                     </span>
                   </div>
@@ -138,7 +138,7 @@ export const Header: React.FC = () => {
             ) : (
               <button
                 onClick={() => setActiveTab("auth")}
-                className="px-3.5 py-1.5 rounded-xl bg-[#0b1f3a] text-white text-xs font-semibold hover:bg-[#163158] transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl bg-[#174EA6] text-white text-xs font-semibold hover:bg-[#123B7A] transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
               >
                 <User className="w-3.5 h-3.5" />
                 <span>Sign In</span>
