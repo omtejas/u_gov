@@ -22,7 +22,7 @@ aiRouter.use(rateLimiter(60000, 30));
 aiRouter.get("/health", (_req, res: Response) => {
   const provider = aiFactory.getAIProvider();
   const isLiveAI = provider.providerName === "GeminiProvider" || provider.providerName === "OpenAIProvider";
-  const searchConfigured = Boolean(process.env.BRAVE_SEARCH_API_KEY);
+  const searchConfigured = Boolean(process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY);
   return res.json({
     status: "HEALTHY",
     provider: provider.providerName,
