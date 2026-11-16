@@ -11,7 +11,7 @@ import {
   Sparkles,
   ArrowRight,
   Clock,
-   AlertTriangle,
+  AlertTriangle,
   FileText,
 } from "lucide-react";
 
@@ -23,11 +23,9 @@ export const DashboardView: React.FC = () => {
     documents,
     auditLogs,
     setActiveTab,
-    openServiceModal,
-    openApplicationModal,
+     openApplicationModal,
     openGBot,
-    services,
-  } = useGov();
+   } = useGov();
 
   const activeGovernmentApps = governmentApplications.filter(
     (a) => !["APPROVED", "REJECTED", "CANCELLED"].includes(a.status)
