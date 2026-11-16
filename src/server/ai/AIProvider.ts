@@ -31,9 +31,18 @@ export interface AIChatRequest {
   context: AIToolContext;
 }
 
+export interface AIResponseCitation {
+  title: string;
+  url: string;
+  snippet?: string;
+  publishedAt?: string;
+  sourceType: "u-gov" | "internet";
+}
+
 export interface AIChatResponse {
   reply: string;
   source: string;
+  citations?: AIResponseCitation[];
   suggestions?: string[];
   toolCalls?: AIToolResult[];
   disclaimer: string;
