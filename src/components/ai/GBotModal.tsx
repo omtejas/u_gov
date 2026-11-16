@@ -28,7 +28,7 @@ interface Conversation {
   messages: Message[];
 }
 
-const renderInline = (line: string) => line.split(/(\\*\\*[^*]+\\*\\*|\\*[^*]+\\*|`[^`]+`)/g).map((part, index) => {
+const renderInline = (line: string) => line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((part, index) => {
   if (part.startsWith("**") && part.endsWith("**")) return <strong key={index} className="font-bold">{part.slice(2, -2)}</strong>;
   if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
   if (part.startsWith("`") && part.endsWith("`")) return <code key={index} className="rounded bg-slate-100 px-1.5 py-0.5 text-[.9em] text-[#174EA6]">{part.slice(1, -1)}</code>;
@@ -36,7 +36,7 @@ const renderInline = (line: string) => line.split(/(\\*\\*[^*]+\\*\\*|\\*[^*]+\\
 });
 const renderMessageBody = (text: string) => (
   <div className="space-y-1.5">
-    {text.split("\\n").map((line, index) => {
+    {text.split("\n").map((line, index) => {
       const trimmed = line.trim();
       if (!trimmed) return <div key={index} className="h-1" />;
       if (trimmed.startsWith("### ")) return <h3 key={index} className="pt-2 font-display text-base font-bold text-[#171717]">{renderInline(trimmed.slice(4))}</h3>;
