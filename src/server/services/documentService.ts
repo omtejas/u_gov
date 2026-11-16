@@ -114,7 +114,7 @@ export class DocumentService {
       action: "DOCUMENT_UPLOADED",
       resource: `Document ${docRecord.title} (${docRecord.id})`,
       result: "SUCCESS",
-      context: `Citizen deposited credential to private DigiVault. SHA-256: ${sha256.slice(0, 16)}...`,
+      context: `Citizen uploaded a document to private U-DOCS storage. SHA-256: ${sha256.slice(0, 16)}...`,
       ipAddress: ip,
     });
 
@@ -133,21 +133,14 @@ export class DocumentService {
       throw err;
     }
 
-    // Ownership check
+    // Consent records express a citizen's prototype preference; they do not
+    // authenticate an external department. Until department identities and
+    // service-to-service credentials exist, only the owner can retrieve files.
     if (doc.ownerUserId === requestingUserId) {
       return doc;
     }
 
-    // Check if recipient has active consent grant
-    if (recipientEntity) {
-      const activeConsent = db.checkActiveConsent(documentId, recipientEntity);
-      if (activeConsent) {
-        return doc;
-      }
-    }
-
-    // IDOR Protection: Caller is neither owner nor authorized recipient
-    const err: any = new Error("Access denied: you do not have permission to view this document.");
+    const err: any = new Error("Access denied: document sharing is recorded in U-GOV, but no authenticated external recipient integration is connected.");
     err.statusCode = 403;
     throw err;
   }
@@ -198,7 +191,7 @@ export class DocumentService {
       action: "DOCUMENT_DOWNLOADED",
       resource: `Document ${doc.title} (${doc.id})`,
       result: "SUCCESS",
-      context: `Streamed encrypted private vault binary with verified SHA-256 integrity.`,
+      context: `Downloaded private storage binary after successful SHA-256 integrity verification.`,
       ipAddress: ip,
     });
 
@@ -270,7 +263,7 @@ export class DocumentService {
       action: "DOCUMENT_DELETED",
       resource: `Document ${doc.title} (${doc.id})`,
       result: "SUCCESS",
-      context: `Citizen permanently deleted document and purged binary from private vault.`,
+      context: `Citizen permanently deleted the U-DOCS document and its private storage binary.`,
       ipAddress: ip,
     });
 
