@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { Readable } from "node:stream";
-import type { FileMetadata, SaveFileOptions, StorageDriver } from "./StorageDriver";
+import type { FileMetadata, SaveFileOptions, StorageDriver, StorageHealthResult } from "./StorageDriver";
 
 /**
  * Private S3-compatible object storage driver.
@@ -41,6 +41,14 @@ export class S3CompatibleStorageDriver implements StorageDriver {
     return crypto.createHmac("sha256", key).update(value, "utf8").digest();
   }
 
+  private bucketUrl(): URL {
+    const url = new URL(this.endpoint.toString());
+    const prefix = url.pathname.replace(/\\/$/, "");
+    url.pathname = `${prefix}/${encodeURIComponent(this.bucket)}`;
+    url.search = "";
+    return url;
+  }
+
   private objectUrl(key: string): URL {
     if (!/^[0-9a-f-]{36}$/i.test(key)) throw new Error("Invalid storage key.");
     const url = new URL(this.endpoint.toString());
@@ -50,8 +58,7 @@ export class S3CompatibleStorageDriver implements StorageDriver {
     return url;
   }
 
-  private async request(method: string, key: string, body?: Buffer, mimeType?: string): Promise<Response> {
-    const url = this.objectUrl(key);
+  private async requestUrl(method: string, url: URL, body?: Buffer, mimeType?: string): Promise<Response> {
     const now = new Date();
     const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
     const dateStamp = amzDate.slice(0, 8);
@@ -93,6 +100,23 @@ export class S3CompatibleStorageDriver implements StorageDriver {
       headers: { ...headers, Authorization: authorization },
       body: method === "PUT" ? body : undefined,
     });
+  }
+
+  private request(method: string, key: string, body?: Buffer, mimeType?: string): Promise<Response> {
+    return this.requestUrl(method, this.objectUrl(key), body, mimeType);
+  }
+
+  async checkHealth(): Promise<StorageHealthResult> {
+    try {
+      const response = await this.requestUrl("HEAD", this.bucketUrl());
+      return {
+        healthy: response.ok,
+        provider: "s3",
+        detail: response.ok ? "Private object-storage bucket is reachable." : `Object-storage health check returned HTTP ${response.status}.`,
+      };
+    } catch {
+      return { healthy: false, provider: "s3", detail: "Private object-storage bucket could not be reached." };
+    }
   }
 
   async save(content: Buffer, options: SaveFileOptions): Promise<{ key: string; sha256: string; size: number }> {
