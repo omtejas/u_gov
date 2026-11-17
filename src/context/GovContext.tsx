@@ -28,6 +28,7 @@ interface GovContextType {
   isLoadingAuth: boolean;
   authError: string | null;
   login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  googleLogin: (credential: string) => Promise<{ success: boolean; error?: string }>;
   register: (data: {
     identifier: string;
     password: string;
@@ -317,6 +318,38 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const errMsg = "Unable to connect to authentication gateway. Please check network.";
       setAuthError(errMsg);
       return { success: false, error: errMsg };
+    } finally {
+      setIsLoadingAuth(false);
+    }
+  };
+
+  // Google OpenID Connect handler: backend verifies the ID token and creates the same U-GOV session.
+  const googleLogin = async (credential: string): Promise<{ success: boolean; error?: string }> => {
+    setAuthError(null);
+    setIsLoadingAuth(true);
+    try {
+      const res = await fetch("/api/v1/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ credential }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const error = data.error || "Google sign-in failed.";
+        setAuthError(error);
+        return { success: false, error };
+      }
+      await checkCurrentSession();
+      await refreshAuditLogs();
+      await refreshDocuments();
+      await refreshApplications();
+      setActiveTabState("dashboard");
+      return { success: true };
+    } catch {
+      const error = "Unable to connect to the U-GOV authentication gateway.";
+      setAuthError(error);
+      return { success: false, error };
     } finally {
       setIsLoadingAuth(false);
     }
@@ -994,6 +1027,7 @@ export const GovProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isLoadingAuth,
         authError,
         login,
+        googleLogin,
         register,
         logout,
         updateProfile,
