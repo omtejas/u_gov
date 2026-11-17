@@ -321,14 +321,9 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
       };
     }
 
-    // 7. Honest fallback when no hosted model is configured or a provider is unavailable.
-    const recentContext = request.conversationHistory?.filter((m) => m.role === "user").slice(-1)[0]?.text;
+    // 7. Honest offline response. Do not misrepresent a catalogue miss as an answer.
     return {
-      reply: `I understood your question: “${request.message.slice(0, 180)}”.
-
-I checked the local U-GOV service catalogue, but could not find enough verified information to answer this accurately. This environment is currently using the offline demo assistant, not a general-purpose hosted AI model.
-
-You can still ask me to find a service, explain a catalogue entry, check your own application status, or assess your document readiness. For open-ended questions and current Internet research, configure a hosted AI provider and web-search provider on the V6 preview environment.${recentContext ? "\n\nYour previous topic was: " + recentContext.slice(0, 120) : ""}`,
+      reply: "General AI answers are unavailable in offline demo mode. I can still help with supported U-GOV service discovery and secure citizen workflows.",
       source: "U-GOV offline demo assistant",
       suggestions: [
         "Search the U-GOV service catalogue",
