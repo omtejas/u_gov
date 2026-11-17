@@ -1,138 +1,15 @@
 import React from "react";
-import { ShieldCheck, PhoneCall, ExternalLink } from "lucide-react";
-
-export const Footer: React.FC = () => {
-  return (
-    <footer className="bg-[#123B7A] text-slate-300 border-t border-white/15 pt-10 pb-20 md:pb-10 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-white/15/80">
-          {/* Col 1: Platform Overview */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#174EA6] p-0.5 flex items-center justify-center overflow-hidden border border-slate-700">
-                <img src="/logo.png" alt="U-GOV Logo" className="w-full h-full object-contain" />
-              </div>
-              <span className="font-bold text-base text-white tracking-tight">
-                U-GOV India
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Unified Governance & Citizen Services Platform. Built for Smart India Hackathon 2026 (PS ID: SIH26129) to eliminate fragmented public service delivery.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-400">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Government Sovereign Security Architecture</span>
-            </div>
-          </div>
-
-          {/* Col 2: Core Pillars */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              U-System Ecosystem
-            </h4>
-            <ul className="text-xs space-y-1.5 text-slate-400">
-              <li>U-Identity (Single Token Sovereign ID)</li>
-              <li>U-Docs (DigiVault & Consent Engine)</li>
-              <li>U-Services (National Service Catalogue)</li>
-              <li>U-Track (Unified SLA Application Tracking)</li>
-              <li>U-AI (Bharat G-Bot Public Knowledge Engine)</li>
-            </ul>
-          </div>
-
-          {/* Col 3: Statutory Helplines */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              National Citizen Helplines
-            </h4>
-            <div className="space-y-1.5 text-xs text-slate-400">
-              <p className="flex items-center gap-1.5 text-white font-semibold">
-                <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-                <span>1947 — Aadhaar & UIDAI Helpdesk</span>
-              </p>
-              <p className="flex items-center gap-1.5 text-white font-semibold">
-                <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-                <span>1930 — National Cyber Crime Helpline</span>
-              </p>
-              <p className="flex items-center gap-1.5 text-white font-semibold">
-                <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-                <span>1800-180-1551 — Kisan Welfare Center</span>
-              </p>
-              <p className="flex items-center gap-1.5 text-white font-semibold">
-                <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-                <span>14555 — Ayushman Bharat (PM-JAY)</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Col 4: National Gateways */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Integrated Portals
-            </h4>
-            <ul className="text-xs space-y-1.5 text-slate-400">
-              <li>
-                <a
-                  href="https://india.gov.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-white transition-colors"
-                >
-                  <span>National Portal of India</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://digilocker.gov.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-white transition-colors"
-                >
-                  <span>DigiLocker Ecosystem</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://pgportal.gov.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-white transition-colors"
-                >
-                  <span>CPGRAMS Public Grievances</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://scholarships.gov.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 hover:text-white transition-colors"
-                >
-                  <span>National Scholarship Portal</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
-          <p>© 2026 U-GOV India • Unified Public Digital Infrastructure.</p>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span className="hover:text-slate-200 cursor-pointer">Privacy Charter</span>
-            <span>•</span>
-            <span className="hover:text-slate-200 cursor-pointer">Terms of Service</span>
-            <span>•</span>
-            <span className="hover:text-slate-200 cursor-pointer">Accessibility Statement</span>
-            <span>•</span>
-            <span className="hover:text-slate-200 cursor-pointer">Security Audit</span>
-          </div>
-        </div>
+import { ShieldCheck, PhoneCall, ExternalLink, ArrowUpRight } from "lucide-react";
+export const Footer: React.FC = () => (
+  <footer className="bg-[#09172D] text-slate-300 border-t border-white/10 pt-16 pb-24 md:pb-10 mt-20">
+    <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12">
+      <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-10 pb-12 border-b border-white/15">
+        <div className="space-y-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-[#174EA6] p-1 flex items-center justify-center"><img src="/logo.png" alt="U-GOV Logo" className="w-full h-full object-contain"/></div><span className="font-extrabold text-xl text-white tracking-tight">U-GOV</span></div><p className="max-w-xs text-sm text-slate-400 leading-7">Unified Governance & Citizen Services Platform. A connected digital gateway concept built for Smart India Hackathon 2026.</p><div className="flex items-center gap-2 text-xs text-emerald-400"><ShieldCheck className="w-4 h-4"/><span>Designed with security and citizen trust in mind</span></div></div>
+        <div className="space-y-4"><h4 className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white">THE PLATFORM</h4><ul className="text-sm space-y-3 text-slate-400"><li>U-Identity · Citizen profile</li><li>U-Docs · Document vault</li><li>U-Services · Service catalogue</li><li>U-Track · Application tracking</li><li>U-AI · Bharat G-Bot</li></ul></div>
+        <div className="space-y-4"><h4 className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white">CITIZEN HELPLINES</h4><div className="space-y-3 text-sm text-slate-400"><p className="flex items-center gap-2"><PhoneCall className="w-4 h-4 text-[#F5C518]"/>1947 — Aadhaar / UIDAI</p><p className="flex items-center gap-2"><PhoneCall className="w-4 h-4 text-[#F5C518]"/>1930 — Cyber Crime</p><p className="flex items-center gap-2"><PhoneCall className="w-4 h-4 text-[#F5C518]"/>1800-180-1551 — Kisan</p><p className="flex items-center gap-2"><PhoneCall className="w-4 h-4 text-[#F5C518]"/>14555 — Ayushman Bharat</p></div></div>
+        <div className="space-y-4"><h4 className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white">OFFICIAL GATEWAYS</h4><ul className="text-sm space-y-3 text-slate-400">{[["National Portal of India","https://india.gov.in"],["DigiLocker","https://digilocker.gov.in"],["CPGRAMS","https://pgportal.gov.in"],["National Scholarship Portal","https://scholarships.gov.in"]].map(([label,url])=><li key={url}><a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white transition">{label}<ExternalLink className="w-3 h-3"/></a></li>)}</ul></div>
       </div>
-    </footer>
-  );
-};
+      <div className="pt-7 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-[11px] text-slate-500"><p>© 2026 U-GOV · Unified Public Digital Infrastructure Concept</p><span className="inline-flex items-center gap-2">PROTOTYPE · NOT AN OFFICIAL GOVERNMENT PORTAL <ArrowUpRight size={12}/></span></div>
+    </div>
+  </footer>
+);
