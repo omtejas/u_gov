@@ -24,7 +24,7 @@ async function getGoogleSigningKeys(): Promise<GoogleJwk[]> {
   }
   cachedKeys = payload.keys;
   const cacheControl = response.headers.get("cache-control") || "";
-  const maxAge = Number(cacheControl.match(/max-age=(\\d+)/i)?.[1] || 3600);
+  const maxAge = Number(cacheControl.match(/max-age=(\d+)/i)?.[1] || 3600);
   keysExpireAt = Date.now() + Math.max(60, Math.min(maxAge, 86400)) * 1000;
   return cachedKeys;
 }
