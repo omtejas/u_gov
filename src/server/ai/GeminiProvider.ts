@@ -6,6 +6,7 @@ import { GoogleGenAI } from "@google/genai";
 import { AIProvider, AIChatRequest, AIChatResponse, IAIToolGateway } from "./AIProvider";
 import { MockAIProvider } from "./MockAIProvider";
 import { BraveWebSearchProvider, WebSearchSource } from "./WebSearchProvider";
+import { classifyAIIntent, isPrivateContextualFollowup, safeGeminiHistory } from "./AIIntentRouter";
 
 export class GeminiProvider implements AIProvider {
   public readonly providerName = "GeminiProvider";
@@ -30,27 +31,24 @@ export class GeminiProvider implements AIProvider {
     request: AIChatRequest,
     toolGateway: IAIToolGateway
   ): Promise<AIChatResponse> {
-    if (!this.client) {
+    const intent = classifyAIIntent(request.message);
+    const privateFollowup = isPrivateContextualFollowup(request.message, request.conversationHistory || []);
+    if (intent === "PRIVATE_CITIZEN_WORKFLOW" || privateFollowup) {
       return this.fallbackProvider.generateResponse(request, toolGateway);
+    }
+    if (!this.client) {
+      return this.unavailableResponse("Gemini is not configured on this server.");
     }
 
     try {
-      // Keep private citizen lookups in U-GOV's authenticated, deterministic
-      // tool gateway. Never send private vault or application data to Gemini.
-      const lowerMessage = request.message.toLowerCase();
-      const privateConversationContext = (request.conversationHistory || []).some((item) => /\b(where is my application|application status|tracking token|my documents|document readiness|readiness score|verified in vault|missing documents|UGOV-\d{4})\b/i.test(item.text));
-      const contextualQuery = [...(request.conversationHistory || []).filter((m) => m.role === "user").slice(-2).map((m) => m.text), request.message].join(" ").slice(0, 700);
-      const isPrivateLookup =
-        /\b(status|track|tracking|application number|where is my application)\b/.test(lowerMessage) ||
-        /\b(my documents|my document|document readiness|am i ready|what am i missing)\b/.test(lowerMessage);
-      if (isPrivateLookup || privateConversationContext) {
-        return this.fallbackProvider.generateResponse(request, toolGateway);
-      }
-
-      // Only public catalogue facts are supplied to the external AI provider.
-      // This catalogue is prototype/demo data, not a live government registry.
-      const searchResults = await toolGateway.searchServices(contextualQuery);
-      const knowledgeResults = toolGateway.searchKnowledge ? await toolGateway.searchKnowledge(contextualQuery) : [];
+      const contextualQuery = request.message.slice(0, 700);
+      const safeHistory = safeGeminiHistory(request.conversationHistory || []);
+      const searchResults = intent === "GOVERNMENT_SERVICE"
+        ? await toolGateway.searchServices(request.message)
+        : [];
+      const knowledgeResults = intent === "UGOV_NAVIGATION" && toolGateway.searchKnowledge
+        ? await toolGateway.searchKnowledge(request.message)
+        : [];
       const selectedService = searchResults[0];
       const serviceDetails = selectedService
         ? await toolGateway.getServiceDetails(selectedService.serviceCode)
@@ -117,7 +115,7 @@ Rules:
         .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]")
         .replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]");
 
-      const history = (request.conversationHistory || []).slice(-12).map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]").replace(/\bAPP-\d+-[A-F0-9]+\b/gi, "[REDACTED APPLICATION ID]").slice(0, 1600) }] }));
+      const history = safeHistory.map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
       const configuredModel = (process.env.GEMINI_MODEL || "gemini-3.8-flash")
@@ -153,10 +151,31 @@ Rules:
         };
       }
 
-      return this.fallbackProvider.generateResponse(request, toolGateway);
+      return this.unavailableResponse("Gemini returned an empty response.");
     } catch (err: any) {
-      console.warn("Gemini provider fallback engaged:", err?.message || err);
-      return this.fallbackProvider.generateResponse(request, toolGateway);
+      const message = String(err?.message || err);
+      const category = /401|403|api key|unauthorized|permission/i.test(message)
+        ? "authentication"
+        : /429|quota|rate.?limit/i.test(message)
+          ? "rate_limit"
+          : /timeout|timed out/i.test(message)
+            ? "timeout"
+            : /404|not found|model/i.test(message)
+              ? "model"
+              : "provider_error";
+      console.warn("Gemini request failed:", { category, message: message.slice(0, 240) });
+      return this.unavailableResponse("The hosted AI service is temporarily unavailable. Please try again shortly.");
     }
+  }
+
+  private unavailableResponse(message: string): AIChatResponse {
+    return {
+      reply: message,
+      source: "GeminiProvider unavailable",
+      suggestions: ["Try again shortly", "Search the U-GOV service catalogue"],
+      toolCalls: [],
+      disclaimer: "No AI-generated answer was produced for this request.",
+      timestamp: new Date().toISOString(),
+    };
   }
 }
