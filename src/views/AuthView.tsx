@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useGov } from "../context/GovContext";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -11,8 +11,74 @@ import {
 type AuthTab = "login" | "register" | "simulation";
 
 export const AuthView: React.FC = () => {
-  const { login, register, authError, isLoadingAuth } = useGov();
+  const { login, googleLogin, register, authError, isLoadingAuth } = useGov();
   const [tab, setTab] = useState<AuthTab>("login");
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const googleLoginRef = useRef(googleLogin);
+  const [googleEnabled, setGoogleEnabled] = useState<boolean | null>(null);
+  const [googleError, setGoogleError] = useState<string | null>(null);
+
+  useEffect(() => { googleLoginRef.current = googleLogin; }, [googleLogin]);
+
+  useEffect(() => {
+    if (tab !== "login") return;
+    let cancelled = false;
+    const setupGoogleButton = async () => {
+      try {
+        const configResponse = await fetch("/api/v1/auth/google/config", { credentials: "same-origin" });
+        const config = await configResponse.json();
+        if (!configResponse.ok || !config.enabled || !config.clientId) {
+          if (!cancelled) setGoogleEnabled(false);
+          return;
+        }
+        const nonceResponse = await fetch("/api/v1/auth/google/nonce", { credentials: "same-origin" });
+        const nonceData = await nonceResponse.json();
+        if (!nonceResponse.ok || !nonceData.success || !nonceData.nonce) throw new Error("Could not start secure Google sign-in. Please refresh and try again.");
+        if (cancelled) return;
+        const render = () => {
+          if (cancelled || !googleButtonRef.current || !(window as any).google?.accounts?.id) return;
+          (window as any).google.accounts.id.initialize({
+            client_id: config.clientId,
+            nonce: nonceData.nonce,
+            callback: async (response: { credential?: string }) => {
+              if (!response.credential) {
+                setGoogleError("Google did not return a valid sign-in credential.");
+                return;
+              }
+              setGoogleError(null);
+              const result = await googleLoginRef.current(response.credential);
+              if (!result.success) setGoogleError(result.error || "Google sign-in failed.");
+            },
+          });
+          googleButtonRef.current.innerHTML = "";
+          (window as any).google.accounts.id.renderButton(googleButtonRef.current, {
+            type: "standard", theme: "outline", size: "large", shape: "rectangular",
+            text: "continue_with", logo_alignment: "left",
+            width: Math.min(390, googleButtonRef.current.clientWidth || 390),
+          });
+          setGoogleEnabled(true);
+        };
+        if ((window as any).google?.accounts?.id) {
+          render();
+        } else {
+          let script = document.querySelector<HTMLScriptElement>('script[src="https://accounts.google.com/gsi/client"]');
+          if (!script) {
+            script = document.createElement("script");
+            script.src = "https://accounts.google.com/gsi/client";
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+          }
+          script.addEventListener("load", render, { once: true });
+          script.addEventListener("error", () => { if (!cancelled) setGoogleError("Google sign-in could not load. Check your connection."); }, { once: true });
+        }
+      } catch (error: any) {
+        if (!cancelled) setGoogleError(error.message || "Google sign-in setup failed.");
+      }
+    };
+    setupGoogleButton();
+    return () => { cancelled = true; };
+  }, [tab]);
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [regIdentifier, setRegIdentifier] = useState("");
@@ -148,6 +214,12 @@ export const AuthView: React.FC = () => {
 
             {tab === "login" && (
               <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <div ref={googleButtonRef} className="flex min-h-10 w-full justify-center" />
+                  {googleEnabled === false && <p className="text-center text-[11px] text-slate-400">Google sign-in will be available after administrator configuration.</p>}
+                  {googleError && <p role="alert" className="text-center text-xs text-rose-600">{googleError}</p>}
+                </div>
+                <div className="relative py-1 text-center"><div className="absolute inset-x-0 top-1/2 border-t border-slate-200" /><span className="relative bg-[#F4F7FC] px-3 text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">Or sign in with email</span></div>
                 <Input label="Email address or U-ID" type="text" value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} placeholder="you@example.com" required />
                 <Input label="Password" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Enter your password" required />
                 <div className="flex items-center justify-between text-[11px] text-slate-500">
