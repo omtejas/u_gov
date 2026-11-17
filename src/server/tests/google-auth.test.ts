@@ -1,12 +1,13 @@
 import crypto from "crypto";
 import { verifyGoogleIdToken } from "../auth/googleIdentity";
 
-const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-  modulusLength: 2048,
-  publicKeyEncoding: { type: "spki", format: "jwk" },
-  privateKeyEncoding: { type: "pkcs8", format: "pem" },
-});
-const jwk = { ...publicKey, kid: "test-google-key", alg: "RS256", use: "sig" };
+const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+const jwk = {
+  ...(publicKey.export({ format: "jwk" }) as JsonWebKey),
+  kid: "test-google-key",
+  alg: "RS256",
+  use: "sig",
+};
 (globalThis as any).fetch = async () => new Response(JSON.stringify({ keys: [jwk] }), {
   status: 200,
   headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=300" },
