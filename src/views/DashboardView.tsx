@@ -97,7 +97,7 @@ export const DashboardView: React.FC = () => {
   const district = user?.district || "Pune";
 
   return (
-    <div className="space-y-8">
+    <div className="ugov-app-page ugov-dashboard-page space-y-8">
       {/* Citizen Identity Header Banner */}
       <div className="p-6 rounded-3xl bg-gradient-to-br from-[#123B7A] via-[#174EA6] to-[#123B7A] text-white shadow-lg border border-blue-300/30 relative overflow-hidden">
         <div className="sovereign-tricolor-bar absolute inset-x-0 top-0" />
