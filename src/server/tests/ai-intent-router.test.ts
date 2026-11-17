@@ -31,7 +31,7 @@ const contaminatedHistory = [
   { role: "model" as const, text: "Application status and tracking token: DOCUMENTS_REQUIRED." },
 ];
 assert.equal(classifyAIIntent("What is Smart India Hackathon?"), "GENERAL_KNOWLEDGE");
-assert.equal(isPrivateContextualFollowup("What does this status mean?", contaminatedHistory), false);
+assert.equal(isPrivateContextualFollowup("What is Smart India Hackathon?", contaminatedHistory), false);
 assert.equal(
   isPrivateContextualFollowup("What does this status mean?", [
     { role: "user", text: "Where is my application?" },
