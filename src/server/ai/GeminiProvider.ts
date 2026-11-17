@@ -122,7 +122,7 @@ Rules:
 
       const response = await Promise.race([
         this.client.models.generateContent({
-          model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+          model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
           contents,
           config: { systemInstruction, temperature: 0.55 },
         }),
