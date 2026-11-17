@@ -163,7 +163,7 @@ Rules:
             : /404|not found|model/i.test(message)
               ? "model"
               : "provider_error";
-      console.warn("Gemini request failed:", { category, message: message.slice(0, 240) });
+      console.warn("Gemini request failed:", { category });
       return this.unavailableResponse("The hosted AI service is temporarily unavailable. Please try again shortly.");
     }
   }
