@@ -124,7 +124,7 @@ Rules:
         this.client.models.generateContent({
           model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
           contents,
-          config: { systemInstruction, temperature: 0.55 },
+          config: { systemInstruction },
         }),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error("Gemini API call timed out")), 7000)
