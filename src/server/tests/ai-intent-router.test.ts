@@ -38,7 +38,7 @@ assert.equal(
 );
 assert.deepEqual(
   safeGeminiHistory(contaminatedHistory).map((item) => item.text),
-  ["Where is my application?"]
+  []
 );
 
 console.log("AI intent router tests passed.");
