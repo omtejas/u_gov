@@ -97,7 +97,7 @@ export const ConsentCenterView: React.FC = () => {
   const expiringSoon = consents.filter((c) => c.status === "ACTIVE" && isExpiringSoon(c.expiresAt)).length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-mydata-page ugov-app-page space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
