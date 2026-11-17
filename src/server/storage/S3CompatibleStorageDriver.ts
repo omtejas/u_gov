@@ -43,7 +43,7 @@ export class S3CompatibleStorageDriver implements StorageDriver {
 
   private bucketUrl(): URL {
     const url = new URL(this.endpoint.toString());
-    const prefix = url.pathname.replace(/\\/$/, "");
+    const prefix = url.pathname.replace(/\/$/, "");
     url.pathname = `${prefix}/${encodeURIComponent(this.bucket)}`;
     url.search = "";
     return url;
