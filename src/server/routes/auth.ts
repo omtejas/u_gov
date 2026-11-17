@@ -201,7 +201,7 @@ authRouter.post("/google", rateLimiter(60000, 10), async (req: AuthenticatedRequ
         });
         return res.status(409).json({
           success: false,
-          error: "An account already exists with this email. Sign in with your U-GOV password first; account linking will be available from account security settings."
+          error: "An account already exists with this email. Google sign-in cannot automatically link existing accounts in this version. Please use your U-GOV password."
         });
       }
 
