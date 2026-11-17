@@ -78,7 +78,7 @@ export class GeminiProvider implements AIProvider {
         : null;
 
       let webSources: WebSearchSource[] = [];
-      if ((process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY) && !isPrivateLookup) {
+      if ((process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY)) {
         try { webSources = await this.webSearch.search(contextualQuery, 6); }
         catch (searchError: any) { console.warn("G-Bot web search unavailable:", searchError?.message || searchError); }
       }
