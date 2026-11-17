@@ -35,8 +35,8 @@ export const AuthView: React.FC = () => {
         if (!nonceResponse.ok || !nonceData.success || !nonceData.nonce) throw new Error("Could not start secure Google sign-in. Please refresh and try again.");
         if (cancelled) return;
         const render = () => {
-          if (cancelled || !googleButtonRef.current || !window.google?.accounts?.id) return;
-          window.google.accounts.id.initialize({
+          if (cancelled || !googleButtonRef.current || !(window as any).google?.accounts?.id) return;
+          (window as any).google.accounts.id.initialize({
             client_id: config.clientId,
             nonce: nonceData.nonce,
             callback: async (response: { credential?: string }) => {
@@ -50,14 +50,14 @@ export const AuthView: React.FC = () => {
             },
           });
           googleButtonRef.current.innerHTML = "";
-          window.google.accounts.id.renderButton(googleButtonRef.current, {
+          (window as any).google.accounts.id.renderButton(googleButtonRef.current, {
             type: "standard", theme: "outline", size: "large", shape: "rectangular",
             text: "continue_with", logo_alignment: "left",
             width: Math.min(390, googleButtonRef.current.clientWidth || 390),
           });
           setGoogleEnabled(true);
         };
-        if (window.google?.accounts?.id) {
+        if ((window as any).google?.accounts?.id) {
           render();
         } else {
           let script = document.querySelector<HTMLScriptElement>('script[src="https://accounts.google.com/gsi/client"]');
