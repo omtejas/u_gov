@@ -11,15 +11,16 @@ Updated: 2026-11-17
 - V10 action: add `providerStatus?: string` to the health-state type and require CI to pass.
 
 ### K-002 — Render production is behind GitHub main
-- Latest known Render live commit: `155b15a6b41b9f038264bdaec4cfd3746a9372a5`.
-- Current GitHub main at V10 branch creation: `23ff2a9c7e8a6ecda9b795f83f80c662f44d7b3a`.
+- Latest checked Render live commit: `155b15a6b41b9f038264bdaec4cfd3746a9372a5`.
+- GitHub `main` after PR #14: `99440b4946f9040108d3da2eb65d47324aa7d097`.
 - Impact: PR #13 changes are not confirmed live.
 - V10 action: inspect Render auto-deploy and service events; deploy only after explicit release approval; verify exact commit and smoke tests.
 
 ### K-003 — Gemini production response not verified
-- Earlier Render logs recorded Gemini timeout and model errors.
-- The V10 code includes bounded model attempts/fallbacks, but that is not proof of provider availability.
-- V10 action: inspect provider configuration without exposing secrets; test model access, quota, API enablement and latency; record a successful real prompt and response.
+- Render logs on the deployed commit explicitly returned HTTP 404 / `NOT_FOUND`: `models/gemini-2.5-flash` is unavailable to new users; Google instructed migration to `models/gemini-3.8-flash`.
+- The deployed code is older than `main`; the newer code already defaults to 3.8 Flash but still allows a stale `GEMINI_MODEL` value to be tried first.
+- V10 branch fix: always try stable `gemini-3.8-flash` first, ignore the retired 2.5 Flash override, then try 3.7 and 3.6 Flash; add deterministic unit tests and release diagnostics.
+- Remaining verification: confirm API key validity, project/API access, quota and a successful real response after the fix is deployed. No secret values are logged or displayed.
 
 ## P1 — Important platform gaps
 
