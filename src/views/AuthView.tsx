@@ -12,6 +12,7 @@ type AuthTab = "login" | "register" | "simulation";
 
 export const AuthView: React.FC = () => {
   const { login, googleLogin, register, authError, isLoadingAuth } = useGov();
+  const [tab, setTab] = useState<AuthTab>("login");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleLoginRef = useRef(googleLogin);
   const [googleEnabled, setGoogleEnabled] = useState<boolean | null>(null);
@@ -78,7 +79,6 @@ export const AuthView: React.FC = () => {
     setupGoogleButton();
     return () => { cancelled = true; };
   }, [tab]);
-  const [tab, setTab] = useState<AuthTab>("login");
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [regIdentifier, setRegIdentifier] = useState("");
