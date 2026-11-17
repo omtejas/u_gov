@@ -8,6 +8,7 @@
 import { Router, Response } from "express";
 import { AuthenticatedRequest, requireAuth, rateLimiter } from "../middleware/auth";
 import { aiFactory } from "../ai";
+import { getGeminiModelCandidates } from "../ai/geminiModelConfig";
 import { db } from "../database/db";
 
 export const aiRouter = Router();
@@ -26,7 +27,7 @@ aiRouter.get("/health", (_req, res: Response) => {
   return res.json({
     status: "HEALTHY",
     provider: provider.providerName,
-    providerLabel: provider.providerName === "OpenAIProvider" ? (process.env.OPENAI_MODEL || "OpenAI-compatible model") : provider.providerName === "GeminiProvider" ? (process.env.GEMINI_MODEL || "Gemini 3.8 Flash") : "U-GOV deterministic demo assistant",
+    providerLabel: provider.providerName === "OpenAIProvider" ? (process.env.OPENAI_MODEL || "OpenAI-compatible model") : provider.providerName === "GeminiProvider" ? getGeminiModelCandidates(process.env.GEMINI_MODEL)[0] : "U-GOV deterministic demo assistant",
     externalProviderConfigured: Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY),
     providerConfigured: isLiveAI && Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY),
     providerStatus: isLiveAI ? "CONFIGURED_NOT_PROBED" : "DETERMINISTIC_DEMO",
