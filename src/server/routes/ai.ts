@@ -26,7 +26,7 @@ aiRouter.get("/health", (_req, res: Response) => {
   return res.json({
     status: "HEALTHY",
     provider: provider.providerName,
-    providerLabel: provider.providerName === "OpenAIProvider" ? (process.env.OPENAI_MODEL || "OpenAI-compatible model") : provider.providerName === "GeminiProvider" ? (process.env.GEMINI_MODEL || "Gemini 2.5 Flash") : "U-GOV deterministic demo assistant",
+    providerLabel: provider.providerName === "OpenAIProvider" ? (process.env.OPENAI_MODEL || "OpenAI-compatible model") : provider.providerName === "GeminiProvider" ? (process.env.GEMINI_MODEL || "Gemini 3.8 Flash") : "U-GOV deterministic demo assistant",
     externalProviderConfigured: Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY),
     internetSearchConfigured: searchConfigured,
     mode: isLiveAI ? "LIVE_AI" : "DETERMINISTIC_DEMO",
