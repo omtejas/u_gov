@@ -12,7 +12,7 @@ export const Card: React.FC<CardProps> = ({
   className = "",
   ...props
 }) => {
-  const baseClasses = "bg-white rounded-[20px] border border-[#E3E9F1] transition-all duration-200 overflow-hidden";
+  const baseClasses = "bg-white rounded-[6px] border border-[#E3E9F1] transition-all duration-200 overflow-hidden";
 
   const variantClasses = {
     default: "shadow-[0_4px_16px_rgba(25,48,82,0.045)]",
