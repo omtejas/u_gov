@@ -120,14 +120,17 @@ Rules:
       const history = (request.conversationHistory || []).slice(-12).map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").replace(/\bUGOV-\d{4}-[A-Z0-9-]+\b/gi, "[REDACTED APPLICATION ID]").replace(/\bAPP-\d+-[A-F0-9]+\b/gi, "[REDACTED APPLICATION ID]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
+      const configuredModel = (process.env.GEMINI_MODEL || "gemini-3.8-flash")
+        .trim()
+        .replace(/^models\//, "");
       const response = await Promise.race([
         this.client.models.generateContent({
-          model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+          model: configuredModel,
           contents,
           config: { systemInstruction },
         }),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Gemini API call timed out")), 7000)
+          setTimeout(() => reject(new Error("Gemini API call timed out")), 30000)
         ),
       ]);
 
