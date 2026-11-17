@@ -7,6 +7,7 @@ import { AIProvider, AIChatRequest, AIChatResponse, IAIToolGateway } from "./AIP
 import { MockAIProvider } from "./MockAIProvider";
 import { BraveWebSearchProvider, WebSearchSource } from "./WebSearchProvider";
 import { classifyAIIntent, isPrivateContextualFollowup, safeGeminiHistory } from "./AIIntentRouter";
+import { getGeminiModelCandidates } from "./geminiModelConfig";
 
 export class GeminiProvider implements AIProvider {
   public readonly providerName = "GeminiProvider";
@@ -118,26 +119,28 @@ Rules:
       const history = safeHistory.map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
-      const configuredModel = (process.env.GEMINI_MODEL || "gemini-3.8-flash")
-        .trim()
-        .replace(/^models\//, "");
-      // Keep the configured model first, but retry once on a stable Flash model
-      // so an obsolete model alias does not take the whole assistant offline.
-      const modelCandidates = [...new Set([configuredModel, "gemini-3.8-flash", "gemini-3.7-flash"])];
+      // Prefer the current stable model. An obsolete deployment variable must
+      // never force the first request onto a retired/unavailable model.
+      const modelCandidates = getGeminiModelCandidates(process.env.GEMINI_MODEL);
       let response: any = null;
       let lastModelError: unknown;
       for (const model of modelCandidates) {
         try {
-          response = await Promise.race([
-            this.client.models.generateContent({
-              model,
-              contents,
-              config: { systemInstruction },
-            }),
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error("Gemini API call timed out")), 15000)
-            ),
-          ]);
+          let timeout: ReturnType<typeof setTimeout> | undefined;
+          try {
+            response = await Promise.race([
+              this.client.models.generateContent({
+                model,
+                contents,
+                config: { systemInstruction },
+              }),
+              new Promise<never>((_, reject) => {
+                timeout = setTimeout(() => reject(new Error("Gemini API call timed out")), 15000);
+              }),
+            ]);
+          } finally {
+            if (timeout) clearTimeout(timeout);
+          }
           if (response?.text?.trim()) break;
           lastModelError = new Error("Gemini returned an empty response.");
         } catch (modelError) {
@@ -179,7 +182,8 @@ Rules:
             : /404|not found|model/i.test(message)
               ? "model"
               : "provider_error";
-      console.warn("Gemini request failed:", { category });
+      const statusCode = Number(err?.status || err?.statusCode || err?.code) || undefined;
+      console.warn("Gemini request failed:", { category, statusCode });
       return this.unavailableResponse("The hosted AI service is temporarily unavailable. Please try again shortly.");
     }
   }
