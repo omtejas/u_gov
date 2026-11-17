@@ -87,7 +87,7 @@ export class GeminiProvider implements AIProvider {
 Respond in the user requested language (language code: ${request.language || "en"}). Use prior conversation context for follow-ups. Answer the actual question; do not repeat a generic introduction unless asked.
 
 U-GOV catalogue facts (prototype/demo data, not a live government registry):
-${catalogueFacts ? JSON.stringify(catalogueFacts, null, 2) : "No matching service was found in the U-GOV prototype catalogue."}
+${catalogueFacts ? JSON.stringify(catalogueFacts, null, 2) : intent === "GOVERNMENT_SERVICE" ? "No matching service was found in the U-GOV prototype catalogue. Do not invent catalogue details." : "Not applicable to this request. Do not treat the absence of a catalogue match as a reason to refuse a general knowledge answer."}
 
 Internal U-GOV FAQ knowledge (public prototype content):
 ${JSON.stringify(knowledgeResults, null, 2)}
@@ -135,7 +135,7 @@ Rules:
       if (response?.text?.trim()) {
         return {
           reply: response.text.trim(),
-          source: `Google Gemini + U-GOV catalogue${webSources.length ? " + Internet search" : ""}`,
+          source: `Google Gemini${catalogueFacts ? " + U-GOV catalogue" : ""}${webSources.length ? " + Internet search" : ""}`,
           citations: [
             ...knowledgeResults.map((item) => ({ title: item.title, url: item.url, snippet: item.snippet, sourceType: "u-gov" as const })),
             ...webSources.map((item) => ({ title: item.title, url: item.url, snippet: item.snippet, publishedAt: item.publishedAt, sourceType: "internet" as const })),
