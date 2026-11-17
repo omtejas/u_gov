@@ -131,7 +131,7 @@ aiRouter.post("/chat", requireAuth, async (req: AuthenticatedRequest, res: Respo
         actorRole: "CITIZEN",
         action: "AI_RESPONSE_GENERATED",
         resource: "U_AI:CHAT",
-        result: aiResponse.source.toLowerCase().includes("unavailable") ? "FAILURE" : "SUCCESS",
+        result: aiResponse.source.toLowerCase().includes("unavailable") ? "FAILED" : "SUCCESS",
         context: JSON.stringify({
           provider: provider.providerName,
           source: aiResponse.source,
