@@ -16,7 +16,7 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] px-2 py-1.5 flex items-center justify-around">
+    <nav className="ugov-mobile-nav md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-4px_16px_rgba(0,0,0,0.04)] px-2 py-1.5 flex items-center justify-around">
       {mobileTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
