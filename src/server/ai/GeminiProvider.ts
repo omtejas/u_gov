@@ -118,12 +118,12 @@ Rules:
       const history = safeHistory.map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
-      const configuredModel = (process.env.GEMINI_MODEL || "gemini-2.5-flash")
+      const configuredModel = (process.env.GEMINI_MODEL || "gemini-3.8-flash")
         .trim()
         .replace(/^models\//, "");
       // Keep the configured model first, but retry once on a stable Flash model
       // so an obsolete model alias does not take the whole assistant offline.
-      const modelCandidates = [...new Set([configuredModel, "gemini-2.5-flash"])];
+      const modelCandidates = [...new Set([configuredModel, "gemini-3.8-flash"])];
       let response: any = null;
       let lastModelError: unknown;
       for (const model of modelCandidates) {
