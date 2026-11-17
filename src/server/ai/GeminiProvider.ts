@@ -118,19 +118,35 @@ Rules:
       const history = safeHistory.map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text.replace(/\b\d{12}\b/g, "[REDACTED ID]").replace(/\b[A-Z]{5}\d{4}[A-Z]\b/gi, "[REDACTED PAN]").replace(/\b\d{10}\b/g, "[REDACTED PHONE]").replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED EMAIL]").slice(0, 1600) }] }));
       const contents = [...history, { role: "user" as const, parts: [{ text: safeMessage.slice(0, 1600) }] }];
 
-      const configuredModel = (process.env.GEMINI_MODEL || "gemini-3.8-flash")
+      const configuredModel = (process.env.GEMINI_MODEL || "gemini-2.5-flash")
         .trim()
         .replace(/^models\//, "");
-      const response = await Promise.race([
-        this.client.models.generateContent({
-          model: configuredModel,
-          contents,
-          config: { systemInstruction },
-        }),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Gemini API call timed out")), 30000)
-        ),
-      ]);
+      // Keep the configured model first, but retry once on a stable Flash model
+      // so an obsolete model alias does not take the whole assistant offline.
+      const modelCandidates = [...new Set([configuredModel, "gemini-2.5-flash"])];
+      let response: any = null;
+      let lastModelError: unknown;
+      for (const model of modelCandidates) {
+        try {
+          response = await Promise.race([
+            this.client.models.generateContent({
+              model,
+              contents,
+              config: { systemInstruction },
+            }),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error("Gemini API call timed out")), 15000)
+            ),
+          ]);
+          if (response?.text?.trim()) break;
+          lastModelError = new Error("Gemini returned an empty response.");
+        } catch (modelError) {
+          lastModelError = modelError;
+          if (model === modelCandidates[modelCandidates.length - 1]) throw modelError;
+          console.warn("Gemini model attempt failed; trying fallback model.");
+        }
+      }
+      if (!response?.text?.trim()) throw lastModelError || new Error("Gemini returned an empty response.");
 
       if (response?.text?.trim()) {
         return {

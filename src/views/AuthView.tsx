@@ -280,9 +280,10 @@ export const AuthView: React.FC = () => {
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#174EA6]"><Globe2 size={17} /></div>
                 <div className="min-w-0">
                   <div className="text-xs font-bold text-slate-700">More sign-in options</div>
-                  <p className="mt-1 text-[11px] leading-5 text-slate-500">Google, Microsoft, Facebook and X sign-in can be enabled after OAuth provider setup and secure account linking. These options are not active in this build.</p>
+                  <p className="mt-1 text-[11px] leading-5 text-slate-500">Google sign-in is configured for this U-GOV deployment. Other providers are not enabled.</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {["Google", "Microsoft", "Facebook", "X"].map((provider) => <span key={provider} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-400">{provider} · setup required</span>)}
+                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${googleEnabled ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-400"}`}>Google · {googleEnabled ? "enabled" : googleEnabled === false ? "setup required" : "checking"}</span>
+                    {["Microsoft", "Facebook", "X"].map((provider) => <span key={provider} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-400">{provider} · not enabled</span>)}
                   </div>
                 </div>
               </div>
