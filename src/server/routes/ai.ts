@@ -131,10 +131,11 @@ aiRouter.post("/chat", requireAuth, async (req: AuthenticatedRequest, res: Respo
         actorRole: "CITIZEN",
         action: "AI_RESPONSE_GENERATED",
         resource: "U_AI:CHAT",
-        result: "SUCCESS",
+        result: aiResponse.source.toLowerCase().includes("unavailable") ? "FAILURE" : "SUCCESS",
         context: JSON.stringify({
           provider: provider.providerName,
           source: aiResponse.source,
+          outcome: aiResponse.source.toLowerCase().includes("unavailable") ? "PROVIDER_UNAVAILABLE" : "RESPONSE_RETURNED",
           toolCallsCount: aiResponse.toolCalls?.length || 0,
         }),
         ipAddress: req.ip,
