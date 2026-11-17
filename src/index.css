@@ -115,3 +115,44 @@
 @media(max-width:900px) { .ugov-hero-inner { grid-template-columns:1fr .75fr; } .ugov-hero-art { transform:scale(.82);margin:0 -35px; } .ugov-intro-strip { grid-template-columns:1fr 1.5fr; } .ugov-intro-note { grid-column:2; } .ugov-feature-band { gap:30px; } }
 @media(max-width:680px) { .ugov-home { padding-bottom:40px; } .ugov-hero { padding:55px 22px 0;min-height:auto; } .ugov-hero-inner { display:block;min-height:0;padding-bottom:35px; } .ugov-hero h1 { font-size:clamp(46px,13vw,70px); } .ugov-hero-lede { font-size:14px; } .ugov-searchbar { flex-wrap:wrap;padding:12px;gap:10px; } .ugov-searchbar input { width:calc(100% - 40px); } .ugov-searchbar button { width:100%; } .ugov-hero-art { min-height:300px;transform:scale(.78);margin:-5px -30px -25px; } .ugov-art-index { right:15px; } .ugov-hero-bottom { flex-wrap:wrap;font-size:8px;padding:15px 0; } .ugov-hero-bottom span:last-child { display:none; } .ugov-intro-strip { display:block;padding:65px 22px 35px; } .ugov-intro-strip h2 { margin:18px 0; } .ugov-intro-note { max-width:100%; } .ugov-quick-grid { grid-template-columns:1fr;padding:0 22px;gap:10px; } .ugov-quick-card { min-height:190px;padding:22px; } .ugov-section { padding:70px 22px 0; } .ugov-section-heading { display:block;margin-bottom:25px; } .ugov-section-heading>p { margin-top:18px; } .ugov-category-grid,.ugov-featured-grid { grid-template-columns:1fr 1fr;gap:9px; } .ugov-category-card { min-height:190px;padding:17px; } .ugov-category-card strong { font-size:14px; } .ugov-category-card small { font-size:10px; } .ugov-feature-band { margin-top:70px;padding:48px 22px;grid-template-columns:1fr;gap:30px; } .ugov-featured-grid { grid-template-columns:1fr; } .ugov-service-card { min-height:270px; } .ugov-closing-cta { margin-top:70px;padding:48px 22px; } .ugov-cta-mark { display:none; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; } }
+
+
+/* V6 extended editorial system — citizen workspace, catalogue and lifecycle */
+.ugov-app-page { color:#101828; }
+.ugov-app-page h1 { font-family:var(--font-display);font-weight:800;letter-spacing:-.065em; }
+.ugov-app-page h2,.ugov-app-page h3 { font-family:var(--font-display);letter-spacing:-.045em; }
+.ugov-app-page input,.ugov-app-page select { border-radius:5px; }
+.ugov-services-page > section:first-child { border-radius:5px!important;min-height:245px;padding:34px!important;background:linear-gradient(118deg,#09172D 0%,#0B2450 62%,#174EA6 100%)!important;box-shadow:none!important; }
+.ugov-services-page > section:first-child h1 { font-size:clamp(34px,4vw,54px)!important;line-height:1.04!important;max-width:700px; }
+.ugov-services-page > section:first-child p { max-width:580px;color:#C6D5EA!important;line-height:1.8!important; }
+.ugov-services-page > section:first-child > div:last-child { border-radius:6px!important; }
+.ugov-services-page > section:nth-child(2) { border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:24px 0 8px!important;border-bottom:1px solid #DCE3EC!important; }
+.ugov-services-page > section:nth-child(2) h2 { font-size:20px;letter-spacing:-.05em; }
+.ugov-services-page > section:nth-child(3) > div:first-child h2 { font-size:clamp(27px,3vw,38px);letter-spacing:-.065em; }
+.ugov-services-page > section:nth-child(3) .group { border-radius:5px!important;border:1px solid #E1E7EF!important;box-shadow:none!important;transition:transform .22s,border-color .22s,box-shadow .22s; }
+.ugov-services-page > section:nth-child(3) .group:hover { transform:translateY(-4px);border-color:#A9C4EB!important;box-shadow:0 18px 40px rgba(16,40,78,.075)!important; }
+.ugov-services-page > section:nth-child(3) .group button { padding:23px!important; }
+.ugov-services-page > section:nth-child(3) .group h3 { font-size:18px!important;line-height:1.25!important; }
+.ugov-dashboard-page > div:first-child { border-radius:5px!important;padding:34px!important;background:linear-gradient(118deg,#09172D,#0B2450 65%,#174EA6)!important;box-shadow:none!important; }
+.ugov-dashboard-page > div:first-child h1 { font-size:clamp(30px,4vw,46px)!important; }
+.ugov-dashboard-page > section[aria-label="Quick actions"] button { min-height:62px;border-radius:5px!important;border-color:#E0E6EF!important;background:#fff!important;color:#174EA6!important;font-size:12px!important;font-weight:800!important;justify-content:flex-start!important;padding:17px!important;transition:transform .2s,border-color .2s,box-shadow .2s; }
+.ugov-dashboard-page > section[aria-label="Quick actions"] button:hover { transform:translateY(-3px);border-color:#A9C4EB!important;box-shadow:0 12px 24px rgba(16,40,78,.07); }
+.ugov-dashboard-page .rounded-3xl,.ugov-dashboard-page .rounded-2xl { border-radius:6px!important; }
+.ugov-dashboard-page .shadow-lg { box-shadow:none!important; }
+.ugov-dashboard-page .grid > div:has(> span:first-child) { border-radius:5px; }
+.ugov-tracker-page > div:first-child h1 { font-size:clamp(28px,3vw,40px)!important;line-height:1.08; }
+.ugov-tracker-page > div:nth-child(2) > div { border-radius:5px!important;border-color:#E1E7EF!important;box-shadow:none!important;padding:20px!important; }
+.ugov-tracker-page > div:nth-child(2) > div > span:nth-child(2) { font-family:var(--font-display);font-size:34px!important;letter-spacing:-.07em; }
+.ugov-tracker-page > div:nth-child(5) > div { border-radius:5px!important;border-color:#E1E7EF!important;box-shadow:none!important; }
+.ugov-tracker-page .rounded-2xl,.ugov-tracker-page .rounded-xl { border-radius:5px!important; }
+.ugov-tracker-page > div:nth-child(4) button { border-radius:4px!important;padding:10px 15px!important;font-size:11px!important; }
+.ugov-mobile-nav { padding:9px 8px max(9px,env(safe-area-inset-bottom));border-top:1px solid #DFE5EE;box-shadow:0 -12px 35px rgba(16,40,78,.09); }
+.ugov-mobile-nav > button { min-width:54px; }
+.ugov-mobile-nav > button:not(:nth-child(3)) { border-radius:5px!important; }
+.ugov-mobile-nav > button:nth-child(3) > div { width:48px;height:48px;border-radius:14px!important;box-shadow:0 8px 18px rgba(23,78,166,.24); }
+@media(max-width:680px) {
+ .ugov-services-page > section:first-child { padding:23px!important; }
+ .ugov-dashboard-page > div:first-child { padding:24px!important; }
+ .ugov-tracker-page > div:first-child { align-items:flex-start; }
+ .ugov-tracker-page > div:first-child h1 { font-size:27px!important; }
+}
