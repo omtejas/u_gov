@@ -217,7 +217,7 @@ export const GBotModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 lg:p-6">
       <button aria-label="Close assistant" className="fixed inset-0 bg-slate-950/55 backdrop-blur-sm" onClick={closeGBot} />
-      <section className="relative z-10 flex h-[100dvh] w-full max-w-6xl overflow-hidden bg-white shadow-2xl sm:h-[90vh] sm:max-h-[900px] sm:rounded-[24px] sm:border sm:border-slate-200">
+      <section className="ugov-gbot-workspace relative z-10 flex h-[100dvh] w-full max-w-6xl overflow-hidden bg-white shadow-2xl sm:h-[90vh] sm:max-h-[900px] sm:rounded-[6px] sm:border sm:border-slate-200">
         {sidebarOpen && (
           <aside className="hidden w-[260px] shrink-0 flex-col border-r border-slate-200 bg-[#F5F7FB] md:flex">
             <div className="flex items-center justify-between px-4 py-5">
