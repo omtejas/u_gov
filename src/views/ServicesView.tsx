@@ -35,7 +35,7 @@ export const ServicesView: React.FC = () => {
   const resetFilters = () => { setSearchQuery(""); setSelectedCategory("all"); setSortBy("relevance"); setStatusFilter("all"); };
 
   return (
-    <div className="space-y-7 sm:space-y-9">
+    <div className="ugov-app-page ugov-services-page space-y-7 sm:space-y-9">
       <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#123B7A] to-[#174EA6] p-6 text-white shadow-[0_16px_42px_rgba(23,78,166,.14)] sm:p-8">
         <div className="sovereign-tricolor-bar absolute inset-x-0 top-0" />
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#F5C518]/15 blur-3xl" />
