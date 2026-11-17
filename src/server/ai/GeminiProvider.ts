@@ -7,7 +7,7 @@ import { AIProvider, AIChatRequest, AIChatResponse, IAIToolGateway } from "./AIP
 import { MockAIProvider } from "./MockAIProvider";
 import { BraveWebSearchProvider, WebSearchSource } from "./WebSearchProvider";
 import { classifyAIIntent, isPrivateContextualFollowup, safeGeminiHistory } from "./AIIntentRouter";
-import { getGeminiModelCandidates } from "./geminiModelConfig";
+import { getGeminiModelCandidates, shouldTryNextGeminiModel } from "./geminiModelConfig";
 
 export class GeminiProvider implements AIProvider {
   public readonly providerName = "GeminiProvider";
@@ -145,7 +145,7 @@ Rules:
           lastModelError = new Error("Gemini returned an empty response.");
         } catch (modelError) {
           lastModelError = modelError;
-          if (model === modelCandidates[modelCandidates.length - 1]) throw modelError;
+          if (model === modelCandidates[modelCandidates.length - 1] || !shouldTryNextGeminiModel(modelError)) throw modelError;
           console.warn("Gemini model attempt failed; trying fallback model.");
         }
       }
