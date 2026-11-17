@@ -16,6 +16,8 @@ const cases: Array<[string, string]> = [
   ["What documents are required for a domicile certificate?", "GOVERNMENT_SERVICE"],
   ["Where is my application?", "PRIVATE_CITIZEN_WORKFLOW"],
   ["Check my application status", "PRIVATE_CITIZEN_WORKFLOW"],
+  ["What is my application status?", "PRIVATE_CITIZEN_WORKFLOW"],
+  ["What documents am I missing for scholarship?", "PRIVATE_CITIZEN_WORKFLOW"],
   ["Am I ready for scholarship?", "PRIVATE_CITIZEN_WORKFLOW"],
   ["What can U-GOV help me do?", "UGOV_NAVIGATION"],
 ];
