@@ -81,7 +81,7 @@ export const GBotModal: React.FC = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [aiHealth, setAiHealth] = useState<{ provider?: string; liveAI?: boolean; internetSearchConfigured?: boolean } | null>(null);
+  const [aiHealth, setAiHealth] = useState<{ provider?: string; liveAI?: boolean; providerStatus?: string; internetSearchConfigured?: boolean } | null>(null);
   const [aiRequestStatus, setAiRequestStatus] = useState<"unknown" | "responding" | "unavailable">("unknown");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
