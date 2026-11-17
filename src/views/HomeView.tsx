@@ -1,119 +1,108 @@
 import React from "react";
 import { useGov } from "../context/GovContext";
-import { Search, Sparkles, ShieldCheck, FolderLock, Activity, ArrowRight, GraduationCap, Sprout, Car, HeartPulse, Landmark, Building2, FileCheck2, Globe2 } from "lucide-react";
+import { Search, Sparkles, ShieldCheck, FolderLock, Activity, ArrowRight, GraduationCap, Sprout, Car, HeartPulse, Landmark, Building2, FileCheck2, Globe2, Fingerprint, ClipboardList, BellRing, LockKeyhole, ChevronRight, MoveUpRight, Network, BadgeCheck } from "lucide-react";
 
 export const HomeView: React.FC = () => {
   const { services, openServiceModal, setActiveTab, openGBot, setSearchQuery } = useGov();
-  const featuredServices = services.filter((s) => s.featured || s.isPopular).slice(0, 6);
+  const featuredServices = services.filter((s) => s.featured || s.isPopular).slice(0, 3);
   const categories = [
-    { id: "education", label: "Education & scholarships", icon: GraduationCap, tone: "bg-blue-50 text-[#174EA6]" },
-    { id: "agriculture", label: "Farmers & agriculture", icon: Sprout, tone: "bg-green-50 text-[#16834A]" },
-    { id: "transport", label: "Transport & driving", icon: Car, tone: "bg-yellow-50 text-[#8A6500]" },
-    { id: "healthcare", label: "Health & wellbeing", icon: HeartPulse, tone: "bg-red-50 text-[#D62828]" },
-    { id: "welfare", label: "Certificates & welfare", icon: Landmark, tone: "bg-blue-50 text-[#174EA6]" },
-    { id: "housing", label: "Housing & homes", icon: Building2, tone: "bg-green-50 text-[#16834A]" },
+    { id: "education", label: "Education & scholarships", detail: "Learning, grants and student support", icon: GraduationCap, tone: "blue" },
+    { id: "agriculture", label: "Farmers & agriculture", detail: "Farming, income and rural support", icon: Sprout, tone: "green" },
+    { id: "transport", label: "Transport & driving", detail: "Licences, vehicles and mobility", icon: Car, tone: "yellow" },
+    { id: "healthcare", label: "Health & wellbeing", detail: "Health cover and public care", icon: HeartPulse, tone: "red" },
+    { id: "welfare", label: "Certificates & welfare", detail: "Identity, residence and benefits", icon: Landmark, tone: "blue" },
+    { id: "housing", label: "Housing & homes", detail: "Housing and essential utilities", icon: Building2, tone: "green" },
   ];
+  const quickActions = [
+    { title: "Find a service", text: "Explore schemes and public services.", icon: Search, action: () => setActiveTab("services"), number: "01" },
+    { title: "Track an application", text: "Follow progress and pending actions.", icon: Activity, action: () => setActiveTab("tracker"), number: "02" },
+    { title: "Your document vault", text: "Manage documents and sharing consent.", icon: FolderLock, action: () => setActiveTab("documents"), number: "03" },
+  ];
+  const searchServices = (value: string) => { setSearchQuery(value); setActiveTab("services"); };
+
   return (
-    <div className="space-y-10 sm:space-y-14">
-      <section className="relative isolate overflow-hidden rounded-[28px] bg-gradient-to-br from-[#123B7A] via-[#174EA6] to-[#2466BC] px-5 py-9 text-white shadow-[0_20px_55px_rgba(23,78,166,.18)] sm:px-10 sm:py-14">
-        <div className="sovereign-tricolor-bar absolute inset-x-0 top-0" />
-        <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#F5C518]/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-28 right-1/4 h-72 w-72 rounded-full bg-[#16834A]/20 blur-3xl" />
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-blue-50 backdrop-blur">
-            <ShieldCheck size={15} className="text-[#F5C518]" /> A simpler way to access public services
-          </div>
-          <div className="space-y-3">
-            <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-              Government services,<br /><span className="text-[#F5D957]">made simpler.</span>
-            </h1>
-            <p className="max-w-2xl text-sm leading-7 text-blue-100 sm:text-base">
-              Discover services, understand what you need, keep track of applications and manage your documents in one convenient place.
-            </p>
-          </div>
-          <div className="flex max-w-2xl flex-col gap-2 rounded-2xl bg-white p-2 shadow-xl sm:flex-row">
-            <div className="flex min-w-0 flex-1 items-center gap-3 px-3">
-              <Search size={20} className="shrink-0 text-[#174EA6]" />
-              <input
-                type="text"
-                aria-label="Search public services"
-                placeholder="What service are you looking for?"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setSearchQuery((e.target as HTMLInputElement).value);
-                    setActiveTab("services");
-                  }
-                }}
-                className="w-full bg-transparent py-3 text-sm text-[#171717] outline-none placeholder:text-slate-400"
-              />
+    <div className="ugov-home">
+      <section className="ugov-hero">
+        <div className="ugov-hero-grid" aria-hidden="true" />
+        <div className="ugov-hero-orbit ugov-orbit-one" aria-hidden="true" />
+        <div className="ugov-hero-orbit ugov-orbit-two" aria-hidden="true" />
+        <div className="ugov-hero-inner">
+          <div className="ugov-hero-copy">
+            <div className="ugov-eyebrow ugov-eyebrow-light"><span className="ugov-live-dot" /> THE CITIZEN-FIRST DIGITAL GATEWAY</div>
+            <h1>Public services.<br /><span>One connected</span><br />experience.</h1>
+            <p className="ugov-hero-lede">Less searching. Less paperwork. More progress. Find the services you need, understand every step, and keep your important work moving.</p>
+            <div className="ugov-searchbar">
+              <Search size={21} />
+              <input aria-label="Search public services" placeholder="What do you need help with today?" onKeyDown={(e) => { if (e.key === "Enter") searchServices((e.target as HTMLInputElement).value); }} />
+              <button onClick={() => setActiveTab("services")}>Explore services <ArrowRight size={17} /></button>
             </div>
-            <button onClick={() => setActiveTab("services")} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#174EA6] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#123B7A]">
-              Explore services <ArrowRight size={16} />
-            </button>
+            <button className="ugov-hero-assist" onClick={() => openGBot("Help me find the right government service.")}><Sparkles size={17} /> Not sure where to begin? Ask Bharat G-Bot <MoveUpRight size={15} /></button>
           </div>
-          <button onClick={() => openGBot("Help me find the right government service.")} className="inline-flex items-center gap-2 rounded-full px-1 py-1 text-sm font-semibold text-white transition hover:text-[#F5D957]">
-            <Sparkles size={17} className="text-[#F5C518]" /> Not sure where to start? Ask Bharat G-Bot <ArrowRight size={14} />
+          <div className="ugov-hero-art" aria-label="Illustration of connected citizen services">
+            <div className="ugov-art-orbit orbit-a" /><div className="ugov-art-orbit orbit-b" />
+            <div className="ugov-art-core"><div className="ugov-art-emblem"><img src="/logo.png" alt="U-GOV emblem" /></div><span>ONE INDIA</span><strong>ONE GATEWAY</strong><small>CONNECTED PUBLIC SERVICES</small></div>
+            <div className="ugov-art-node node-top"><Fingerprint size={19} /><span>Identity</span></div>
+            <div className="ugov-art-node node-right"><FileCheck2 size={19} /><span>Documents</span></div>
+            <div className="ugov-art-node node-bottom"><Network size={19} /><span>Services</span></div>
+            <div className="ugov-art-node node-left"><Activity size={19} /><span>Tracking</span></div>
+            <div className="ugov-art-index">01 <i>/ 04</i></div>
+          </div>
+        </div>
+        <div className="ugov-hero-bottom"><span>BUILT AROUND YOUR NEEDS</span><span>SECURE BY DESIGN <ShieldCheck size={14} /></span><span>ACCESSIBLE ACROSS INDIA</span></div>
+      </section>
+
+      <section className="ugov-intro-strip">
+        <p>ONE PLACE FOR THE THINGS THAT MATTER.</p>
+        <h2>Government, made<br className="sm:hidden" /> easier to navigate.</h2>
+        <div className="ugov-intro-note">A single, connected starting point for discovering services, managing documents and following applications—designed around people, not departments.</div>
+      </section>
+
+      <section className="ugov-quick-grid" aria-label="Quick actions">
+        {quickActions.map((item) => { const Icon = item.icon; return (
+          <button key={item.number} onClick={item.action} className="ugov-quick-card">
+            <span className="ugov-quick-number">{item.number}</span><span className="ugov-quick-icon"><Icon size={22} /></span>
+            <strong>{item.title}</strong><p>{item.text}</p><span className="ugov-quick-link">Get started <MoveUpRight size={16} /></span>
           </button>
-        </div>
-        <div className="relative z-10 mt-9 grid max-w-3xl grid-cols-3 gap-2 border-t border-white/15 pt-5 sm:gap-6">
-          <div><p className="font-display text-xl font-extrabold sm:text-2xl">{services.length}</p><p className="mt-1 text-[10px] text-blue-100 sm:text-xs">Services in this demo</p></div>
-          <div><p className="font-display text-xl font-extrabold sm:text-2xl">One</p><p className="mt-1 text-[10px] text-blue-100 sm:text-xs">Connected experience</p></div>
-          <div><p className="font-display text-xl font-extrabold sm:text-2xl">24/7</p><p className="mt-1 text-[10px] text-blue-100 sm:text-xs">Self-service access</p></div>
+        ); })}
+      </section>
+
+      <section className="ugov-section ugov-category-section">
+        <div className="ugov-section-heading"><div><span className="ugov-eyebrow">EXPLORE BY NEED</span><h2>Where can we<br />help you today?</h2></div><p>Start with what matters to you. Explore a topic and find the public services connected to it.</p></div>
+        <div className="ugov-category-grid">
+          {categories.map((cat, index) => { const Icon = cat.icon; return (
+            <button key={cat.id} onClick={() => searchServices(cat.id)} className={`ugov-category-card tone-${cat.tone}`}>
+              <span className="ugov-category-top"><span>0{index + 1}</span><MoveUpRight size={18} /></span><Icon size={29} strokeWidth={1.6} />
+              <strong>{cat.label}</strong><small>{cat.detail}</small>
+            </button>
+          ); })}
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {[
-          { title: "Your digital document vault", text: "Keep your demo documents organised and manage access permissions.", icon: FolderLock, tone: "bg-blue-50 text-[#174EA6]", action: () => setActiveTab("documents"), link: "Open DigiVault" },
-          { title: "Track your applications", text: "See application progress and identify actions that may need your attention.", icon: Activity, tone: "bg-green-50 text-[#16834A]", action: () => setActiveTab("tracker"), link: "View tracker" },
-          { title: "Guidance when you need it", text: "Ask questions in natural language and explore relevant public-service information.", icon: Sparkles, tone: "bg-yellow-50 text-[#8A6500]", action: () => openGBot(), link: "Chat with G-Bot" },
-        ].map((item) => {
-          const Icon = item.icon;
-          return <button key={item.title} onClick={item.action} className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-[0_6px_24px_rgba(25,48,82,.04)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg sm:p-6">
-            <span className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${item.tone}`}><Icon size={21} /></span>
-            <h2 className="font-display text-base font-bold text-[#171717]">{item.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{item.text}</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#174EA6]">{item.link}<ArrowRight size={14} className="transition group-hover:translate-x-1" /></span>
-          </button>;
-        })}
-      </section>
-
-      <section className="space-y-5">
-        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
-          <div><p className="text-xs font-bold uppercase tracking-[.14em] text-[#174EA6]">Find what you need</p><h2 className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[#171717]">Browse by citizen need</h2><p className="mt-1 text-sm text-slate-500">Start with a topic. We’ll help you find the right service.</p></div>
-          <button onClick={() => setActiveTab("services")} className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-[#174EA6] transition hover:bg-blue-50 sm:self-auto">View all services <ArrowRight size={14} /></button>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            return <button key={cat.id} onClick={() => { setSearchQuery(cat.id); setActiveTab("services"); }} className="group flex min-h-32 flex-col items-start justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:border-[#174EA6]/30 hover:shadow-md">
-              <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${cat.tone}`}><Icon size={20} /></span>
-              <span className="mt-4 text-xs font-bold leading-5 text-slate-800">{cat.label}</span>
-            </button>;
-          })}
+      <section className="ugov-feature-band">
+        <div className="ugov-feature-copy"><span className="ugov-eyebrow ugov-eyebrow-light">A MORE CONNECTED WAY FORWARD</span><h2>One account.<br /><em>Many possibilities.</em></h2><p>Keep your citizen journey organised—from understanding requirements to tracking progress—with tools designed to work together.</p><button onClick={() => setActiveTab("dashboard")}>Explore your workspace <ArrowRight size={17} /></button></div>
+        <div className="ugov-feature-stack">
+          <div className="ugov-feature-tile"><span className="tile-icon"><ShieldCheck /></span><div><small>U-IDENTITY</small><strong>A single citizen profile</strong><p>Your account and preferences in one place.</p></div><ChevronRight /></div>
+          <div className="ugov-feature-tile"><span className="tile-icon"><FolderLock /></span><div><small>U-DOCS</small><strong>Your documents, in control</strong><p>Organise records and manage consent.</p></div><ChevronRight /></div>
+          <div className="ugov-feature-tile"><span className="tile-icon"><ClipboardList /></span><div><small>U-TRACK</small><strong>Know what happens next</strong><p>See application progress and actions.</p></div><ChevronRight /></div>
         </div>
       </section>
 
-      <section className="space-y-5">
-        <div className="flex items-end justify-between gap-3">
-          <div><p className="text-xs font-bold uppercase tracking-[.14em] text-[#16834A]">Popular in the catalogue</p><h2 className="mt-1 font-display text-2xl font-extrabold tracking-tight text-[#171717]">Explore featured services</h2><p className="mt-1 text-sm text-slate-500">Review the information available in this U-GOV prototype.</p></div>
-        </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featuredServices.map((service) => (
-            <button key={service.id} onClick={() => openServiceModal(service)} className="group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-[0_6px_24px_rgba(25,48,82,.04)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg">
-              <div className="flex w-full items-center justify-between gap-2"><span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-[#174EA6]">{service.shortCode}</span><span className="text-[11px] font-medium text-slate-500">Typical SLA: {service.slaDays} days</span></div>
-              <h3 className="mt-4 font-display text-base font-bold leading-6 text-[#171717] group-hover:text-[#174EA6]">{service.name}</h3>
-              <p className="mt-1 text-xs font-medium text-slate-500">{service.ministry}</p>
-              <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">{service.description}</p>
-              <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#16834A]"><FileCheck2 size={14} />{service.fee === 0 ? "No fee listed" : `Fee listed: ₹${service.fee}`}</span>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-[#174EA6]">Details <ArrowRight size={14} /></span>
-              </div>
+      <section className="ugov-section ugov-services-section">
+        <div className="ugov-section-heading"><div><span className="ugov-eyebrow">THE SERVICE DIRECTORY</span><h2>Useful services.<br />Clear next steps.</h2></div><button className="ugov-text-link" onClick={() => setActiveTab("services")}>View all services <ArrowRight size={17} /></button></div>
+        <div className="ugov-featured-grid">
+          {featuredServices.map((service, index) => (
+            <button key={service.id} onClick={() => openServiceModal(service)} className={`ugov-service-card service-card-${index + 1}`}>
+              <span className="ugov-service-index">0{index + 1} / FEATURED</span><span className="ugov-service-code">{service.shortCode}</span>
+              <strong>{service.name}</strong><p>{service.description}</p>
+              <span className="ugov-service-meta"><span>{service.slaDays} day estimate</span><span>{service.fee === 0 ? "No fee listed" : `₹${service.fee} listed`}</span></span>
+              <span className="ugov-service-arrow"><MoveUpRight size={19} /></span>
             </button>
           ))}
         </div>
-        <div className="rounded-2xl border border-[#D9E5F5] bg-[#EEF4FC] p-4 text-xs leading-6 text-[#27466F]"><Globe2 size={15} className="mr-1 inline" /> Service details shown here are prototype catalogue information. Always confirm current rules, fees and eligibility with the issuing department.</div>
+        <div className="ugov-prototype-note"><Globe2 size={16} /><span>U-GOV is a Smart India Hackathon prototype. Service listings, fees and timelines are illustrative and must be confirmed with the issuing department.</span></div>
       </section>
+
+      <section className="ugov-closing-cta"><div><span className="ugov-eyebrow ugov-eyebrow-light">HERE WHEN YOU NEED A HAND</span><h2>Good guidance<br />changes everything.</h2><p>Tell Bharat G-Bot what you are trying to do. Get help navigating the U-GOV prototype and its service catalogue.</p><button onClick={() => openGBot()}>Talk to Bharat G-Bot <ArrowRight size={17} /></button></div><div className="ugov-cta-mark"><Sparkles size={42} /><span>G</span></div></section>
     </div>
   );
 };
