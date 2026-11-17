@@ -14,6 +14,8 @@ export interface UserRecord {
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
+  /** Stable Google OpenID Connect subject; never use email as provider identity. */
+  googleSub?: string;
 }
 
 export interface ProfileRecord {
@@ -767,6 +769,10 @@ class Database {
   public findUserByIdentifier(identifier: string): UserRecord | undefined {
     const clean = identifier.toLowerCase().trim();
     return this.data.users.find((u) => u.identifier.toLowerCase() === clean);
+  }
+
+  public findUserByGoogleSub(googleSub: string): UserRecord | undefined {
+    return this.data.users.find((u) => u.googleSub === googleSub);
   }
 
   public findUserById(id: string): UserRecord | undefined {
