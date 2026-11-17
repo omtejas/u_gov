@@ -120,7 +120,7 @@ export const ServiceDetailsModal: React.FC = () => {
       }
       maxWidth="2xl"
     >
-      <div className="space-y-5">
+      <div className="ugov-service-details space-y-5">
         {errorMessage && (
           <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
