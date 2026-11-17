@@ -22,3 +22,15 @@ export function getGeminiModelCandidates(configuredModel?: string): string[] {
   candidates.push(...FALLBACK_MODELS);
   return [...new Set(candidates)];
 }
+
+/** Retry another model only when the failure can plausibly be model-specific. */
+export function shouldTryNextGeminiModel(error: unknown): boolean {
+  const candidate = error as { status?: unknown; statusCode?: unknown; code?: unknown; message?: unknown };
+  const status = Number(candidate?.status || candidate?.statusCode || candidate?.code);
+  if (status === 401 || status === 403 || status === 429) return false;
+  const message = String(candidate?.message || error || "").toLowerCase();
+  if (/\b(401|403|429)\b|unauthorized|permission denied|api key|quota|rate.?limit/.test(message)) {
+    return false;
+  }
+  return true;
+}
