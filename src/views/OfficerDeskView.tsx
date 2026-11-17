@@ -263,7 +263,7 @@ export const OfficerDeskView: React.FC = () => {
   const rejectedCount = applications.filter((a) => a.status === "REJECTED").length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-app-page ugov-officer-page space-y-6">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
