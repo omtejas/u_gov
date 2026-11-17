@@ -82,6 +82,7 @@ export const GBotModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [aiHealth, setAiHealth] = useState<{ provider?: string; liveAI?: boolean; internetSearchConfigured?: boolean } | null>(null);
+  const [aiRequestStatus, setAiRequestStatus] = useState<"unknown" | "responding" | "unavailable">("unknown");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
   const messages = activeConversation?.messages || [];
@@ -189,6 +190,8 @@ export const GBotModal: React.FC = () => {
       if (res.status === 429) throw new Error("You’ve reached the short-term request limit. Please wait a moment and try again.");
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Unable to generate guidance.");
+      if (data.source === "GeminiProvider unavailable") setAiRequestStatus("unavailable");
+      else if (String(data.source || "").startsWith("Google Gemini")) setAiRequestStatus("responding");
       const botMsg: Message = {
         id: "msg-" + (Date.now() + 1),
         sender: "bot",
@@ -200,6 +203,7 @@ export const GBotModal: React.FC = () => {
       };
       updateActive((c) => ({ ...c, updatedAt: new Date().toISOString(), messages: [...c.messages, botMsg] }));
     } catch (error: any) {
+      if (!String(error?.message || "").includes("sign in")) setAiRequestStatus("unavailable");
       updateActive((c) => ({
         ...c,
         messages: [...c.messages, {
@@ -273,7 +277,7 @@ export const GBotModal: React.FC = () => {
 
           <div className="flex items-center gap-2 border-b border-[#E6ECF4] bg-[#F8FAFD] px-4 py-2.5 text-[11px] text-slate-600 sm:px-6">
             <Globe2 size={14} className="text-[#174EA6]" />
-            <span>U-GOV knowledge</span><span className="text-slate-300">•</span><span>{aiHealth?.liveAI ? "Hosted AI ready" : "Offline demo assistant"}</span><span className="text-slate-300">•</span><span>{aiHealth?.internetSearchConfigured ? "Internet search ready" : "Internet search not configured"}</span>
+            <span>U-GOV knowledge</span><span className="text-slate-300">•</span><span>{aiRequestStatus === "responding" ? "Hosted AI responding" : aiRequestStatus === "unavailable" ? "Hosted AI unavailable" : aiHealth?.providerStatus === "CONFIGURED_NOT_PROBED" ? "Hosted AI configured · unverified" : aiHealth?.liveAI ? "Hosted AI configured · unverified" : aiHealth ? "Demo assistant" : "Checking AI status"}</span><span className="text-slate-300">•</span><span>{aiHealth?.internetSearchConfigured ? "Internet search ready" : "Internet search not configured"}</span>
             <span className="ml-auto hidden items-center gap-1 text-[#16834A] sm:flex"><ShieldCheck size={13} /> Citizen data protected</span>
           </div>
 

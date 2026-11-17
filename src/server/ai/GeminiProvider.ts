@@ -123,7 +123,7 @@ Rules:
         .replace(/^models\//, "");
       // Keep the configured model first, but retry once on a stable Flash model
       // so an obsolete model alias does not take the whole assistant offline.
-      const modelCandidates = [...new Set([configuredModel, "gemini-3.8-flash"])];
+      const modelCandidates = [...new Set([configuredModel, "gemini-3.8-flash", "gemini-3.7-flash"])];
       let response: any = null;
       let lastModelError: unknown;
       for (const model of modelCandidates) {
