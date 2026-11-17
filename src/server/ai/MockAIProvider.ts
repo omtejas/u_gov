@@ -67,11 +67,9 @@ export class MockAIProvider implements AIProvider {
 
     // 1. Application Status Query
     if (
-      q.includes("status") ||
-      q.includes("track") ||
-      q.includes("where is my application") ||
-      q.match(/ugov-\d{4}-[a-z-]+-[a-f0-9]+/i) ||
-      q.match(/app-\d+/i)
+      classifyAIIntent(request.message) === "PRIVATE_CITIZEN_WORKFLOW" &&
+      (q.includes("status") || q.includes("track") || q.includes("where is my application") ||
+        q.match(/ugov-\d{4}-[a-z-]+-[a-f0-9]+/i) || q.match(/app-\d+/i))
     ) {
       // Extract application number or ID if present
       const appMatch = q.match(/(ugov-\d{4}-[a-z0-9-]+|app-\d+-[a-f0-9]+)/i);
@@ -128,9 +126,9 @@ You can inspect the full lifecycle history and integration gateway telemetry in 
 
     // 2. Document Readiness Query
     if (
-      q.includes("ready") ||
-      q.includes("missing") ||
-      (q.includes("document") && (q.includes("have") || q.includes("my") || q.includes("check")))
+      classifyAIIntent(request.message) === "PRIVATE_CITIZEN_WORKFLOW" &&
+      (q.includes("ready") || q.includes("missing") ||
+        (q.includes("document") && (q.includes("have") || q.includes("my") || q.includes("check"))))
     ) {
       let targetCode = "NSP";
       if (q.includes("driving") || q.includes("licence") || q.includes("sarathi")) targetCode = "SARATHI-DL";
