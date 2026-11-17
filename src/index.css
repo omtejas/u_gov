@@ -156,3 +156,25 @@
  .ugov-tracker-page > div:first-child { align-items:flex-start; }
  .ugov-tracker-page > div:first-child h1 { font-size:27px!important; }
 }
+
+
+/* Unified application screens: extend the visual language beyond the landing page */
+.ugov-app-page > div:first-child h1 { font-size:clamp(29px,3.3vw,43px);line-height:1.08;letter-spacing:-.065em;color:#101828; }
+.ugov-app-page > div:first-child p { line-height:1.8; }
+.ugov-app-page .rounded-3xl,.ugov-app-page .rounded-2xl,.ugov-app-page .rounded-xl { border-radius:6px!important; }
+.ugov-app-page .shadow-xl,.ugov-app-page .shadow-lg,.ugov-app-page .shadow-md { box-shadow:0 10px 30px rgba(16,40,78,.055)!important; }
+.ugov-app-page input:not([type=checkbox]):not([type=radio]),.ugov-app-page textarea,.ugov-app-page select { border-radius:5px!important; }
+.ugov-app-page button { transition:background-color .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s; }
+.ugov-app-page button:focus-visible { outline:3px solid rgba(23,78,166,.3);outline-offset:3px; }
+.ugov-documents-page > div:first-child h1,.ugov-consent-page > div:first-child h1,.ugov-faq-page > div:first-child h1,.ugov-notifications-page > div:first-child h1,.ugov-mydata-page > div:first-child h1 { font-size:clamp(29px,3.3vw,43px); }
+.ugov-documents-page .bg-white,.ugov-consent-page .bg-white,.ugov-faq-page .bg-white,.ugov-notifications-page .bg-white,.ugov-mydata-page .bg-white { border-radius:6px!important; }
+.ugov-documents-page .border-slate-200,.ugov-consent-page .border-slate-200,.ugov-faq-page .border-slate-200,.ugov-notifications-page .border-slate-200,.ugov-mydata-page .border-slate-200 { border-color:#E1E7EF; }
+.ugov-faq-page > div:nth-child(2) input,.ugov-notifications-page > div:nth-child(2) input { min-height:48px; }
+.ugov-faq-page > div:last-child > div,.ugov-notifications-page > div:last-child > div { border-radius:5px!important; }
+.ugov-auth-page { border:0!important;border-radius:5px!important;box-shadow:0 18px 60px rgba(16,40,78,.09)!important; }
+.ugov-auth-page > div:first-child { background:linear-gradient(145deg,#09172D 0%,#0B2450 58%,#174EA6 100%)!important;padding:clamp(28px,4vw,60px)!important; }
+.ugov-auth-page > div:first-child h1 { font-family:var(--font-display);font-size:clamp(35px,4vw,52px);line-height:1.04;letter-spacing:-.065em; }
+.ugov-auth-page > div:last-child { padding:clamp(25px,4vw,60px)!important; }
+.ugov-auth-page > div:last-child h2 { font-family:var(--font-display);font-size:clamp(26px,3vw,36px);letter-spacing:-.06em; }
+.ugov-auth-page .rounded-xl,.ugov-auth-page .rounded-2xl { border-radius:5px!important; }
+@media(max-width:680px) { .ugov-auth-page { margin:0!important; } .ugov-auth-page > div:first-child { min-height:420px; } }
