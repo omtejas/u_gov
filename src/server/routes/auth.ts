@@ -1,7 +1,9 @@
 import { Router, Response } from "express";
+import crypto from "crypto";
 import { db, UserRecord, ProfileRecord } from "../database/db";
 import { hashPassword, verifyPassword, generateSessionToken, hashToken } from "../auth/crypto";
-import { AuthenticatedRequest, requireAuth, rateLimiter, csrfProtection } from "../middleware/auth";
+import { AuthenticatedRequest, requireAuth, rateLimiter, csrfProtection, parseCookies } from "../middleware/auth";
+import { verifyGoogleIdToken } from "../auth/googleIdentity";
 
 export const authRouter = Router();
 
@@ -134,6 +136,156 @@ authRouter.post(
     }
   }
 );
+
+
+/**
+ * GET /api/v1/auth/google/nonce
+ * Issues a one-time nonce bound to an HttpOnly same-site cookie.
+ */
+authRouter.get("/google/nonce", (_req: AuthenticatedRequest, res: Response) => {
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return res.status(503).json({ success: false, error: "Google sign-in is not configured yet." });
+  }
+  const nonce = generateSessionToken();
+  const isProd = process.env.NODE_ENV === "production";
+  res.setHeader("Set-Cookie", `ugov_google_nonce=${nonce}; Path=/api/v1/auth/google; HttpOnly; SameSite=Lax; Max-Age=300${isProd ? "; Secure" : ""}`);
+  return res.json({ success: true, nonce });
+});
+
+/**
+ * POST /api/v1/auth/google
+ * Verifies a Google ID token, resolves a linked identity, and issues a normal U-GOV session.
+ */
+authRouter.post("/google", rateLimiter(60000, 10), async (req: AuthenticatedRequest, res: Response) => {
+  const isProd = process.env.NODE_ENV === "production";
+  const clearNonce = `ugov_google_nonce=; Path=/api/v1/auth/google; HttpOnly; SameSite=Lax; Max-Age=0${isProd ? "; Secure" : ""}`;
+  try {
+    const host = req.get("host");
+    const origin = req.get("origin");
+    if (!origin || !host || new URL(origin).host !== host) {
+      res.setHeader("Set-Cookie", clearNonce);
+      return res.status(403).json({ success: false, error: "Google sign-in request origin was rejected." });
+    }
+    const nonceCookie = parseCookies(req).ugov_google_nonce;
+    const credential = req.body?.credential;
+    if (!nonceCookie || typeof credential !== "string" || credential.length > 10000) {
+      res.setHeader("Set-Cookie", clearNonce);
+      return res.status(400).json({ success: false, error: "Google sign-in session expired. Please try again." });
+    }
+    const identity = await verifyGoogleIdToken(credential, process.env.GOOGLE_CLIENT_ID || "", nonceCookie);
+    res.setHeader("Set-Cookie", clearNonce);
+
+    let user = db.findUserByGoogleSub(identity.sub);
+    const now = new Date().toISOString();
+    let isNewAccount = false;
+    if (!user) {
+      const emailAccount = db.findUserByIdentifier(identity.email);
+      if (emailAccount) {
+        db.recordAuditEvent({
+          id: `aud-${Date.now()}-google-collision`,
+          timestamp: now,
+          actorId: emailAccount.id,
+          actorName: identity.email,
+          actorRole: "Anonymous",
+          action: "GOOGLE_ACCOUNT_LINK_BLOCKED",
+          resource: "Google Sign-In",
+          result: "BLOCKED",
+          context: "Google identity matched an existing email account; explicit authenticated account linking is required.",
+          ipAddress: req.ip,
+        });
+        return res.status(409).json({
+          success: false,
+          error: "An account already exists with this email. Sign in with your U-GOV password first; account linking will be available from account security settings."
+        });
+      }
+
+      const randomPassword = generateSessionToken();
+      const { hash, salt } = hashPassword(randomPassword);
+      const userId = `usr-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+      user = {
+        id: userId,
+        identifier: identity.email,
+        passwordHash: hash,
+        salt,
+        status: "ACTIVE",
+        createdAt: now,
+        updatedAt: now,
+        lastLoginAt: now,
+        googleSub: identity.sub,
+      };
+      const profile: ProfileRecord = {
+        id: `prof-${Date.now()}`,
+        userId,
+        displayName: identity.name,
+        phone: "",
+        preferredLanguage: "en",
+        kycLevel: "Tier 1 (Basic)",
+        aadhaarLinked: false,
+        panLinked: false,
+        state: "",
+        district: "",
+        createdAt: now,
+        updatedAt: now,
+      };
+      db.createUser(user, profile, "CITIZEN");
+      isNewAccount = true;
+    }
+
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({ success: false, error: "This U-GOV account is not active. Please contact support." });
+    }
+
+    user.googleSub = identity.sub;
+    db.updateUser(user.id, { googleSub: identity.sub, lastLoginAt: now });
+    const token = generateSessionToken();
+    const tokenHash = hashToken(token);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    db.createSession({
+      id: `sess-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`,
+      userId: user.id,
+      tokenHash,
+      createdAt: now,
+      expiresAt,
+      ipAddress: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+    const profile = db.getProfileByUserId(user.id);
+    const roles = db.getUserRoles(user.id).map((role) => role.id);
+    const permissions = db.getUserPermissions(user.id);
+    db.recordAuditEvent({
+      id: `aud-${Date.now()}-google-login`,
+      timestamp: now,
+      actorId: user.id,
+      actorName: profile?.displayName || identity.email,
+      actorRole: roles[0] || "CITIZEN",
+      action: isNewAccount ? "GOOGLE_ACCOUNT_CREATED" : "GOOGLE_LOGIN",
+      resource: "National Gateway Session",
+      result: "SUCCESS",
+      context: "Google OpenID Connect identity verified server-side; U-GOV session issued.",
+      ipAddress: req.ip,
+    });
+    res.setHeader("Set-Cookie", [
+      `ugov_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800${isProd ? "; Secure" : ""}`,
+      clearNonce,
+    ]);
+    return res.json({
+      success: true,
+      message: "Google authentication successful",
+      user: {
+        id: user.id,
+        identifier: user.identifier,
+        profile,
+        roles,
+        permissions,
+      },
+    });
+  } catch (error: any) {
+    res.setHeader("Set-Cookie", clearNonce);
+    const message = error?.message || "Google authentication failed";
+    const status = message.includes("not configured") ? 503 : 401;
+    return res.status(status).json({ success: false, error: status === 503 ? message : "Google authentication could not be verified. Please try again." });
+  }
+});
 
 /**
  * POST /api/v1/auth/login
