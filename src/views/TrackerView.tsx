@@ -95,7 +95,7 @@ export const TrackerView: React.FC = () => {
   const cancelledCount = governmentApplications.filter((a) => a.status === "CANCELLED").length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-app-page ugov-tracker-page space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
