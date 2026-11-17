@@ -13,6 +13,7 @@ import {
   IAIToolGateway,
   AIToolResult,
 } from "./AIProvider";
+import { classifyAIIntent, isPrivateContextualFollowup } from "./AIIntentRouter";
 
 export class MockAIProvider implements AIProvider {
   public readonly providerName = "MockAIProvider";
@@ -52,9 +53,8 @@ export class MockAIProvider implements AIProvider {
       };
     }
 
-    // Follow-ups about a previously displayed private status stay local to U-GOV.
-    const lastAssistantMessage = request.conversationHistory?.filter((m) => m.role === "model").slice(-1)[0]?.text || "";
-    if (/application status|current lifecycle state|tracking token/i.test(lastAssistantMessage) && /\b(what does|what is|why|explain|meaning|next|pending)\b/i.test(q)) {
+    // Only an explicit follow-up to the citizen's own previous request is handled locally.
+    if (isPrivateContextualFollowup(request.message, request.conversationHistory || [])) {
       return {
         reply: "I can explain the status without sending your application details outside U-GOV. DRAFT means the application has not been submitted; DOCUMENTS_REQUIRED means required items are missing; READY means the checklist is satisfied; CONSENT_REQUIRED means you must authorize the requested document sharing; SUBMITTED or PROCESSING means the sandbox workflow has received the demo application; ACTION_REQUIRED means you need to review the Tracker for the next step; APPROVED or REJECTED are terminal demo outcomes. Open Tracker to see the exact action recorded for your application.",
         source: "U-GOV private application guidance",
@@ -67,11 +67,9 @@ export class MockAIProvider implements AIProvider {
 
     // 1. Application Status Query
     if (
-      q.includes("status") ||
-      q.includes("track") ||
-      q.includes("where is my application") ||
-      q.match(/ugov-\d{4}-[a-z-]+-[a-f0-9]+/i) ||
-      q.match(/app-\d+/i)
+      classifyAIIntent(request.message) === "PRIVATE_CITIZEN_WORKFLOW" &&
+      (q.includes("status") || q.includes("track") || q.includes("where is my application") ||
+        q.match(/ugov-\d{4}-[a-z-]+-[a-f0-9]+/i) || q.match(/app-\d+/i))
     ) {
       // Extract application number or ID if present
       const appMatch = q.match(/(ugov-\d{4}-[a-z0-9-]+|app-\d+-[a-f0-9]+)/i);
@@ -128,9 +126,9 @@ You can inspect the full lifecycle history and integration gateway telemetry in 
 
     // 2. Document Readiness Query
     if (
-      q.includes("ready") ||
-      q.includes("missing") ||
-      (q.includes("document") && (q.includes("have") || q.includes("my") || q.includes("check")))
+      classifyAIIntent(request.message) === "PRIVATE_CITIZEN_WORKFLOW" &&
+      (q.includes("ready") || q.includes("missing") ||
+        (q.includes("document") && (q.includes("have") || q.includes("my") || q.includes("check"))))
     ) {
       let targetCode = "NSP";
       if (q.includes("driving") || q.includes("licence") || q.includes("sarathi")) targetCode = "SARATHI-DL";
@@ -196,7 +194,7 @@ ${
     }
 
     // 3. Service Discovery Query: Scholarship
-    if (q.includes("scholarship") || q.includes("nsp") || q.includes("student") || q.includes("college")) {
+    if (classifyAIIntent(request.message) === "GOVERNMENT_SERVICE" && (q.includes("scholarship") || q.includes("nsp"))) {
       const details = await toolGateway.getServiceDetails("NSP");
       toolCalls.push({
         toolName: "getServiceDetails",
@@ -232,7 +230,7 @@ ${(details.benefits || []).map((b: string) => `• ${b}`).join("\n")}`;
     }
 
     // 4. Service Discovery Query: Driving Licence
-    if (q.includes("driving") || q.includes("licence") || q.includes("sarathi") || q.includes("rto")) {
+    if (classifyAIIntent(request.message) === "GOVERNMENT_SERVICE" && (q.includes("driving") || q.includes("licence") || q.includes("sarathi") || q.includes("rto"))) {
       const details = await toolGateway.getServiceDetails("SARATHI-DL");
       toolCalls.push({
         toolName: "getServiceDetails",
@@ -265,7 +263,7 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
     }
 
     // 5. Service Discovery Query: Domicile Certificate
-    if (q.includes("domicile") || q.includes("residence") || q.includes("adivas")) {
+    if (classifyAIIntent(request.message) === "GOVERNMENT_SERVICE" && (q.includes("domicile") || q.includes("residence") || q.includes("adivas"))) {
       const details = await toolGateway.getServiceDetails("DOMICILE-CERT");
       toolCalls.push({
         toolName: "getServiceDetails",
@@ -295,7 +293,9 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
     }
 
     // 6. Generic Service Search
-    const searchResults = await toolGateway.searchServices(request.message);
+    const searchResults = classifyAIIntent(request.message) === "GOVERNMENT_SERVICE"
+      ? await toolGateway.searchServices(request.message)
+      : [];
     if (searchResults.length > 0) {
       toolCalls.push({
         toolName: "searchServices",
@@ -321,14 +321,9 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
       };
     }
 
-    // 7. Honest fallback when no hosted model is configured or a provider is unavailable.
-    const recentContext = request.conversationHistory?.filter((m) => m.role === "user").slice(-1)[0]?.text;
+    // 7. Honest offline response. Do not misrepresent a catalogue miss as an answer.
     return {
-      reply: `I understood your question: “${request.message.slice(0, 180)}”.
-
-I checked the local U-GOV service catalogue, but could not find enough verified information to answer this accurately. This environment is currently using the offline demo assistant, not a general-purpose hosted AI model.
-
-You can still ask me to find a service, explain a catalogue entry, check your own application status, or assess your document readiness. For open-ended questions and current Internet research, configure a hosted AI provider and web-search provider on the V6 preview environment.${recentContext ? "\n\nYour previous topic was: " + recentContext.slice(0, 120) : ""}`,
+      reply: "General AI answers are unavailable in offline demo mode. I can still help with supported U-GOV service discovery and secure citizen workflows.",
       source: "U-GOV offline demo assistant",
       suggestions: [
         "Search the U-GOV service catalogue",

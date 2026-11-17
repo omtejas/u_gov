@@ -28,11 +28,13 @@ aiRouter.get("/health", (_req, res: Response) => {
     provider: provider.providerName,
     providerLabel: provider.providerName === "OpenAIProvider" ? (process.env.OPENAI_MODEL || "OpenAI-compatible model") : provider.providerName === "GeminiProvider" ? (process.env.GEMINI_MODEL || "Gemini 3.8 Flash") : "U-GOV deterministic demo assistant",
     externalProviderConfigured: Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY),
+    providerConfigured: isLiveAI && Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY),
+    providerStatus: isLiveAI ? "CONFIGURED_NOT_PROBED" : "DETERMINISTIC_DEMO",
     internetSearchConfigured: searchConfigured,
     mode: isLiveAI ? "LIVE_AI" : "DETERMINISTIC_DEMO",
     liveAI: isLiveAI,
     notice: isLiveAI
-      ? "A hosted AI provider is selected. Individual requests may use the safe U-GOV fallback."
+      ? "A hosted AI provider is configured. This health check does not test live generation; inspect individual request outcomes."
       : "No hosted AI key is configured. Responses use the deterministic U-GOV demo provider.",
     timestamp: new Date().toISOString(),
   });
@@ -129,10 +131,11 @@ aiRouter.post("/chat", requireAuth, async (req: AuthenticatedRequest, res: Respo
         actorRole: "CITIZEN",
         action: "AI_RESPONSE_GENERATED",
         resource: "U_AI:CHAT",
-        result: "SUCCESS",
+        result: aiResponse.source.toLowerCase().includes("unavailable") ? "FAILED" : "SUCCESS",
         context: JSON.stringify({
           provider: provider.providerName,
           source: aiResponse.source,
+          outcome: aiResponse.source.toLowerCase().includes("unavailable") ? "PROVIDER_UNAVAILABLE" : "RESPONSE_RETURNED",
           toolCallsCount: aiResponse.toolCalls?.length || 0,
         }),
         ipAddress: req.ip,
