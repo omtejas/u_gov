@@ -38,7 +38,7 @@ export const Input: React.FC<InputProps> = ({
         )}
         <input
           id={inputId}
-          className={`w-full rounded-xl border transition-all duration-150 text-sm leading-6 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#174EA6]/20 ${
+          className={`w-full rounded-[5px] border transition-all duration-200 text-sm leading-6 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#174EA6]/20 ${
             leftIcon ? "pl-10" : "pl-3.5"
           } ${rightIcon ? "pr-10" : "pr-3.5"} py-2.5 ${
             error
