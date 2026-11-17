@@ -12,6 +12,7 @@ const cases: Array<[string, string]> = [
   ["Explain cloud computing", "GENERAL_KNOWLEDGE"],
   ["What scholarships can I apply for?", "GOVERNMENT_SERVICE"],
   ["Tell me about NSP", "GOVERNMENT_SERVICE"],
+  ["Show me education services", "GOVERNMENT_SERVICE"],
   ["How do I renew a driving licence?", "GOVERNMENT_SERVICE"],
   ["What documents are required for a domicile certificate?", "GOVERNMENT_SERVICE"],
   ["Where is my application?", "PRIVATE_CITIZEN_WORKFLOW"],
