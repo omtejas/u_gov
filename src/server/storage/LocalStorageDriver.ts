@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { Readable } from "stream";
-import { StorageDriver, FileMetadata, SaveFileOptions } from "./StorageDriver";
+import { StorageDriver, FileMetadata, SaveFileOptions, StorageHealthResult } from "./StorageDriver";
 
 export class LocalStorageDriver implements StorageDriver {
   private vaultDirectory: string;
@@ -58,6 +58,19 @@ export class LocalStorageDriver implements StorageDriver {
       if (handle) await handle.close().catch(() => undefined);
       await fs.promises.unlink(temporaryPath).catch(() => undefined);
       throw error;
+    }
+  }
+
+  public async checkHealth(): Promise<StorageHealthResult> {
+    this.ensureDirectoryExists();
+    const probe = path.join(this.vaultDirectory, `.health-${crypto.randomUUID()}`);
+    try {
+      await fs.promises.writeFile(probe, "ugov-storage-health", { flag: "wx", mode: 0o600 });
+      await fs.promises.unlink(probe);
+      return { healthy: true, provider: "local", detail: "Private local vault is writable." };
+    } catch {
+      await fs.promises.unlink(probe).catch(() => undefined);
+      return { healthy: false, provider: "local", detail: "Private local vault is not writable." };
     }
   }
 

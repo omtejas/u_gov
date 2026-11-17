@@ -17,6 +17,7 @@ import { faqRouter } from "./src/server/routes/faq";
 import { officerRouter } from "./src/server/routes/officer";
 import { requireAuth } from "./src/server/middleware/auth";
 import { inspectStorageDirectory } from "./src/server/storage/storageHealth";
+import { getStorageDriver } from "./src/server/storage/storageFactory";
 import type { AuthenticatedRequest } from "./src/server/middleware/auth";
 
 dotenv.config();
@@ -101,38 +102,49 @@ app.patch("/api/v1/preferences", requireAuth as any, (req: AuthenticatedRequest,
 
 // Health endpoint reports storage readiness without treating a configured path
 // as proof of durability. Production startup separately enforces the mount guard.
-app.get("/api/v1/health", (_req: Request, res: Response) => {
+app.get("/api/v1/health", async (_req: Request, res: Response) => {
   const dataDirectory = process.env.UGOV_DATA_DIR || path.join(process.cwd(), "storage");
   const storageReadiness = inspectStorageDirectory(dataDirectory);
   const geminiConfigured = Boolean(process.env.GEMINI_API_KEY);
   const ephemeralDemoMode = process.env.NODE_ENV === "production" && process.env.UGOV_STORAGE_MODE === "ephemeral-demo";
-  const storageReady = process.env.NODE_ENV !== "production" || storageReadiness.persistentMountVerified || ephemeralDemoMode;
-
+  const storageType = (process.env.UGOV_STORAGE_TYPE || "local").toLowerCase();
+  let binaryStorage: { healthy: boolean; provider: "local" | "s3"; detail: string } = {
+    healthy: false, provider: storageType === "s3" ? "s3" : "local", detail: "Storage health check has not completed.",
+  };
+  try { binaryStorage = await getStorageDriver().checkHealth(); }
+  catch { binaryStorage.detail = "Configured storage backend is unavailable or missing required configuration."; }
+  const metadataStorageReady = process.env.NODE_ENV !== "production" || storageReadiness.persistentMountVerified || ephemeralDemoMode;
+  const storageReady = metadataStorageReady && binaryStorage.healthy;
+  const hostedAiConfigured = Boolean(process.env.OPENAI_API_KEY || geminiConfigured);
   res.status(storageReady ? 200 : 503).json({
     status: storageReady ? "ok" : "degraded",
     timestamp: new Date().toISOString(),
     service: "U-GOV National Unified Governance Platform",
-    version: "4.0",
+    version: "6.0",
     environment: process.env.NODE_ENV || "development",
-    aiEngineActive: geminiConfigured,
+    aiEngineActive: hostedAiConfigured,
     ai: {
-      provider: geminiConfigured && process.env.NODE_ENV !== "test" ? "gemini" : "mock",
-      credentialsConfigured: geminiConfigured,
+      provider: process.env.OPENAI_API_KEY ? "openai-compatible" : geminiConfigured ? "gemini" : "mock",
+      credentialsConfigured: hostedAiConfigured,
+      internetSearchConfigured: Boolean(process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_API_KEY),
+    },
+    database: {
+      engine: "json-file",
+      postgresConfigured: Boolean(process.env.DATABASE_URL),
+      runtimeIntegrated: false,
+      notice: "DATABASE_URL alone does not enable PostgreSQL persistence; this build still uses the JSON-file metadata store.",
     },
     storage: {
-      engine: "json-file",
+      metadataEngine: "json-file",
+      binaryEngine: binaryStorage.provider,
+      binaryHealthy: binaryStorage.healthy,
+      binaryDetail: binaryStorage.detail,
       directoryConfigured: Boolean(process.env.UGOV_DATA_DIR),
       directoryExists: storageReadiness.directoryExists,
       writable: storageReadiness.writable,
       persistentMountVerified: storageReadiness.persistentMountVerified,
       filesystem: storageReadiness.filesystem,
-      durability: storageReadiness.persistentMountVerified
-        ? "persistent-volume-mounted-and-writable"
-        : ephemeralDemoMode
-          ? "ephemeral-demo-non-durable"
-          : storageReadiness.ephemeralPath
-            ? "ephemeral"
-            : "not-verified",
+      durability: storageReadiness.persistentMountVerified ? "persistent-volume-mounted-and-writable" : ephemeralDemoMode ? "ephemeral-demo-non-durable" : storageReadiness.ephemeralPath ? "ephemeral" : "not-verified",
       mode: ephemeralDemoMode ? "ephemeral-demo" : "persistent-required",
       warning: storageReadiness.reason,
     },

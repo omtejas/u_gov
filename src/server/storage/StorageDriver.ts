@@ -8,12 +8,21 @@ export interface FileMetadata {
   sha256Checksum: string;
 }
 
+export interface StorageHealthResult {
+  healthy: boolean;
+  provider: "local" | "s3";
+  detail: string;
+}
+
 export interface SaveFileOptions {
   mimeType: string;
   metadata?: Record<string, string>;
 }
 
 export interface StorageDriver {
+  /** Verify that the configured private storage backend can be reached and used. */
+  checkHealth(): Promise<StorageHealthResult>;
+
   /**
    * Save a binary buffer or stream to the private vault
    * Returns the generated opaque storage key

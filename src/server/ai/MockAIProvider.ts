@@ -52,6 +52,19 @@ export class MockAIProvider implements AIProvider {
       };
     }
 
+    // Follow-ups about a previously displayed private status stay local to U-GOV.
+    const lastAssistantMessage = request.conversationHistory?.filter((m) => m.role === "model").slice(-1)[0]?.text || "";
+    if (/application status|current lifecycle state|tracking token/i.test(lastAssistantMessage) && /\b(what does|what is|why|explain|meaning|next|pending)\b/i.test(q)) {
+      return {
+        reply: "I can explain the status without sending your application details outside U-GOV. DRAFT means the application has not been submitted; DOCUMENTS_REQUIRED means required items are missing; READY means the checklist is satisfied; CONSENT_REQUIRED means you must authorize the requested document sharing; SUBMITTED or PROCESSING means the sandbox workflow has received the demo application; ACTION_REQUIRED means you need to review the Tracker for the next step; APPROVED or REJECTED are terminal demo outcomes. Open Tracker to see the exact action recorded for your application.",
+        source: "U-GOV private application guidance",
+        suggestions: ["Open my application in Tracker", "Explain the document checklist", "How does consent work?"],
+        toolCalls,
+        disclaimer,
+        timestamp,
+      };
+    }
+
     // 1. Application Status Query
     if (
       q.includes("status") ||
@@ -308,15 +321,19 @@ ${(details.requiredDocuments || []).map((d: string) => `• ${d}`).join("\n")}`;
       };
     }
 
-    // 7. General Fallback Guidance
+    // 7. Honest fallback when no hosted model is configured or a provider is unavailable.
+    const recentContext = request.conversationHistory?.filter((m) => m.role === "user").slice(-1)[0]?.text;
     return {
-      reply: `Namaste! I am **Bharat G-Bot**, your Sovereign AI Public Services Guide.\n\nI can assist you with:\n• **Service Discovery**: Ask about scholarships, driving licences, domicile certificates, PM-KISAN, or Ayushman Bharat.\n• **Document Requirements**: Ask what documents are required for any government service.\n• **Vault Readiness**: Ask *"Am I ready for scholarship?"* to evaluate your U-DOCS vault.\n• **Application Tracking**: Ask *"Where is my application?"* to track submitted services.\n\nHow can I help you today?`,
-      source: "U-GOV National AI Public Services Engine (MockAIProvider)",
+      reply: `I understood your question: “${request.message.slice(0, 180)}”.
+
+I checked the local U-GOV service catalogue, but could not find enough verified information to answer this accurately. This environment is currently using the offline demo assistant, not a general-purpose hosted AI model.
+
+You can still ask me to find a service, explain a catalogue entry, check your own application status, or assess your document readiness. For open-ended questions and current Internet research, configure a hosted AI provider and web-search provider on the V6 preview environment.${recentContext ? "\n\nYour previous topic was: " + recentContext.slice(0, 120) : ""}`,
+      source: "U-GOV offline demo assistant",
       suggestions: [
-        "What scholarships can I apply for?",
-        "Driving licence documents required",
-        "Check my application status",
-        "Am I ready for scholarship?",
+        "Search the U-GOV service catalogue",
+        "Show me the U-GOV help topics",
+        "How do I check my application status?",
       ],
       toolCalls,
       disclaimer,

@@ -46,13 +46,13 @@ export const NotificationsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-consent-page ugov-app-page space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Bell className="w-5 h-5 text-[#0b1f3a]" />
-            <h1 className="text-2xl font-extrabold text-[#0b1f3a]">Notifications</h1>
+            <Bell className="w-5 h-5 text-[#174EA6]" />
+            <h1 className="text-2xl font-extrabold text-[#174EA6]">Notifications</h1>
             {unreadCount > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">
                 {unreadCount} unread
@@ -96,7 +96,7 @@ export const NotificationsView: React.FC = () => {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
-                filter === f ? "bg-[#0b1f3a] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                filter === f ? "bg-[#174EA6] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               {f} ({count})

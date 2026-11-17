@@ -87,7 +87,7 @@ export const WhereAmIView: React.FC = () => {
   // Render empty state if citizen has no applications
   if (governmentApplications.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="ugov-app-page ugov-whereami-page space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
@@ -184,7 +184,7 @@ export const WhereAmIView: React.FC = () => {
                   onClick={() => setSelectedAppId(app.id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     isSel
-                      ? "bg-[#0b1f3a] text-white shadow-xs"
+                      ? "bg-[#174EA6] text-white shadow-xs"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                   }`}
                 >

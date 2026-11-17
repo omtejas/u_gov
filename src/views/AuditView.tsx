@@ -18,7 +18,7 @@ export const AuditView: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-app-page ugov-audit-page space-y-6">
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

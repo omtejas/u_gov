@@ -95,7 +95,7 @@ export const TrackerView: React.FC = () => {
   const cancelledCount = governmentApplications.filter((a) => a.status === "CANCELLED").length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-app-page ugov-tracker-page space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -197,7 +197,7 @@ export const TrackerView: React.FC = () => {
             onClick={() => setFilter(item.id)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
               filter === item.id
-                ? "bg-[#0b1f3a] text-white shadow-2xs"
+                ? "bg-[#174EA6] text-white shadow-2xs"
                 : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900"
             }`}
           >

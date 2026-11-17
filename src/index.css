@@ -1,82 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    
-    /* Sovereign Color Tokens matching Google Stitch Master Design */
-    --color-primary: #000615;
-    --color-primary-container: #0b1f3a;
-    --color-on-primary-container: #7587a7;
-    --color-secondary: #0057c2;
-    --color-secondary-container: #246fe7;
-    --color-tertiary: #0c0500;
-    --color-on-tertiary-container: #b87a00;
-    --color-background: #f7f9fc;
-    --color-surface-white: #ffffff;
-    --color-surface-low: #f2f4f7;
-    --color-surface-container: #eceef1;
-    --color-surface-high: #e6e8eb;
-    --color-border-subtle: #e2e8f0;
-    
-    /* Semantic Status Tokens */
-    --color-status-success: #10B981;
-    --color-status-warning: #F59E0B;
-    --color-status-pending: #F97316;
-    --color-status-error: #EF4444;
-    --color-status-info: #3B82F6;
+    color-scheme: light;
+    --font-display: 'Manrope', 'Inter', system-ui, sans-serif;
+    --font-body: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Kannada', system-ui, sans-serif;
+    --ugov-blue: #174EA6; --ugov-blue-dark: #0B2450; --ugov-red: #D62828;
+    --ugov-green: #16834A; --ugov-yellow: #F5C518; --ugov-white: #FFFFFF; --ugov-black: #101828;
+    --color-primary: var(--ugov-blue); --color-primary-container: #EAF1FC;
+    --color-on-primary-container: #173B70; --color-secondary: var(--ugov-green);
+    --color-secondary-container: #E8F5ED; --color-tertiary: var(--ugov-yellow);
+    --color-background: #F7F8FA; --color-surface-white: #FFFFFF; --color-surface-low: #F1F3F6;
+    --color-surface-container: #E9EDF2; --color-surface-high: #DFE6EF; --color-border-subtle: #DFE5EE;
+    --color-status-success: #16834A; --color-status-warning: #B77900; --color-status-pending: #B77900;
+    --color-status-error: #D62828; --color-status-info: #174EA6;
+    font-family: var(--font-body); font-synthesis: none; text-rendering: optimizeLegibility;
   }
+  html, body, #root { min-height: 100%; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { padding: 0; font-family: var(--font-body); background: #F7F8FA; color: #101828; -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.6; }
+  h1,h2,h3,h4,h5,h6,.font-display { font-family: var(--font-display); letter-spacing: -.04em; }
+  button,input,textarea,select { font: inherit; } button { -webkit-tap-highlight-color: transparent; }
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline: 3px solid rgba(23,78,166,.32); outline-offset: 3px; }
+  ::selection { background: rgba(245,197,24,.45); color: #101828; }
+  ::-webkit-scrollbar { width: 7px; height: 7px; } ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #C7D1DF; border-radius: 9999px; } ::-webkit-scrollbar-thumb:hover { background: #9EADBF; }
+}
+.sovereign-tricolor-bar { height: 4px; background: linear-gradient(90deg,#174EA6 0 32%,#D62828 32% 48%,#F5C518 48% 66%,#16834A 66% 100%); }
+.sovereign-tricolor-subtle { background: linear-gradient(90deg,rgba(23,78,166,.12),rgba(214,40,40,.10),rgba(245,197,24,.16),rgba(22,131,74,.12)); }
+.ugov-card { background:#fff; border:1px solid #E3E9F1; border-radius:1.1rem; box-shadow:0 8px 28px rgba(25,48,82,.045); }
+.ugov-soft-shadow { box-shadow:0 12px 36px rgba(23,59,112,.09); }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-inter);
-    background-color: var(--color-background);
-    color: #191c1e;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+/* Editorial citizen experience — bold type, generous space, crisp geometry. */
+.ugov-home { width:100%; max-width:1600px; margin:0 auto; padding:0 0 72px; color:#101828; }
+.ugov-hero { position:relative; isolation:isolate; overflow:hidden; background:#0B2450; color:#fff; min-height:590px; padding:76px clamp(24px,6vw,92px) 0; }
+.ugov-hero:before { content:""; position:absolute; inset:0; z-index:-2; background:radial-gradient(ellipse at 78% 48%,rgba(23,78,166,.7),transparent 42%),linear-gradient(115deg,#09172D 0%,#0B2450 56%,#123B7A 100%); }
+.ugov-hero-grid { position:absolute; inset:0; z-index:-1; opacity:.13; background-image:linear-gradient(rgba(255,255,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.22) 1px,transparent 1px); background-size:64px 64px; mask-image:linear-gradient(90deg,black,transparent 90%); }
+.ugov-hero-orbit { position:absolute; border:1px solid rgba(255,255,255,.12); border-radius:50%; pointer-events:none; }
+.ugov-orbit-one { width:650px;height:650px;right:-170px;top:-260px; } .ugov-orbit-two { width:850px;height:850px;right:-270px;top:-360px; }
+.ugov-hero-inner { max-width:1360px; margin:auto; display:grid; grid-template-columns:1.12fr .88fr; align-items:center; gap:30px; min-height:500px; padding-bottom:54px; }
+.ugov-hero-copy { max-width:720px; position:relative; z-index:2; }
+.ugov-eyebrow { display:inline-flex; align-items:center; gap:10px; color:#174EA6; font-size:10px; line-height:1.4; letter-spacing:.19em; font-weight:800; }
+.ugov-eyebrow-light { color:#C6D8F5; }
+.ugov-live-dot { width:8px;height:8px;border-radius:50%;background:#F5C518;box-shadow:0 0 0 5px rgba(245,197,24,.13); }
+.ugov-hero h1 { margin:24px 0 20px; font-size:clamp(48px,6.4vw,92px); line-height:.99; letter-spacing:-.075em; font-weight:800; }
+.ugov-hero h1 span { color:#F5C518; }
+.ugov-hero-lede { max-width:560px; color:#C7D5EA; font-size:16px; line-height:1.8; margin-bottom:30px; }
+.ugov-searchbar { max-width:670px; min-height:68px; display:flex; align-items:center; gap:14px; background:#fff; color:#174EA6; padding:8px 8px 8px 20px; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.22); }
+.ugov-searchbar input { flex:1; min-width:0; color:#101828; outline:none; border:0; font-size:14px; background:transparent; }
+.ugov-searchbar input::placeholder { color:#8792A4; }
+.ugov-searchbar button,.ugov-feature-copy button,.ugov-closing-cta button { display:inline-flex; align-items:center; justify-content:center; gap:12px; background:#174EA6; color:#fff; border:0; border-radius:5px; padding:16px 20px; font-size:12px; font-weight:800; white-space:nowrap; cursor:pointer; transition:transform .2s,background .2s; }
+.ugov-searchbar button:hover,.ugov-feature-copy button:hover,.ugov-closing-cta button:hover { transform:translateY(-2px); background:#0F397E; }
+.ugov-hero-assist { display:inline-flex; align-items:center; gap:9px; margin-top:20px; color:#E8EFFB; font-size:12px; font-weight:700; background:transparent; border:0; cursor:pointer; }
+.ugov-hero-assist svg:first-child { color:#F5C518; } .ugov-hero-assist:hover { color:#F5C518; }
+.ugov-hero-art { min-height:430px; position:relative; display:flex; align-items:center; justify-content:center; }
+.ugov-art-orbit { position:absolute; border:1px solid rgba(255,255,255,.18); border-radius:50%; transform:rotate(-24deg); }
+.orbit-a { width:360px;height:360px; } .orbit-b { width:470px;height:250px; transform:rotate(42deg); border-color:rgba(245,197,24,.28); }
+.ugov-art-core { width:220px;height:220px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:radial-gradient(circle at 30% 25%,#2A69BD,#123B7A 68%,#0B2450);border:1px solid rgba(255,255,255,.35);box-shadow:0 0 0 18px rgba(255,255,255,.035),0 0 90px rgba(23,78,166,.45);text-align:center;z-index:2; }
+.ugov-art-emblem { width:55px;height:55px;border-radius:16px;background:#fff;padding:6px;display:grid;place-items:center; }
+.ugov-art-emblem img { width:100%;height:100%;object-fit:contain; }
+.ugov-art-core span { font-size:9px;letter-spacing:.24em;color:#D8E5F8;font-weight:800; } .ugov-art-core strong { font-size:17px;letter-spacing:-.04em; } .ugov-art-core small { font-size:7px;letter-spacing:.13em;color:#C6D8F5; }
+.ugov-art-node { position:absolute;z-index:3;display:flex;align-items:center;gap:8px;padding:12px 15px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(8,25,54,.78);color:#fff;box-shadow:0 14px 35px rgba(0,0,0,.2);font-size:11px;font-weight:700;backdrop-filter:blur(14px); }
+.ugov-art-node svg { color:#F5C518; } .node-top { top:22px;left:45%; } .node-right { right:-2px;top:45%; } .node-bottom { bottom:25px;left:39%; } .node-left { left:-3px;top:48%; }
+.ugov-art-index { position:absolute;right:2px;bottom:0;font-family:var(--font-display);font-size:32px;font-weight:800;color:#fff;letter-spacing:-.06em; } .ugov-art-index i { font-size:12px;color:#9CB4D8;font-style:normal; }
+.ugov-hero-bottom { max-width:1360px;margin:auto;border-top:1px solid rgba(255,255,255,.18);padding:18px 0;display:flex;justify-content:space-between;gap:12px;color:#AFC3E2;font-size:9px;font-weight:800;letter-spacing:.16em; }
+.ugov-hero-bottom span:nth-child(2) { display:flex;align-items:center;gap:8px;color:#DCE7F6; } .ugov-hero-bottom svg { color:#F5C518; }
+.ugov-intro-strip { max-width:1360px;margin:0 auto;padding:100px clamp(24px,6vw,92px) 60px;display:grid;grid-template-columns:.8fr 1.2fr .9fr;gap:32px;align-items:start; }
+.ugov-intro-strip>p { margin:12px 0 0;color:#174EA6;font-size:10px;font-weight:800;letter-spacing:.18em; }
+.ugov-intro-strip h2,.ugov-section-heading h2 { margin:0;font-size:clamp(34px,4vw,54px);line-height:1.05;letter-spacing:-.07em;font-weight:800; }
+.ugov-intro-note { max-width:330px;color:#667085;font-size:14px;line-height:1.85;border-left:2px solid #F5C518;padding-left:20px; }
+.ugov-quick-grid { max-width:1360px;margin:0 auto;padding:0 clamp(24px,6vw,92px);display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
+.ugov-quick-card { position:relative;text-align:left;background:#fff;border:1px solid #E5E9EF;border-radius:8px;padding:28px;min-height:220px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s; }
+.ugov-quick-card:hover { transform:translateY(-6px);border-color:#A9C4EB;box-shadow:0 22px 45px rgba(16,40,78,.09); }
+.ugov-quick-number { position:absolute;right:24px;top:22px;font-size:11px;font-weight:800;color:#AAB4C2;letter-spacing:.12em; }
+.ugov-quick-icon { width:46px;height:46px;display:grid;place-items:center;background:#EAF1FC;color:#174EA6;border-radius:7px;margin-bottom:24px; }
+.ugov-quick-card strong { display:block;font-family:var(--font-display);font-size:19px;letter-spacing:-.04em; }
+.ugov-quick-card p { margin:7px 0 20px;color:#667085;font-size:13px; }
+.ugov-quick-link { display:inline-flex;align-items:center;gap:8px;color:#174EA6;font-size:11px;font-weight:800; }
+.ugov-section { max-width:1360px;margin:0 auto;padding:100px clamp(24px,6vw,92px) 0; }
+.ugov-section-heading { display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:35px; }
+.ugov-section-heading h2 { margin-top:15px; }
+.ugov-section-heading>p { max-width:350px;color:#667085;font-size:14px;line-height:1.8;margin:0 0 5px; }
+.ugov-category-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
+.ugov-category-card { min-height:210px;padding:24px;text-align:left;border:1px solid #E5E9EF;border-radius:8px;background:#fff;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:transform .22s,box-shadow .22s; }
+.ugov-category-card:hover { transform:translateY(-5px);box-shadow:0 18px 35px rgba(16,40,78,.08); }
+.ugov-category-top { width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;color:#98A2B3;font-size:10px;font-weight:800;letter-spacing:.1em; }
+.ugov-category-card>svg { margin-bottom:17px; } .ugov-category-card strong { font-size:17px;letter-spacing:-.04em; } .ugov-category-card small { margin-top:5px;color:#667085;font-size:12px; }
+.tone-blue>svg { color:#174EA6; } .tone-green>svg { color:#16834A; } .tone-yellow>svg { color:#A47A00; } .tone-red>svg { color:#D62828; }
+.tone-blue { background:linear-gradient(135deg,#fff,#F5F8FE); } .tone-green { background:linear-gradient(135deg,#fff,#F3FAF5); } .tone-yellow { background:linear-gradient(135deg,#fff,#FFFCED); } .tone-red { background:linear-gradient(135deg,#fff,#FFF6F5); }
+.ugov-feature-band { max-width:1360px;margin:100px auto 0;padding:70px clamp(24px,6vw,92px);background:#0B2450;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center;position:relative;overflow:hidden; }
+.ugov-feature-band:after { content:"";position:absolute;width:460px;height:460px;border:1px solid rgba(255,255,255,.1);border-radius:50%;right:-190px;top:-220px;box-shadow:0 0 0 50px rgba(255,255,255,.025),0 0 0 100px rgba(255,255,255,.02); }
+.ugov-feature-copy { position:relative;z-index:1; } .ugov-feature-copy h2,.ugov-closing-cta h2 { font-size:clamp(40px,5vw,65px);line-height:1.02;letter-spacing:-.075em;margin:20px 0; }
+.ugov-feature-copy h2 em { color:#F5C518;font-style:normal; } .ugov-feature-copy p,.ugov-closing-cta p { color:#C6D5EA;max-width:440px;font-size:14px;line-height:1.85;margin-bottom:27px; }
+.ugov-feature-copy button { background:#F5C518;color:#101828; } .ugov-feature-copy button:hover { background:#FFE16A; }
+.ugov-feature-stack { position:relative;z-index:1;display:flex;flex-direction:column;gap:10px; }
+.ugov-feature-tile { display:flex;align-items:center;gap:17px;padding:19px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:7px; }
+.ugov-feature-tile .tile-icon { width:44px;height:44px;display:grid;place-items:center;background:rgba(245,197,24,.14);color:#F5C518;border-radius:7px;flex-shrink:0; }
+.ugov-feature-tile div { flex:1; } .ugov-feature-tile small { display:block;color:#9DB7DB;font-size:9px;font-weight:800;letter-spacing:.16em; } .ugov-feature-tile strong { display:block;margin-top:3px;font-size:14px; } .ugov-feature-tile p { margin:3px 0 0;color:#B6C7E0;font-size:11px; } .ugov-feature-tile>svg { color:#9DB7DB; }
+.ugov-text-link { display:inline-flex;align-items:center;gap:10px;background:none;border:0;color:#174EA6;font-size:12px;font-weight:800;cursor:pointer;padding:10px 0; }
+.ugov-featured-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
+.ugov-service-card { min-height:320px;position:relative;display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:27px;border-radius:8px;border:1px solid #E5E9EF;background:#fff;cursor:pointer;transition:transform .25s,box-shadow .25s; }
+.ugov-service-card:hover { transform:translateY(-5px);box-shadow:0 20px 40px rgba(16,40,78,.1); }
+.service-card-2 { background:#F1F5FC; } .service-card-3 { background:#F2F8F4; }
+.ugov-service-index { color:#7D899B;font-size:9px;font-weight:800;letter-spacing:.15em; } .ugov-service-code { margin-top:25px;color:#174EA6;font-size:10px;font-weight:800;letter-spacing:.12em; }
+.ugov-service-card strong { margin-top:10px;font-size:20px;line-height:1.2;letter-spacing:-.05em; } .ugov-service-card p { color:#667085;font-size:12px;line-height:1.7;margin:12px 0 25px; }
+.ugov-service-meta { margin-top:auto;width:100%;display:flex;justify-content:space-between;gap:8px;padding-top:14px;border-top:1px solid rgba(16,24,40,.12);font-size:10px;font-weight:700;color:#475467; }
+.ugov-service-arrow { position:absolute;right:24px;top:22px;color:#174EA6; }
+.ugov-prototype-note { display:flex;align-items:flex-start;gap:12px;margin-top:20px;padding:16px 18px;border:1px solid #E3E9F1;background:#fff;color:#667085;font-size:11px;line-height:1.7;border-radius:6px; } .ugov-prototype-note svg { flex-shrink:0;color:#174EA6;margin-top:1px; }
+.ugov-closing-cta { max-width:1360px;margin:100px auto 0;padding:65px clamp(24px,6vw,92px);display:flex;justify-content:space-between;align-items:center;gap:30px;background:#EAF1FC;position:relative;overflow:hidden; }
+.ugov-closing-cta h2 { color:#101828; } .ugov-closing-cta p { color:#667085; } .ugov-closing-cta button { background:#174EA6; }
+.ugov-cta-mark { width:190px;height:190px;border-radius:50%;display:grid;place-items:center;position:relative;background:#174EA6;color:#F5C518;box-shadow:0 0 0 20px rgba(23,78,166,.08),0 0 0 45px rgba(23,78,166,.04);flex-shrink:0; }
+.ugov-cta-mark span { position:absolute;font-family:var(--font-display);font-size:100px;font-weight:800;color:rgba(255,255,255,.12); }
+@media(max-width:900px) { .ugov-hero-inner { grid-template-columns:1fr .75fr; } .ugov-hero-art { transform:scale(.82);margin:0 -35px; } .ugov-intro-strip { grid-template-columns:1fr 1.5fr; } .ugov-intro-note { grid-column:2; } .ugov-feature-band { gap:30px; } }
+@media(max-width:680px) { .ugov-home { padding-bottom:40px; } .ugov-hero { padding:55px 22px 0;min-height:auto; } .ugov-hero-inner { display:block;min-height:0;padding-bottom:35px; } .ugov-hero h1 { font-size:clamp(46px,13vw,70px); } .ugov-hero-lede { font-size:14px; } .ugov-searchbar { flex-wrap:wrap;padding:12px;gap:10px; } .ugov-searchbar input { width:calc(100% - 40px); } .ugov-searchbar button { width:100%; } .ugov-hero-art { min-height:300px;transform:scale(.78);margin:-5px -30px -25px; } .ugov-art-index { right:15px; } .ugov-hero-bottom { flex-wrap:wrap;font-size:8px;padding:15px 0; } .ugov-hero-bottom span:last-child { display:none; } .ugov-intro-strip { display:block;padding:65px 22px 35px; } .ugov-intro-strip h2 { margin:18px 0; } .ugov-intro-note { max-width:100%; } .ugov-quick-grid { grid-template-columns:1fr;padding:0 22px;gap:10px; } .ugov-quick-card { min-height:190px;padding:22px; } .ugov-section { padding:70px 22px 0; } .ugov-section-heading { display:block;margin-bottom:25px; } .ugov-section-heading>p { margin-top:18px; } .ugov-category-grid,.ugov-featured-grid { grid-template-columns:1fr 1fr;gap:9px; } .ugov-category-card { min-height:190px;padding:17px; } .ugov-category-card strong { font-size:14px; } .ugov-category-card small { font-size:10px; } .ugov-feature-band { margin-top:70px;padding:48px 22px;grid-template-columns:1fr;gap:30px; } .ugov-featured-grid { grid-template-columns:1fr; } .ugov-service-card { min-height:270px; } .ugov-closing-cta { margin-top:70px;padding:48px 22px; } .ugov-cta-mark { display:none; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; } }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
+
+/* V6 extended editorial system — citizen workspace, catalogue and lifecycle */
+.ugov-app-page { color:#101828; }
+.ugov-app-page h1 { font-family:var(--font-display);font-weight:800;letter-spacing:-.065em; }
+.ugov-app-page h2,.ugov-app-page h3 { font-family:var(--font-display);letter-spacing:-.045em; }
+.ugov-app-page input,.ugov-app-page select { border-radius:5px; }
+.ugov-services-page > section:first-child { border-radius:5px!important;min-height:245px;padding:34px!important;background:linear-gradient(118deg,#09172D 0%,#0B2450 62%,#174EA6 100%)!important;box-shadow:none!important; }
+.ugov-services-page > section:first-child h1 { font-size:clamp(34px,4vw,54px)!important;line-height:1.04!important;max-width:700px; }
+.ugov-services-page > section:first-child p { max-width:580px;color:#C6D5EA!important;line-height:1.8!important; }
+.ugov-services-page > section:first-child > div:last-child { border-radius:6px!important; }
+.ugov-services-page > section:nth-child(2) { border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:24px 0 8px!important;border-bottom:1px solid #DCE3EC!important; }
+.ugov-services-page > section:nth-child(2) h2 { font-size:20px;letter-spacing:-.05em; }
+.ugov-services-page > section:nth-child(3) > div:first-child h2 { font-size:clamp(27px,3vw,38px);letter-spacing:-.065em; }
+.ugov-services-page > section:nth-child(3) .group { border-radius:5px!important;border:1px solid #E1E7EF!important;box-shadow:none!important;transition:transform .22s,border-color .22s,box-shadow .22s; }
+.ugov-services-page > section:nth-child(3) .group:hover { transform:translateY(-4px);border-color:#A9C4EB!important;box-shadow:0 18px 40px rgba(16,40,78,.075)!important; }
+.ugov-services-page > section:nth-child(3) .group button { padding:23px!important; }
+.ugov-services-page > section:nth-child(3) .group h3 { font-size:18px!important;line-height:1.25!important; }
+.ugov-dashboard-page > div:first-child { border-radius:5px!important;padding:34px!important;background:linear-gradient(118deg,#09172D,#0B2450 65%,#174EA6)!important;box-shadow:none!important; }
+.ugov-dashboard-page > div:first-child h1 { font-size:clamp(30px,4vw,46px)!important; }
+.ugov-dashboard-page > section[aria-label="Quick actions"] button { min-height:62px;border-radius:5px!important;border-color:#E0E6EF!important;background:#fff!important;color:#174EA6!important;font-size:12px!important;font-weight:800!important;justify-content:flex-start!important;padding:17px!important;transition:transform .2s,border-color .2s,box-shadow .2s; }
+.ugov-dashboard-page > section[aria-label="Quick actions"] button:hover { transform:translateY(-3px);border-color:#A9C4EB!important;box-shadow:0 12px 24px rgba(16,40,78,.07); }
+.ugov-dashboard-page .rounded-3xl,.ugov-dashboard-page .rounded-2xl { border-radius:6px!important; }
+.ugov-dashboard-page .shadow-lg { box-shadow:none!important; }
+.ugov-dashboard-page .grid > div:has(> span:first-child) { border-radius:5px; }
+.ugov-tracker-page > div:first-child h1 { font-size:clamp(28px,3vw,40px)!important;line-height:1.08; }
+.ugov-tracker-page > div:nth-child(2) > div { border-radius:5px!important;border-color:#E1E7EF!important;box-shadow:none!important;padding:20px!important; }
+.ugov-tracker-page > div:nth-child(2) > div > span:nth-child(2) { font-family:var(--font-display);font-size:34px!important;letter-spacing:-.07em; }
+.ugov-tracker-page > div:nth-child(5) > div { border-radius:5px!important;border-color:#E1E7EF!important;box-shadow:none!important; }
+.ugov-tracker-page .rounded-2xl,.ugov-tracker-page .rounded-xl { border-radius:5px!important; }
+.ugov-tracker-page > div:nth-child(4) button { border-radius:4px!important;padding:10px 15px!important;font-size:11px!important; }
+.ugov-mobile-nav { padding:9px 8px max(9px,env(safe-area-inset-bottom));border-top:1px solid #DFE5EE;box-shadow:0 -12px 35px rgba(16,40,78,.09); }
+.ugov-mobile-nav > button { min-width:54px; }
+.ugov-mobile-nav > button:not(:nth-child(3)) { border-radius:5px!important; }
+.ugov-mobile-nav > button:nth-child(3) > div { width:48px;height:48px;border-radius:14px!important;box-shadow:0 8px 18px rgba(23,78,166,.24); }
+@media(max-width:680px) {
+ .ugov-services-page > section:first-child { padding:23px!important; }
+ .ugov-dashboard-page > div:first-child { padding:24px!important; }
+ .ugov-tracker-page > div:first-child { align-items:flex-start; }
+ .ugov-tracker-page > div:first-child h1 { font-size:27px!important; }
 }
 
-/* Material Symbols helper class */
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
-}
 
-/* Sovereign Tricolor Accent Trace Line */
-.sovereign-tricolor-bar {
-  height: 3px;
-  background: linear-gradient(90deg, #b87a00 0%, #ffffff 50%, #10B981 100%);
-}
+/* Unified application screens: extend the visual language beyond the landing page */
+.ugov-app-page > div:first-child h1 { font-size:clamp(29px,3.3vw,43px);line-height:1.08;letter-spacing:-.065em;color:#101828; }
+.ugov-app-page > div:first-child p { line-height:1.8; }
+.ugov-app-page .rounded-3xl,.ugov-app-page .rounded-2xl,.ugov-app-page .rounded-xl { border-radius:6px!important; }
+.ugov-app-page .shadow-xl,.ugov-app-page .shadow-lg,.ugov-app-page .shadow-md { box-shadow:0 10px 30px rgba(16,40,78,.055)!important; }
+.ugov-app-page input:not([type=checkbox]):not([type=radio]),.ugov-app-page textarea,.ugov-app-page select { border-radius:5px!important; }
+.ugov-app-page button { transition:background-color .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s; }
+.ugov-app-page button:focus-visible { outline:3px solid rgba(23,78,166,.3);outline-offset:3px; }
+.ugov-documents-page > div:first-child h1,.ugov-consent-page > div:first-child h1,.ugov-faq-page > div:first-child h1,.ugov-notifications-page > div:first-child h1,.ugov-mydata-page > div:first-child h1 { font-size:clamp(29px,3.3vw,43px); }
+.ugov-documents-page .bg-white,.ugov-consent-page .bg-white,.ugov-faq-page .bg-white,.ugov-notifications-page .bg-white,.ugov-mydata-page .bg-white { border-radius:6px!important; }
+.ugov-documents-page .border-slate-200,.ugov-consent-page .border-slate-200,.ugov-faq-page .border-slate-200,.ugov-notifications-page .border-slate-200,.ugov-mydata-page .border-slate-200 { border-color:#E1E7EF; }
+.ugov-faq-page > div:nth-child(2) input,.ugov-notifications-page > div:nth-child(2) input { min-height:48px; }
+.ugov-faq-page > div:last-child > div,.ugov-notifications-page > div:last-child > div { border-radius:5px!important; }
+.ugov-auth-page { border:0!important;border-radius:5px!important;box-shadow:0 18px 60px rgba(16,40,78,.09)!important; }
+.ugov-auth-page > div:first-child { background:linear-gradient(145deg,#09172D 0%,#0B2450 58%,#174EA6 100%)!important;padding:clamp(28px,4vw,60px)!important; }
+.ugov-auth-page > div:first-child h1 { font-family:var(--font-display);font-size:clamp(35px,4vw,52px);line-height:1.04;letter-spacing:-.065em; }
+.ugov-auth-page > div:last-child { padding:clamp(25px,4vw,60px)!important; }
+.ugov-auth-page > div:last-child h2 { font-family:var(--font-display);font-size:clamp(26px,3vw,36px);letter-spacing:-.06em; }
+.ugov-auth-page .rounded-xl,.ugov-auth-page .rounded-2xl { border-radius:5px!important; }
+@media(max-width:680px) { .ugov-auth-page { margin:0!important; } .ugov-auth-page > div:first-child { min-height:420px; } }
 
-.sovereign-tricolor-subtle {
-  background: linear-gradient(90deg, rgba(184, 122, 0, 0.4) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(16, 185, 129, 0.4) 100%);
+
+/* Transactional UI and shared component finishing system */
+.ugov-app-page { max-width:1440px;margin-inline:auto;color:#101828; }
+.ugov-app-page h1,.ugov-app-page h2,.ugov-app-page h3,.ugov-app-page h4 { font-family:var(--font-display);letter-spacing:-.055em; }
+.ugov-app-page .rounded-3xl,.ugov-app-page .rounded-2xl,.ugov-app-page .rounded-xl { border-radius:6px!important; }
+.ugov-app-page input:not([type=checkbox]):not([type=radio]),.ugov-app-page select,.ugov-app-page textarea { border-radius:5px!important; }
+.ugov-app-page table thead { background:#F2F5F9!important; }
+.ugov-app-page table tbody tr:hover { background:#F6F8FC; }
+.ugov-app-page button:focus-visible { outline:3px solid rgba(23,78,166,.3);outline-offset:3px; }
+.ugov-officer-page > div:first-child h1,.ugov-admin-page > div:first-child h1,.ugov-audit-page > div:first-child h1,.ugov-grievance-page > div:first-child h1 { font-size:clamp(29px,3.2vw,42px);line-height:1.08; }
+.ugov-officer-page .rounded-2xl,.ugov-admin-page .rounded-2xl,.ugov-audit-page .rounded-2xl,.ugov-grievance-page .rounded-2xl,.ugov-whereami-page .rounded-2xl { border-radius:6px!important; }
+.ugov-admin-page button { border-radius:5px; }
+.ugov-audit-page table { min-width:820px; }
+.ugov-grievance-page textarea { min-height:130px; }
+.ugov-modal { isolation:isolate; }
+.ugov-modal-panel { border-radius:6px!important;box-shadow:0 30px 100px rgba(2,12,27,.3)!important; }
+.ugov-modal-header { min-height:76px; }
+.ugov-modal-header h3 { font-family:var(--font-display);letter-spacing:-.04em; }
+.ugov-modal-content { scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent; }
+.ugov-modal-content .rounded-2xl,.ugov-modal-content .rounded-xl { border-radius:5px!important; }
+.ugov-application-workflow > div:first-child { padding-bottom:18px; }
+.ugov-service-details > div:first-child { padding-bottom:16px;border-bottom:1px solid #E1E7EF; }
+.ugov-gbot-workspace { border-radius:6px!important;box-shadow:0 30px 100px rgba(2,12,27,.35)!important; }
+.ugov-gbot-workspace aside { background:#F3F6FA!important; }
+.ugov-gbot-workspace button { border-radius:5px; }
+.ugov-gbot-workspace textarea { border-radius:5px!important; }
+@media(max-width:680px) {
+ .ugov-modal { padding:0!important;align-items:flex-end!important; }
+ .ugov-modal-panel { width:100%;max-width:none;max-height:94dvh;border-radius:10px 10px 0 0!important; }
+ .ugov-modal-header { padding:16px 18px; }
+ .ugov-modal-content { padding:18px; }
+ .ugov-gbot-workspace { border-radius:0!important; }
+ .ugov-audit-page { overflow-x:hidden; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .ugov-app-page *, .ugov-gbot-workspace * { transition-duration:.01ms!important;animation-duration:.01ms!important; }
 }

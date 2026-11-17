@@ -97,19 +97,19 @@ export const DashboardView: React.FC = () => {
   const district = user?.district || "Pune";
 
   return (
-    <div className="space-y-8">
+    <div className="ugov-app-page ugov-dashboard-page space-y-8">
       {/* Citizen Identity Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0b1f3a] via-[#11294d] to-[#071529] text-white shadow-lg border border-blue-900/60 relative overflow-hidden">
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-[#123B7A] via-[#174EA6] to-[#123B7A] text-white shadow-lg border border-blue-300/30 relative overflow-hidden">
         <div className="sovereign-tricolor-bar absolute inset-x-0 top-0" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           {/* Identity info */}
           <div className="flex items-start sm:items-center gap-4">
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-xl font-black text-amber-300 shadow-inner">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-xl font-black text-[#F5C518] shadow-inner">
                 {displayName.slice(0, 1)}
               </div>
-              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#0b1f3a] border border-blue-400/40 p-0.5 overflow-hidden shadow-sm">
+              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#174EA6] border border-blue-400/40 p-0.5 overflow-hidden shadow-sm">
                 <img src="/logo.png" alt="U-GOV" className="w-full h-full object-contain" />
               </div>
             </div>
@@ -230,11 +230,11 @@ export const DashboardView: React.FC = () => {
 
       {/* U-GOV Cloud Interoperability Control Tower */}
       <section className="rounded-3xl overflow-hidden border border-slate-800 bg-[#071426] text-white shadow-xl">
-        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#0b1f3a] via-[#102b4d] to-[#0b1f3a] relative">
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#174EA6] via-[#123B7A] to-[#174EA6] relative">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-white to-emerald-400" />
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-cyan-300 text-[10px] font-black tracking-[0.22em] uppercase">
+              <div className="flex items-center gap-2 text-[#F5D957] text-[10px] font-black tracking-[0.22em] uppercase">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 U-GOV / CLOUD OPERATIONS
               </div>
@@ -259,7 +259,7 @@ export const DashboardView: React.FC = () => {
             </div>
             <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
               <div className="text-[10px] text-slate-400 uppercase tracking-wider">Gateway Environment</div>
-              <div className="text-lg font-black text-cyan-300 mt-2">SANDBOX</div>
+              <div className="text-lg font-black text-[#F5D957] mt-2">SANDBOX</div>
             </div>
             <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
               <div className="text-[10px] text-slate-400 uppercase tracking-wider">Last Diagnostics</div>
@@ -282,7 +282,7 @@ export const DashboardView: React.FC = () => {
                   <div key={provider.providerCode} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${healthy ? "bg-emerald-400/15 text-emerald-300" : degraded ? "bg-amber-400/15 text-amber-300" : "bg-rose-400/15 text-rose-300"}`}>
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${healthy ? "bg-emerald-400/15 text-emerald-300" : degraded ? "bg-amber-400/15 text-[#F5C518]" : "bg-rose-400/15 text-rose-300"}`}>
                           <Server className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-mono text-slate-400 truncate">{provider.providerCode}</span>
@@ -291,7 +291,7 @@ export const DashboardView: React.FC = () => {
                     </div>
                     <h3 className="text-sm font-bold leading-snug mt-3 min-h-[2.5rem]">{provider.displayName}</h3>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-                      <span className={`text-[10px] font-bold tracking-wider ${healthy ? "text-emerald-300" : degraded ? "text-amber-300" : "text-rose-300"}`}>{provider.status}</span>
+                      <span className={`text-[10px] font-bold tracking-wider ${healthy ? "text-emerald-300" : degraded ? "text-[#F5C518]" : "text-rose-300"}`}>{provider.status}</span>
                       <span className="text-[10px] text-slate-400 flex items-center gap-1"><Wifi className="w-3 h-3" />{typeof provider.latencyMs === "number" ? `${provider.latencyMs} ms` : "—"}</span>
                     </div>
                     <div className="text-[9px] text-slate-500 mt-2">{provider.environment || "SANDBOX"} • Adapter health probe</div>

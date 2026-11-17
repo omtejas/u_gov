@@ -136,20 +136,20 @@ export const MyDataView: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-faq-page ugov-app-page space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Database className="w-5 h-5 text-[#0b1f3a]" />
-            <h1 className="text-2xl font-extrabold text-[#0b1f3a]">My Data Center</h1>
+            <Database className="w-5 h-5 text-[#174EA6]" />
+            <h1 className="text-2xl font-extrabold text-[#174EA6]">My Data Center</h1>
           </div>
           <p className="text-slate-500 text-sm">View, understand, and control all data stored in your U-GOV workspace.</p>
         </div>
         <button
           onClick={handleExportData}
           disabled={isExporting}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0b1f3a] text-white text-xs font-bold hover:bg-[#163158] transition-colors disabled:opacity-70"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#174EA6] text-white text-xs font-bold hover:bg-[#123B7A] transition-colors disabled:opacity-70"
         >
           <Download className="w-3.5 h-3.5" />
           {isExporting ? "Exporting…" : "Export Data"}
@@ -157,7 +157,7 @@ export const MyDataView: React.FC = () => {
       </div>
 
       {/* U-SYS ID Card */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#0b1f3a] to-[#1a3a6e] rounded-2xl p-6 text-white">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#174EA6] to-[#1a3a6e] rounded-2xl p-6 text-white">
         <div className="absolute -top-4 -right-4 w-32 h-32 rounded-full bg-white/5" />
         <div className="absolute -bottom-6 -left-4 w-24 h-24 rounded-full bg-white/5" />
         <div className="relative">

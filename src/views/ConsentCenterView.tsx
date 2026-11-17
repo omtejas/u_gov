@@ -97,13 +97,13 @@ export const ConsentCenterView: React.FC = () => {
   const expiringSoon = consents.filter((c) => c.status === "ACTIVE" && isExpiringSoon(c.expiresAt)).length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-mydata-page ugov-app-page space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <ShieldCheck className="w-5 h-5 text-[#0b1f3a]" />
-            <h1 className="text-2xl font-extrabold text-[#0b1f3a]">Consent Center</h1>
+            <ShieldCheck className="w-5 h-5 text-[#174EA6]" />
+            <h1 className="text-2xl font-extrabold text-[#174EA6]">Consent Center</h1>
           </div>
           <p className="text-slate-500 text-sm">
             Review and manage document-sharing permissions recorded inside the U-GOV prototype. Revoke an active U-GOV consent when needed.
@@ -151,7 +151,7 @@ export const ConsentCenterView: React.FC = () => {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              filter === f ? "bg-[#0b1f3a] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              filter === f ? "bg-[#174EA6] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             {f === "ALL" ? `All (${consents.length})` : `${f} (${consents.filter((c) => c.status === f).length})`}

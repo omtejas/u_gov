@@ -263,7 +263,7 @@ export const OfficerDeskView: React.FC = () => {
   const rejectedCount = applications.filter((a) => a.status === "REJECTED").length;
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-app-page ugov-officer-page space-y-6">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -328,7 +328,7 @@ export const OfficerDeskView: React.FC = () => {
                 onClick={() => setSelectedDept(dept)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                   selectedDept === dept
-                    ? "bg-[#0b1f3a] text-white"
+                    ? "bg-[#174EA6] text-white"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >

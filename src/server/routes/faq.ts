@@ -4,7 +4,7 @@ import { AuthenticatedRequest, requireAuth, csrfProtection } from "../middleware
 export const faqRouter = Router();
 
 // Static FAQ catalogue
-const FAQ_CATALOGUE = [
+export const FAQ_CATALOGUE = [
   {
     id: "faq-1",
     category: "getting-started",
@@ -131,7 +131,7 @@ const FAQ_CATALOGUE = [
     categoryLabel: "G-Bot AI Assistant",
     question: "What can G-Bot help me with?",
     answer:
-      "G-Bot is powered by Google Gemini AI and can help you: find the right government scheme, check your eligibility for services, explain complex government terminology, guide you through application steps, and answer questions about your documents and consents.",
+      "G-Bot can use a configurable hosted AI provider (OpenAI-compatible or Google Gemini) and optional Internet search when configured. It can help explore U-GOV services and FAQs, explain public information, summarize web research with citations, and guide users through prototype workflows. Private document and application lookups remain subject to citizen authentication and U-GOV access controls.",
     helpful: 0,
     notHelpful: 0,
   },
@@ -151,11 +151,27 @@ const FAQ_CATALOGUE = [
     categoryLabel: "General",
     question: "Is U-GOV available in regional languages?",
     answer:
-      "U-GOV currently fully supports English. Hindi, Marathi, and Kannada language support is actively being developed. The language selector is available in the top navigation bar. All government service names, document types, and official references follow standardized Government of India nomenclature.",
+      "U-GOV provides a language selector for English, Hindi, Marathi and Kannada. Translation coverage may vary across modules and prototype content; official service names and statutory references should be checked with the issuing authority.",
     helpful: 0,
     notHelpful: 0,
   },
 ];
+
+export function searchFaqKnowledge(query: string) {
+  const terms = query.toLowerCase().split(/[^a-z0-9]+/).filter((word) => word.length > 2);
+  if (!terms.length) return [];
+  return FAQ_CATALOGUE.map((item) => {
+    const haystack = (item.question + " " + item.answer + " " + item.categoryLabel).toLowerCase();
+    const score = terms.reduce((total, term) => total + (haystack.includes(term) ? (item.question.toLowerCase().includes(term) ? 3 : 1) : 0), 0);
+    return { item, score };
+  }).filter((entry) => entry.score > 0).sort((a, b) => b.score - a.score).slice(0, 5).map(({ item }) => ({
+    title: item.question,
+    snippet: item.answer,
+    url: "/faq",
+    category: item.categoryLabel,
+    sourceType: "u-gov" as const,
+  }));
+}
 
 // In-memory vote store (anonymous — maps faq_id → { helpful, notHelpful })
 const voteStore: Record<string, { helpful: number; notHelpful: number }> = {};

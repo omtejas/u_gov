@@ -9,6 +9,7 @@
 import { IAIToolGateway, AIToolContext } from "./AIProvider";
 import { GovernmentService } from "../services/governmentService";
 import { db } from "../database/db";
+import { searchFaqKnowledge } from "../routes/faq";
 
 export class AIToolGateway implements IAIToolGateway {
   private governmentService: GovernmentService;
@@ -72,6 +73,13 @@ export class AIToolGateway implements IAIToolGateway {
       slaDays: s.slaDays,
       description: s.description,
     }));
+  }
+
+  /**
+   * Search public U-GOV help content and FAQs. This dataset contains no citizen records.
+   */
+  public async searchKnowledge(query: string): Promise<any[]> {
+    return searchFaqKnowledge(query);
   }
 
   /**

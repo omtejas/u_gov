@@ -12,13 +12,13 @@ export const Card: React.FC<CardProps> = ({
   className = "",
   ...props
 }) => {
-  const baseClasses = "bg-white rounded-2xl border border-slate-200/90 transition-all duration-200 overflow-hidden";
+  const baseClasses = "bg-white rounded-[6px] border border-[#E3E9F1] transition-all duration-200 overflow-hidden";
 
   const variantClasses = {
-    default: "shadow-[0_1px_3px_rgba(11,31,58,0.04)]",
-    hoverable: "shadow-[0_1px_3px_rgba(11,31,58,0.04)] hover:shadow-[0_8px_20px_rgba(11,31,58,0.08)] hover:-translate-y-0.5 cursor-pointer",
+    default: "shadow-[0_4px_16px_rgba(25,48,82,0.045)]",
+    hoverable: "shadow-[0_4px_16px_rgba(25,48,82,0.045)] hover:shadow-[0_12px_28px_rgba(23,78,166,0.10)] hover:-translate-y-0.5 cursor-pointer",
     flat: "border-slate-200 shadow-none bg-slate-50/60",
-    elevated: "shadow-[0_10px_25px_-5px_rgba(11,31,58,0.08)]",
+    elevated: "shadow-[0_14px_34px_-8px_rgba(23,78,166,0.12)]",
   };
 
   const paddingClasses = {

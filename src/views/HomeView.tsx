@@ -1,250 +1,108 @@
 import React from "react";
 import { useGov } from "../context/GovContext";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Badge } from "../components/ui/Badge";
-import {
-  Search,
-  Sparkles,
-  ShieldCheck,
-  FolderLock,
-  Activity,
-  ArrowRight,
-  GraduationCap,
-  Sprout,
-  Car,
-  HeartPulse,
-  Landmark,
-  Building,
-} from "lucide-react";
+import { Search, Sparkles, ShieldCheck, FolderLock, Activity, ArrowRight, GraduationCap, Sprout, Car, HeartPulse, Landmark, Building2, FileCheck2, Globe2, Fingerprint, ClipboardList, BellRing, LockKeyhole, ChevronRight, MoveUpRight, Network, BadgeCheck } from "lucide-react";
 
 export const HomeView: React.FC = () => {
   const { services, openServiceModal, setActiveTab, openGBot, setSearchQuery } = useGov();
-
-  const featuredServices = services.filter((s) => s.featured || s.isPopular).slice(0, 6);
-
+  const featuredServices = services.filter((s) => s.featured || s.isPopular).slice(0, 3);
   const categories = [
-    { id: "education", label: "Scholarships & Education", icon: GraduationCap, color: "text-blue-600 bg-blue-50" },
-    { id: "agriculture", label: "Farmers & Agriculture", icon: Sprout, color: "text-emerald-600 bg-emerald-50" },
-    { id: "transport", label: "Transport & Driving", icon: Car, color: "text-amber-600 bg-amber-50" },
-    { id: "healthcare", label: "Health & Ayushman", icon: HeartPulse, color: "text-rose-600 bg-rose-50" },
-    { id: "welfare", label: "Certificates & Welfare", icon: Landmark, color: "text-indigo-600 bg-indigo-50" },
-    { id: "housing", label: "Housing & PMAY", icon: Building, color: "text-cyan-600 bg-cyan-50" },
+    { id: "education", label: "Education & scholarships", detail: "Learning, grants and student support", icon: GraduationCap, tone: "blue" },
+    { id: "agriculture", label: "Farmers & agriculture", detail: "Farming, income and rural support", icon: Sprout, tone: "green" },
+    { id: "transport", label: "Transport & driving", detail: "Licences, vehicles and mobility", icon: Car, tone: "yellow" },
+    { id: "healthcare", label: "Health & wellbeing", detail: "Health cover and public care", icon: HeartPulse, tone: "red" },
+    { id: "welfare", label: "Certificates & welfare", detail: "Identity, residence and benefits", icon: Landmark, tone: "blue" },
+    { id: "housing", label: "Housing & homes", detail: "Housing and essential utilities", icon: Building2, tone: "green" },
   ];
+  const quickActions = [
+    { title: "Find a service", text: "Explore schemes and public services.", icon: Search, action: () => setActiveTab("services"), number: "01" },
+    { title: "Track an application", text: "Follow progress and pending actions.", icon: Activity, action: () => setActiveTab("tracker"), number: "02" },
+    { title: "Your document vault", text: "Manage documents and sharing consent.", icon: FolderLock, action: () => setActiveTab("documents"), number: "03" },
+  ];
+  const searchServices = (value: string) => { setSearchQuery(value); setActiveTab("services"); };
 
   return (
-    <div className="space-y-12">
-      {/* Hero Section */}
-      <div className="relative rounded-3xl bg-[#0b1f3a] text-white p-6 sm:p-12 overflow-hidden shadow-xl border border-blue-900/60">
-        {/* Ambient sovereign gradients */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 w-80 h-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
-        <div className="sovereign-tricolor-bar absolute inset-x-0 top-0" />
-
-        <div className="relative z-10 max-w-3xl space-y-6">
-          {/* DPI Pill */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs">
-            <div className="w-5 h-5 rounded-md bg-[#0b1f3a] p-0.5 flex items-center justify-center overflow-hidden border border-white/20">
-              <img src="/logo.png" alt="U-GOV" className="w-full h-full object-contain" />
+    <div className="ugov-home">
+      <section className="ugov-hero">
+        <div className="ugov-hero-grid" aria-hidden="true" />
+        <div className="ugov-hero-orbit ugov-orbit-one" aria-hidden="true" />
+        <div className="ugov-hero-orbit ugov-orbit-two" aria-hidden="true" />
+        <div className="ugov-hero-inner">
+          <div className="ugov-hero-copy">
+            <div className="ugov-eyebrow ugov-eyebrow-light"><span className="ugov-live-dot" /> THE CITIZEN-FIRST DIGITAL GATEWAY</div>
+            <h1>Public services.<br /><span>One connected</span><br />experience.</h1>
+            <p className="ugov-hero-lede">Less searching. Less paperwork. More progress. Find the services you need, understand every step, and keep your important work moving.</p>
+            <div className="ugov-searchbar">
+              <Search size={21} />
+              <input aria-label="Search public services" placeholder="What do you need help with today?" onKeyDown={(e) => { if (e.key === "Enter") searchServices((e.target as HTMLInputElement).value); }} />
+              <button onClick={() => setActiveTab("services")}>Explore services <ArrowRight size={17} /></button>
             </div>
-            <span className="font-semibold tracking-wide text-amber-200 uppercase text-[11px]">
-              National Digital Public Infrastructure • Smart India Hackathon 2026
-            </span>
+            <button className="ugov-hero-assist" onClick={() => openGBot("Help me find the right government service.")}><Sparkles size={17} /> Not sure where to begin? Ask Bharat G-Bot <MoveUpRight size={15} /></button>
           </div>
-
-          {/* Heading */}
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">
-            One Citizen. One Identity. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-amber-200">
-              Connected Governance.
-            </span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-            Access 240+ Central and State citizen schemes, verified DigiVault credentials, and statutory SLA application tracking via one high-assurance sovereign public gateway.
-          </p>
-
-          {/* Natural Language Citizen Search Bar */}
-          <div className="pt-2 flex flex-col sm:flex-row gap-2 max-w-2xl">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="What service or scheme do you need? (e.g., scholarship, driving licence, PM Kisan)"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setSearchQuery((e.target as HTMLInputElement).value);
-                    setActiveTab("services");
-                  }
-                }}
-                className="w-full pl-11 pr-4 py-3 bg-white text-slate-900 rounded-2xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-lg"
-              />
-            </div>
-            <Button
-              variant="saffron"
-              size="lg"
-              onClick={() => setActiveTab("services")}
-              rightIcon={<ArrowRight className="w-4 h-4" />}
-            >
-              Explore Hub
-            </Button>
+          <div className="ugov-hero-art" aria-label="Illustration of connected citizen services">
+            <div className="ugov-art-orbit orbit-a" /><div className="ugov-art-orbit orbit-b" />
+            <div className="ugov-art-core"><div className="ugov-art-emblem"><img src="/logo.png" alt="U-GOV emblem" /></div><span>ONE INDIA</span><strong>ONE GATEWAY</strong><small>CONNECTED PUBLIC SERVICES</small></div>
+            <div className="ugov-art-node node-top"><Fingerprint size={19} /><span>Identity</span></div>
+            <div className="ugov-art-node node-right"><FileCheck2 size={19} /><span>Documents</span></div>
+            <div className="ugov-art-node node-bottom"><Network size={19} /><span>Services</span></div>
+            <div className="ugov-art-node node-left"><Activity size={19} /><span>Tracking</span></div>
+            <div className="ugov-art-index">01 <i>/ 04</i></div>
           </div>
+        </div>
+        <div className="ugov-hero-bottom"><span>BUILT AROUND YOUR NEEDS</span><span>SECURE BY DESIGN <ShieldCheck size={14} /></span><span>ACCESSIBLE ACROSS INDIA</span></div>
+      </section>
 
-          {/* Quick Guidance Prompt */}
-          <div className="pt-1 flex items-center gap-2 text-xs text-slate-300">
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>Unsure which department or scheme?</span>
-            <button
-              onClick={() => openGBot("What government schemes am I eligible for?")}
-              className="text-amber-300 hover:underline font-bold cursor-pointer"
-            >
-              Ask Bharat G-Bot AI →
+      <section className="ugov-intro-strip">
+        <p>ONE PLACE FOR THE THINGS THAT MATTER.</p>
+        <h2>Government, made<br className="sm:hidden" /> easier to navigate.</h2>
+        <div className="ugov-intro-note">A single, connected starting point for discovering services, managing documents and following applications—designed around people, not departments.</div>
+      </section>
+
+      <section className="ugov-quick-grid" aria-label="Quick actions">
+        {quickActions.map((item) => { const Icon = item.icon; return (
+          <button key={item.number} onClick={item.action} className="ugov-quick-card">
+            <span className="ugov-quick-number">{item.number}</span><span className="ugov-quick-icon"><Icon size={22} /></span>
+            <strong>{item.title}</strong><p>{item.text}</p><span className="ugov-quick-link">Get started <MoveUpRight size={16} /></span>
+          </button>
+        ); })}
+      </section>
+
+      <section className="ugov-section ugov-category-section">
+        <div className="ugov-section-heading"><div><span className="ugov-eyebrow">EXPLORE BY NEED</span><h2>Where can we<br />help you today?</h2></div><p>Start with what matters to you. Explore a topic and find the public services connected to it.</p></div>
+        <div className="ugov-category-grid">
+          {categories.map((cat, index) => { const Icon = cat.icon; return (
+            <button key={cat.id} onClick={() => searchServices(cat.id)} className={`ugov-category-card tone-${cat.tone}`}>
+              <span className="ugov-category-top"><span>0{index + 1}</span><MoveUpRight size={18} /></span><Icon size={29} strokeWidth={1.6} />
+              <strong>{cat.label}</strong><small>{cat.detail}</small>
             </button>
-          </div>
+          ); })}
         </div>
-      </div>
+      </section>
 
-      {/* Flagship Pillars */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <Card variant="hoverable" padding="lg" onClick={() => setActiveTab("documents")}>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
-            <FolderLock className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-bold text-slate-900 mb-1">
-            U-DOCS Digital Vault
-          </h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Store and share verified government documents with granular consent control and instant revocability.
-          </p>
-        </Card>
-
-        <Card variant="hoverable" padding="lg" onClick={() => setActiveTab("tracker")}>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-            <Activity className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-bold text-slate-900 mb-1">
-            U-TRACK Application Radar
-          </h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            End-to-end statutory SLA tracking across Central and State departments with transparent timelines.
-          </p>
-        </Card>
-
-        <Card variant="hoverable" padding="lg" onClick={() => openGBot()}>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-bold text-slate-900 mb-1">
-            U-AI Bharat G-Bot
-          </h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Multilingual public services assistant grounded in authoritative government regulations.
-          </p>
-        </Card>
-      </div>
-
-      {/* Service Categories Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-              Browse by Citizen Need
-            </h2>
-            <p className="text-xs text-slate-500">
-              Citizen-centric classification regardless of internal departmental structures
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setActiveTab("services")}
-            rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-          >
-            All 240+ Services
-          </Button>
+      <section className="ugov-feature-band">
+        <div className="ugov-feature-copy"><span className="ugov-eyebrow ugov-eyebrow-light">A MORE CONNECTED WAY FORWARD</span><h2>One account.<br /><em>Many possibilities.</em></h2><p>Keep your citizen journey organised—from understanding requirements to tracking progress—with tools designed to work together.</p><button onClick={() => setActiveTab("dashboard")}>Explore your workspace <ArrowRight size={17} /></button></div>
+        <div className="ugov-feature-stack">
+          <div className="ugov-feature-tile"><span className="tile-icon"><ShieldCheck /></span><div><small>U-IDENTITY</small><strong>A single citizen profile</strong><p>Your account and preferences in one place.</p></div><ChevronRight /></div>
+          <div className="ugov-feature-tile"><span className="tile-icon"><FolderLock /></span><div><small>U-DOCS</small><strong>Your documents, in control</strong><p>Organise records and manage consent.</p></div><ChevronRight /></div>
+          <div className="ugov-feature-tile"><span className="tile-icon"><ClipboardList /></span><div><small>U-TRACK</small><strong>Know what happens next</strong><p>See application progress and actions.</p></div><ChevronRight /></div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={cat.id}
-                onClick={() => {
-                  setSearchQuery(cat.id);
-                  setActiveTab("services");
-                }}
-                className="p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-2 group"
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat.color} group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span className="text-xs font-bold text-slate-800 leading-tight">
-                  {cat.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Featured Services */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-              Flagship Sovereign Services
-            </h2>
-            <p className="text-xs text-slate-500">
-              Most requested public welfare and statutory services with instant DigiVault integration
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {featuredServices.map((service) => (
-            <Card
-              key={service.id}
-              variant="hoverable"
-              padding="md"
-              className="flex flex-col justify-between"
-              onClick={() => openServiceModal(service)}
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <Badge variant="info" size="sm">
-                    {service.shortCode}
-                  </Badge>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    SLA: {service.slaDays} Days
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-blue-600">
-                    {service.name}
-                  </h3>
-                  <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
-                    {service.ministry}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
-
-              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-700">
-                  {service.fee === 0 ? "Free of Charge" : `Fee: ₹${service.fee}`}
-                </span>
-                <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
-                  <span>View Details</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Card>
+      <section className="ugov-section ugov-services-section">
+        <div className="ugov-section-heading"><div><span className="ugov-eyebrow">THE SERVICE DIRECTORY</span><h2>Useful services.<br />Clear next steps.</h2></div><button className="ugov-text-link" onClick={() => setActiveTab("services")}>View all services <ArrowRight size={17} /></button></div>
+        <div className="ugov-featured-grid">
+          {featuredServices.map((service, index) => (
+            <button key={service.id} onClick={() => openServiceModal(service)} className={`ugov-service-card service-card-${index + 1}`}>
+              <span className="ugov-service-index">0{index + 1} / FEATURED</span><span className="ugov-service-code">{service.shortCode}</span>
+              <strong>{service.name}</strong><p>{service.description}</p>
+              <span className="ugov-service-meta"><span>{service.slaDays} day estimate</span><span>{service.fee === 0 ? "No fee listed" : `₹${service.fee} listed`}</span></span>
+              <span className="ugov-service-arrow"><MoveUpRight size={19} /></span>
+            </button>
           ))}
         </div>
-      </div>
+        <div className="ugov-prototype-note"><Globe2 size={16} /><span>U-GOV is a Smart India Hackathon prototype. Service listings, fees and timelines are illustrative and must be confirmed with the issuing department.</span></div>
+      </section>
+
+      <section className="ugov-closing-cta"><div><span className="ugov-eyebrow ugov-eyebrow-light">HERE WHEN YOU NEED A HAND</span><h2>Good guidance<br />changes everything.</h2><p>Tell Bharat G-Bot what you are trying to do. Get help navigating the U-GOV prototype and its service catalogue.</p><button onClick={() => openGBot()}>Talk to Bharat G-Bot <ArrowRight size={17} /></button></div><div className="ugov-cta-mark"><Sparkles size={42} /><span>G</span></div></section>
     </div>
   );
 };
