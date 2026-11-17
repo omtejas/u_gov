@@ -49,23 +49,23 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="ugov-modal fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+        className="ugov-modal-backdrop fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white rounded-[6px] shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col max-h-[90vh]`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
         {(title || subtitle) && (
-          <div className="px-6 py-4 border-b border-slate-100 flex items-start justify-between bg-slate-50/50">
+          <div className="ugov-modal-header px-6 py-4 border-b border-slate-200 flex items-start justify-between bg-[#F7F8FA]">
             <div className="flex flex-col pr-6">
               {title && (
                 <h3 className="text-lg font-bold text-slate-900 leading-tight">
@@ -87,7 +87,7 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="ugov-modal-content p-6 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );
