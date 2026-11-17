@@ -203,7 +203,7 @@ export const ApplicationWorkflowModal: React.FC = () => {
       }
       maxWidth="3xl"
     >
-      <div className="space-y-6">
+      <div className="ugov-application-workflow space-y-6">
         {/* Step Progression Bar (Only for non-submitted flows) */}
         {!isSubmitted && !isTerminal && (
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
