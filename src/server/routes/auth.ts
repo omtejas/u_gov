@@ -142,6 +142,12 @@ authRouter.post(
  * GET /api/v1/auth/google/nonce
  * Issues a one-time nonce bound to an HttpOnly same-site cookie.
  */
+
+/** Public browser configuration; the OAuth client ID is not a secret. */
+authRouter.get("/google/config", (_req: AuthenticatedRequest, res: Response) => {
+  return res.json({ success: true, enabled: Boolean(process.env.GOOGLE_CLIENT_ID), clientId: process.env.GOOGLE_CLIENT_ID || null });
+});
+
 authRouter.get("/google/nonce", (_req: AuthenticatedRequest, res: Response) => {
   if (!process.env.GOOGLE_CLIENT_ID) {
     return res.status(503).json({ success: false, error: "Google sign-in is not configured yet." });
