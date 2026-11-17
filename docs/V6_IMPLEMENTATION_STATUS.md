@@ -89,3 +89,32 @@ Limitations:
 - `npm run build`: passed
 - `npm test`: passed
 - This does not verify external provider credentials, visual browser QA, responsive device testing or a deployed V6 preview.
+
+
+## V6 completion audit — 2026-11-17
+
+### Verified repository and preview infrastructure
+- Dedicated Render preview service exists: `ugov-v6-preview`, connected to branch `u_gov_v6`, Singapore region, free web-service plan.
+- Production Render service `ugov` remains connected to `main`; no production service changes are part of this work.
+- Preview's latest recorded deployment before this increment used commit `014ebca2654eccbd0b7655d1497b2003721635b0`; later V6 commits auto-trigger preview deployment because auto-deploy is enabled. Confirm the resulting deploy before claiming the latest UI is live.
+- No Render PostgreSQL instance exists in the connected workspace.
+- `package.json` and `package-lock.json` do not include a PostgreSQL client. The execution environment has no npm registry DNS access and no cached `pg` package, so a reproducible lockfile update cannot be produced here.
+- The existing PostgreSQL `schema.sql` is not yet proven compatible with runtime model IDs and JSON-store seed records. A safe migration requires an explicit ID mapping/data-import design and a complete repository conversion; do not switch production runtime to PostgreSQL based on the current SQL file alone.
+
+### Storage readiness improvement
+- Added an active `checkHealth()` contract to local and S3-compatible binary storage drivers.
+- Local storage health uses a temporary private write/remove probe.
+- S3 health uses an authenticated, signed bucket HEAD request and reports a degraded status when credentials or bucket access are unavailable.
+- `/api/v1/health` now distinguishes the JSON-file metadata engine from local/S3 binary storage, reports configured AI/search readiness and explicitly states that `DATABASE_URL` is not yet integrated.
+- Added deterministic tests for local health, S3 missing-credential fail-closed behavior and a mocked successful S3 HEAD health check.
+- This is binary-storage health verification, not proof of real cloud upload/download, encryption policy, retention or backup configuration.
+
+### Current release blockers
+1. PostgreSQL driver dependency and lockfile are not installed; database runtime remains JSON-file.
+2. No PostgreSQL instance is provisioned.
+3. No private S3 bucket credentials are configured; live object upload/download has not been verified.
+4. AI/search credentials are not confirmed on the V6 preview.
+5. Render preview needs a deployment of the latest V6 commit and a browser/API smoke test.
+6. UI was CI-verified, but no visual browser/device QA has been evidenced.
+7. Do not import seeded demonstration accounts or synthetic documents into any real citizen database.
+8. Do not merge `u_gov_v6` into `main` or deploy to the production service without explicit release approval.
