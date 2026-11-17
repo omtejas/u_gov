@@ -46,7 +46,7 @@ export const NotificationsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="ugov-consent-page ugov-app-page space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
