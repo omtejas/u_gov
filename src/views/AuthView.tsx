@@ -67,7 +67,7 @@ export const AuthView: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col lg:flex-row min-h-[calc(100vh-10rem)] rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white my-2">
+    <div className="ugov-auth-page w-full flex flex-col lg:flex-row min-h-[calc(100vh-10rem)] rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white my-2">
       {/* Left Branding Panel: Deep Navy Public Infrastructure Canvas */}
       <div className="relative w-full lg:w-[44%] bg-[#174EA6] text-white p-8 lg:p-12 flex flex-col justify-between overflow-hidden">
         {/* Subtle Sovereign Motifs */}
