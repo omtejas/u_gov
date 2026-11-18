@@ -1,0 +1,86 @@
+rules_version = '2';
+
+// U-GOV V10 Storage Security Rules (Local Storage Emulator Only in M1)
+// Note: Live Firebase Cloud Storage requires the Blaze billing plan and remains blocked.
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 1. Default-Deny Global Catch-All
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Identity & Validation Helpers
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'tagtheindian0@gmail.com';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidFileName(fileName) {
+      return fileName is string
+        && fileName.size() >= 1
+        && fileName.size() <= 180
+        && fileName.matches('^[a-zA-Z0-9._\\-]+$')
+        && !fileName.matches('.*\\.\\..*');
+    }
+
+    function isValidDocumentUpload() {
+      return request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType in ['application/pdf', 'image/jpeg', 'image/png'];
+    }
+
+    // 3. Private U-DOCS Vault Objects (Immutable Versions: no in-place overwrite)
+    match /vault/{userId}/{documentId}/{fileName} {
+      allow read: if isValidId(userId)
+        && isValidId(documentId)
+        && isValidFileName(fileName)
+        && (isOwner(userId) || isAdmin());
+
+      allow create: if isValidId(userId)
+        && isValidId(documentId)
+        && isValidFileName(fileName)
+        && isOwner(userId)
+        && isValidDocumentUpload();
+
+      allow update: if false;
+
+      allow delete: if isValidId(userId)
+        && isValidId(documentId)
+        && isValidFileName(fileName)
+        && (isOwner(userId) || isAdmin());
+    }
+
+    // 4. Scoped Application Attachment Staging Objects
+    match /applications/{userId}/{applicationId}/{fileName} {
+      allow read: if isValidId(userId)
+        && isValidId(applicationId)
+        && isValidFileName(fileName)
+        && (isOwner(userId) || isAdmin());
+
+      allow create: if isValidId(userId)
+        && isValidId(applicationId)
+        && isValidFileName(fileName)
+        && isOwner(userId)
+        && isValidDocumentUpload();
+
+      allow update: if false;
+
+      allow delete: if isValidId(userId)
+        && isValidId(applicationId)
+        && isValidFileName(fileName)
+        && (isOwner(userId) || isAdmin());
+    }
+  }
+}

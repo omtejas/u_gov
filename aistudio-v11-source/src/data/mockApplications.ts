@@ -1,0 +1,116 @@
+import { GovApplication } from "../types";
+
+export const MOCK_APPLICATIONS: GovApplication[] = [
+  {
+    id: "app-101",
+    refNumber: "UGOV-2026-NSP-891024",
+    serviceId: "serv-nsp",
+    serviceName: "National Scholarship Portal (NSP)",
+    category: "education",
+    department: "Department of Higher Education",
+    status: "under_review",
+    submittedAt: "2026-08-22T10:30:00Z",
+    updatedAt: "2026-08-28T14:15:00Z",
+    slaTargetDate: "2026-09-12T18:00:00Z",
+    feePaid: 0,
+    timeline: [
+      {
+        title: "Application Submitted",
+        timestamp: "22 Aug 2026, 10:30 AM",
+        completed: true,
+        notes: "Form validated and verified via DigiVault credentials",
+      },
+      {
+        title: "College / Institute Level Verification",
+        timestamp: "25 Aug 2026, 04:45 PM",
+        completed: true,
+        notes: "Dean of Academic Affairs approved bonafide marks",
+      },
+      {
+        title: "District Nodal Officer (DNO) Review",
+        timestamp: "28 Aug 2026, 02:15 PM",
+        completed: false,
+        current: true,
+        notes: "Cross-verifying family income certificate with state revenue database",
+      },
+      {
+        title: "Ministry Sanction & PFMS DBT Disbursement",
+        completed: false,
+        notes: "Funds will be credited directly to Aadhaar seeded bank account",
+      },
+    ],
+  },
+  {
+    id: "app-102",
+    refNumber: "UGOV-2026-DL-448201",
+    serviceId: "serv-parivahan",
+    serviceName: "Driving Licence (Permanent DL Slot)",
+    category: "transport",
+    department: "Motor Vehicles Department (MH-12 Pune RTO)",
+    status: "action_required",
+    submittedAt: "2026-08-15T09:00:00Z",
+    updatedAt: "2026-09-02T11:20:00Z",
+    slaTargetDate: "2026-09-05T18:00:00Z",
+    actionRequiredText: "Please book your Automated Driving Test slot at RTO Pune track before 08 Sept 2026.",
+    feePaid: 350,
+    timeline: [
+      {
+        title: "Learner's Licence Online Test",
+        timestamp: "15 Jul 2026, 02:00 PM",
+        completed: true,
+        notes: "Passed 15/15 remote proctored computer test",
+      },
+      {
+        title: "Permanent DL Application Filed",
+        timestamp: "15 Aug 2026, 09:00 AM",
+        completed: true,
+      },
+      {
+        title: "Practical Track Slot Booking Required",
+        completed: false,
+        current: true,
+        notes: "Slot selection pending by applicant",
+      },
+      {
+        title: "Smart Card Dispatch via Speed Post",
+        completed: false,
+      },
+    ],
+  },
+  {
+    id: "app-103",
+    refNumber: "UGOV-2026-DOM-771920",
+    serviceId: "serv-domicile",
+    serviceName: "Domicile & Permanent Residence Certificate",
+    category: "welfare",
+    department: "Tehsildar Office, Haveli Division",
+    status: "approved",
+    submittedAt: "2026-08-10T11:00:00Z",
+    updatedAt: "2026-08-24T16:30:00Z",
+    slaTargetDate: "2026-08-24T18:00:00Z",
+    feePaid: 50,
+    timeline: [
+      {
+        title: "Application Received at Tehsil",
+        timestamp: "10 Aug 2026, 11:00 AM",
+        completed: true,
+      },
+      {
+        title: "Talathi Ground Inquiry & Verification",
+        timestamp: "16 Aug 2026, 03:20 PM",
+        completed: true,
+      },
+      {
+        title: "Sub-Divisional Officer (SDO) Digital Signature",
+        timestamp: "24 Aug 2026, 04:30 PM",
+        completed: true,
+      },
+      {
+        title: "Certificate Issued to DigiVault",
+        timestamp: "24 Aug 2026, 04:35 PM",
+        completed: true,
+        notes: "Digitally signed with 2D barcode (Doc ID: DOM/2026/88921)",
+      },
+    ],
+  },
+];

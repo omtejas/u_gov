@@ -1,0 +1,44 @@
+/**
+ * Resolve a safe, deterministic Gemini model order.
+ * A stale deployment variable must not pin production to a retired model.
+ */
+const PRIMARY_MODEL = "gemini-4-hydrogen";
+const FALLBACK_MODELS = ["gemini-3.1-flash-lite"];
+const RETIRED_MODEL_IDS = new Set([
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-2.0-pro",
+  "gemini-2.0-flash-thinking",
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "gemini-pro",
+]);
+
+export function getGeminiModelCandidates(configuredModel?: string): string[] {
+  const configured = (configuredModel || "").trim().replace(/^models\//, "");
+  const candidates = [PRIMARY_MODEL];
+
+  if (
+    configured &&
+    configured !== PRIMARY_MODEL &&
+    !RETIRED_MODEL_IDS.has(configured) &&
+    /^[a-z0-9][a-z0-9.-]{1,80}$/i.test(configured)
+  ) {
+    candidates.push(configured);
+  }
+
+  candidates.push(...FALLBACK_MODELS);
+  return [...new Set(candidates)];
+}
+
+/** Retry another model only when the failure can plausibly be model-specific. */
+export function shouldTryNextGeminiModel(error: unknown): boolean {
+  const candidate = error as { status?: unknown; statusCode?: unknown; code?: unknown; message?: unknown };
+  const status = Number(candidate?.status || candidate?.statusCode || candidate?.code);
+  if (status === 401 || status === 403 || status === 429) return false;
+  const message = String(candidate?.message || error || "").toLowerCase();
+  if (/\b(401|403|429)\b|unauthorized|permission denied|api key|quota|rate.?limit/.test(message)) {
+    return false;
+  }
+  return true;
+}

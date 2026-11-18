@@ -1,0 +1,8 @@
+{
+  "name": "U-GOV",
+  "description": "Unified Governance & Citizen Services Platform — citizen services discovery, private document vault, consent control, application tracking, Government Web Hub, Life Bio, and grounded AI guidance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

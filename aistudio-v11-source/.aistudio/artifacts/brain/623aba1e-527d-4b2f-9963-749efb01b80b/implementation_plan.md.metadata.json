@@ -1,0 +1,6 @@
+{
+  "summary": "Implementation plan for fixing Bharat G-Bot routing/knowledge grounding and verified offline fallback, upgrading AuthView with descriptive loading and an inline retryable error banner, verifying end-to-end tests, and producing the 13-section U-GOV V10 implementation audit and handover report.",
+  "updatedAt": "2026-11-18T12:55:38.554622956Z",
+  "requestFeedback": true,
+  "userFacing": true
+}

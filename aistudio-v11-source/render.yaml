@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: ugov
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: UGOV_DATA_DIR
+        value: /tmp/ugov-data
+      - key: UGOV_STORAGE_MODE
+        value: ephemeral-demo
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false

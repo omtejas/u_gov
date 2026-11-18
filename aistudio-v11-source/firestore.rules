@@ -1,0 +1,426 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Default-Deny Global Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Primitive Helpers
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'tagtheindian0@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // 3. Entity Validation Blueprints (Anti-Update-Gap)
+    function isValidUserPublic(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'preferredLanguage', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'preferredLanguage', 'createdAt', 'updatedAt'])
+        && data.uid is string && isValidId(data.uid)
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80
+        && data.preferredLanguage in ['en', 'hi', 'mr', 'kn']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivate(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'phone', 'state', 'district', 'kycLevel', 'createdAt', 'updatedAt'])
+        && data.uid is string && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 25))
+        && (!('state' in data) || (data.state is string && data.state.size() <= 60))
+        && (!('district' in data) || (data.district is string && data.district.size() <= 60))
+        && (!('kycLevel' in data) || (data.kycLevel is string && data.kycLevel.size() <= 60))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPreferences(data) {
+      return data.keys().hasAll(['ownerId', 'updatedAt'])
+        && data.keys().hasOnly(['ownerId', 'preferredLanguage', 'notificationsEnabled', 'tutorialSeen', 'dashboardLayout', 'theme', 'updatedAt'])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && (!('preferredLanguage' in data) || data.preferredLanguage in ['en', 'hi', 'mr', 'kn'])
+        && (!('notificationsEnabled' in data) || data.notificationsEnabled is bool)
+        && (!('tutorialSeen' in data) || data.tutorialSeen is bool)
+        && (!('dashboardLayout' in data) || data.dashboardLayout in ['standard', 'compact', 'simple'])
+        && (!('theme' in data) || data.theme in ['light', 'high-contrast'])
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCitizenDocument(data) {
+      return data.keys().hasAll([
+          'ownerId', 'documentTypeId', 'title', 'mimeType',
+          'sha256Checksum', 'verificationStatus', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'documentTypeId', 'title', 'documentNumber',
+          'mimeType', 'sha256Checksum', 'verificationStatus', 'version',
+          'createdAt', 'updatedAt'
+        ])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.documentTypeId is string && data.documentTypeId.size() >= 2 && data.documentTypeId.size() <= 64
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 120
+        && (!('documentNumber' in data) || (data.documentNumber is string && data.documentNumber.size() <= 80))
+        && data.mimeType in ['application/pdf', 'image/jpeg', 'image/png']
+        && data.sha256Checksum is string && data.sha256Checksum.size() == 64
+        && data.verificationStatus in ['UNVERIFIED', 'SELF_ATTESTED', 'SANDBOX_SIMULATED', 'DIGILOCKER_VERIFIED']
+        && (!('version' in data) || (data.version is int && data.version >= 1 && data.version <= 1000))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidConsent(data) {
+      return data.keys().hasAll([
+          'ownerId', 'documentId', 'recipientEntity', 'purpose',
+          'status', 'grantedAt', 'expiresAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'documentId', 'recipientEntity', 'purpose',
+          'status', 'grantedAt', 'expiresAt'
+        ])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.documentId is string && isValidId(data.documentId)
+        && data.recipientEntity is string && data.recipientEntity.size() >= 1 && data.recipientEntity.size() <= 160
+        && data.purpose is string && data.purpose.size() >= 1 && data.purpose.size() <= 240
+        && data.status in ['ACTIVE', 'REVOKED', 'EXPIRED']
+        && data.grantedAt is timestamp
+        && data.expiresAt is timestamp;
+    }
+
+    function isValidApplication(data) {
+      return data.keys().hasAll(['ownerId', 'serviceId', 'applicationNumber', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'ownerId', 'serviceId', 'applicationNumber', 'status',
+          'attachedDocumentIds', 'consentIds', 'createdAt', 'updatedAt'
+        ])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.serviceId is string && isValidId(data.serviceId)
+        && data.applicationNumber is string && data.applicationNumber.size() >= 4 && data.applicationNumber.size() <= 64
+        && data.status in [
+          'DRAFT', 'DOCUMENTS_REQUIRED', 'READY', 'CONSENT_REQUIRED',
+          'CONSENT_GRANTED', 'SUBMITTED', 'PROCESSING', 'ACTION_REQUIRED',
+          'APPROVED', 'REJECTED', 'CANCELLED'
+        ]
+        && (!('attachedDocumentIds' in data) || (
+          data.attachedDocumentIds is list &&
+          data.attachedDocumentIds.size() <= 10 &&
+          (data.attachedDocumentIds.size() == 0 || data.attachedDocumentIds[0] is string)
+        ))
+        && (!('consentIds' in data) || (
+          data.consentIds is list &&
+          data.consentIds.size() <= 10 &&
+          (data.consentIds.size() == 0 || data.consentIds[0] is string)
+        ))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidGrievance(data) {
+      return data.keys().hasAll([
+          'ownerId', 'ticketId', 'title', 'category', 'department',
+          'location', 'status', 'upvotes', 'description', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'ticketId', 'title', 'category', 'department',
+          'location', 'status', 'upvotes', 'description', 'createdAt', 'updatedAt'
+        ])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.ticketId is string && data.ticketId.size() >= 4 && data.ticketId.size() <= 40
+        && data.title is string && data.title.size() >= 3 && data.title.size() <= 140
+        && data.category is string && data.category.size() >= 2 && data.category.size() <= 60
+        && data.department is string && data.department.size() >= 2 && data.department.size() <= 120
+        && data.location is string && data.location.size() >= 2 && data.location.size() <= 120
+        && data.status in ['Open', 'Assigned', 'In-Progress', 'Resolved']
+        && data.upvotes is int && data.upvotes >= 0 && data.upvotes <= 1000000
+        && data.description is string && data.description.size() >= 5 && data.description.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['ownerId', 'title', 'message', 'type', 'priority', 'read', 'createdAt'])
+        && data.keys().hasOnly(['ownerId', 'title', 'message', 'type', 'priority', 'read', 'createdAt'])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.message is string && data.message.size() >= 1 && data.message.size() <= 600
+        && data.type in ['info', 'success', 'warning', 'alert', 'status']
+        && data.priority in ['high', 'normal', 'low']
+        && data.read is bool
+        && data.createdAt is timestamp;
+    }
+
+    function isValidFeedback(data) {
+      return data.keys().hasAll(['ownerId', 'category', 'subject', 'message', 'status', 'createdAt'])
+        && data.keys().hasOnly(['ownerId', 'category', 'subject', 'message', 'rating', 'status', 'createdAt'])
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.category in ['bug', 'feature', 'ui', 'service', 'general', 'security']
+        && data.subject is string && data.subject.size() >= 5 && data.subject.size() <= 100
+        && data.message is string && data.message.size() >= 10 && data.message.size() <= 2000
+        && (!('rating' in data) || (data.rating is int && data.rating >= 1 && data.rating <= 5))
+        && data.status in ['RECEIVED', 'REVIEWED', 'RESOLVED']
+        && data.createdAt is timestamp;
+    }
+
+    function isValidService(data) {
+      return data.keys().hasAll(['serviceCode', 'name', 'department', 'category', 'status', 'updatedAt'])
+        && data.keys().hasOnly(['serviceCode', 'name', 'department', 'category', 'status', 'updatedAt'])
+        && data.serviceCode is string && data.serviceCode.size() >= 2 && data.serviceCode.size() <= 32
+        && data.name is string && data.name.size() >= 3 && data.name.size() <= 160
+        && data.department is string && data.department.size() >= 2 && data.department.size() <= 160
+        && data.category is string && data.category.size() >= 2 && data.category.size() <= 60
+        && data.status in ['AVAILABLE', 'SANDBOX_PROTOTYPE', 'MAINTENANCE']
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidWebHubPortal(data) {
+      return data.keys().hasAll(['name', 'category', 'url', 'description', 'verifiedOfficial', 'updatedAt'])
+        && data.keys().hasOnly(['name', 'category', 'url', 'description', 'verifiedOfficial', 'updatedAt'])
+        && data.name is string && data.name.size() >= 3 && data.name.size() <= 140
+        && data.category is string && data.category.size() >= 2 && data.category.size() <= 60
+        && data.url is string && data.url.size() >= 10 && data.url.size() <= 260 && data.url.matches('^https://.*')
+        && data.description is string && data.description.size() >= 5 && data.description.size() <= 400
+        && data.verifiedOfficial is bool
+        && data.updatedAt is timestamp;
+    }
+
+    // 4. Collection Rules
+
+    // Trusted Admins Marker (only readable by owner or admin; never self-created)
+    match /admins/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Users Split Collection: Public display summary + strictly isolated Private PII + Preferences
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isSignedIn() && existing().uid == request.auth.uid;
+      allow create: if isValidId(userId) && isOwner(userId) && isValidUserPublic(incoming())
+        && incoming().uid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) && isValidUserPublic(incoming()) && (
+        isAdmin() || (
+          isOwner(userId)
+          && incoming().uid == existing().uid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'preferredLanguage', 'updatedAt'])
+        )
+      );
+      allow delete: if false;
+
+      match /private/{docId} {
+        allow get: if isValidId(userId) && isValidId(docId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId);
+        allow create: if isValidId(userId) && isValidId(docId) && isOwner(userId) && isValidUserPrivate(incoming())
+          && incoming().uid == request.auth.uid
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(docId) && isValidUserPrivate(incoming()) && (
+          isAdmin() || (
+            isOwner(userId)
+            && incoming().uid == existing().uid
+            && incoming().createdAt == existing().createdAt
+            && incoming().updatedAt == request.time
+            && incoming().diff(existing()).affectedKeys().hasOnly(['phone', 'state', 'district', 'updatedAt'])
+          )
+        );
+        allow delete: if false;
+      }
+
+      match /preferences/{prefId} {
+        allow get: if isValidId(userId) && isValidId(prefId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId);
+        allow create: if isValidId(userId) && isValidId(prefId) && isOwner(userId) && isValidUserPreferences(incoming())
+          && incoming().ownerId == request.auth.uid
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(prefId) && isValidUserPreferences(incoming()) && (
+          isAdmin() || (
+            isOwner(userId)
+            && incoming().ownerId == existing().ownerId
+            && incoming().updatedAt == request.time
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'preferredLanguage', 'notificationsEnabled', 'tutorialSeen', 'dashboardLayout', 'theme', 'updatedAt'
+            ])
+          )
+        );
+        allow delete: if false;
+      }
+    }
+
+    // U-DOCS Private Documents + Subcollection Consents
+    match /documents/{documentId} {
+      allow get: if isValidId(documentId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      allow create: if isValidId(documentId) && isSignedIn() && isValidCitizenDocument(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().verificationStatus in ['UNVERIFIED', 'SELF_ATTESTED']
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(documentId) && isSignedIn() && isValidCitizenDocument(incoming()) && (
+        isAdmin() || (
+          existing().ownerId == request.auth.uid
+          && incoming().ownerId == existing().ownerId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'sha256Checksum', 'version', 'updatedAt'])
+        )
+      );
+      allow delete: if isValidId(documentId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+
+      // Master Gate on Consents Subcollection
+      match /consents/{consentId} {
+        allow get: if isValidId(documentId) && isValidId(consentId) && isSignedIn() && (
+          existing().ownerId == request.auth.uid || isAdmin()
+        );
+        allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(documentId) && isValidId(consentId) && isSignedIn() && isValidConsent(incoming())
+          && incoming().ownerId == request.auth.uid
+          && incoming().documentId == documentId
+          && incoming().status == 'ACTIVE'
+          && incoming().grantedAt == request.time
+          && exists(/databases/$(database)/documents/documents/$(documentId))
+          && get(/databases/$(database)/documents/documents/$(documentId)).data.ownerId == request.auth.uid;
+        allow update: if isValidId(documentId) && isValidId(consentId) && isSignedIn() && isValidConsent(incoming()) && (
+          isAdmin() || (
+            existing().ownerId == request.auth.uid
+            && existing().status == 'ACTIVE'
+            && incoming().ownerId == existing().ownerId
+            && incoming().documentId == existing().documentId
+            && incoming().grantedAt == existing().grantedAt
+            && incoming().status == 'REVOKED'
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+          )
+        );
+        allow delete: if isAdmin();
+      }
+    }
+
+    // U-APPLICATIONS (Terminal State Locked)
+    match /applications/{applicationId} {
+      allow get: if isValidId(applicationId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      allow create: if isValidId(applicationId) && isSignedIn() && isValidApplication(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status in ['DRAFT', 'DOCUMENTS_REQUIRED']
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(applicationId) && isSignedIn() && isValidApplication(incoming()) && (
+        isAdmin() || (
+          existing().ownerId == request.auth.uid
+          && !(existing().status in ['APPROVED', 'REJECTED', 'CANCELLED'])
+          && incoming().ownerId == existing().ownerId
+          && incoming().serviceId == existing().serviceId
+          && incoming().applicationNumber == existing().applicationNumber
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            (incoming().diff(existing()).affectedKeys().hasOnly(['attachedDocumentIds', 'updatedAt'])) ||
+            (incoming().diff(existing()).affectedKeys().hasOnly(['status', 'consentIds', 'updatedAt'])
+              && incoming().status in ['READY', 'CONSENT_REQUIRED', 'CONSENT_GRANTED', 'SUBMITTED', 'CANCELLED'])
+          )
+        )
+      );
+      allow delete: if false;
+    }
+
+    // Civic Grievances (Owner-scoped writes, Terminal state Resolved locked)
+    match /grievances/{grievanceId} {
+      allow get: if isValidId(grievanceId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      allow create: if isValidId(grievanceId) && isSignedIn() && isValidGrievance(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status == 'Open'
+        && incoming().upvotes == 0
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(grievanceId) && isSignedIn() && isValidGrievance(incoming()) && (
+        isAdmin() || (
+          existing().ownerId == request.auth.uid
+          && existing().status != 'Resolved'
+          && incoming().ownerId == existing().ownerId
+          && incoming().ticketId == existing().ticketId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['description', 'location', 'updatedAt'])
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Citizen Notifications (Owner-scoped read & read-state toggle)
+    match /notifications/{notificationId} {
+      allow get: if isValidId(notificationId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      allow create: if isValidId(notificationId) && isAdmin() && isValidNotification(incoming())
+        && incoming().createdAt == request.time;
+      allow update: if isValidId(notificationId) && isSignedIn() && isValidNotification(incoming()) && (
+        isAdmin() || (
+          existing().ownerId == request.auth.uid
+          && incoming().ownerId == existing().ownerId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['read'])
+        )
+      );
+      allow delete: if isValidId(notificationId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+    }
+
+    // Citizen Feedback (Create by owner, admin review updates)
+    match /feedback/{feedbackId} {
+      allow get: if isValidId(feedbackId) && isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      allow create: if isValidId(feedbackId) && isSignedIn() && isValidFeedback(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status == 'RECEIVED'
+        && incoming().createdAt == request.time;
+      allow update: if isValidId(feedbackId) && isAdmin() && isValidFeedback(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt;
+      allow delete: if isAdmin();
+    }
+
+    // Public Service Catalogue (Public read, Admin write)
+    match /services/{serviceId} {
+      allow get: if isValidId(serviceId);
+      allow list: if true;
+      allow create, update: if isValidId(serviceId) && isAdmin() && isValidService(incoming())
+        && incoming().updatedAt == request.time;
+      allow delete: if isValidId(serviceId) && isAdmin();
+    }
+
+    // Curated Government Web Hub Directory (Public read, Admin write)
+    match /webhubPortals/{portalId} {
+      allow get: if isValidId(portalId);
+      allow list: if true;
+      allow create, update: if isValidId(portalId) && isAdmin() && isValidWebHubPortal(incoming())
+        && incoming().updatedAt == request.time;
+      allow delete: if isValidId(portalId) && isAdmin();
+    }
+  }
+}

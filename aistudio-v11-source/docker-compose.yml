@@ -1,0 +1,83 @@
+# U-GOV V10 — Zero-Cost Local Cloud Development Stack (Milestone M1)
+# Strictly local development infrastructure (₹0 cloud cost).
+# Default `docker compose up -d` starts PostgreSQL 16 without conflicting with `npm run dev` on port 3000.
+# Optional containerized app workflow: `docker compose --profile app up -d`
+
+name: ugov-local-cloud
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ugov-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ugov}
+      POSTGRES_USER: ${POSTGRES_USER:-ugov_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_local_dev_only}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ugov_postgres_data:/var/lib/postgresql/data
+      - ./src/server/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./src/server/database/migrations/001_v6_lifecycle_foundation.sql:/docker-entrypoint-initdb.d/02-migration-001.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ugov_dev} -d ${POSTGRES_DB:-ugov}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ugov_data_net
+
+  ugov-app:
+    profiles: ["app"]
+    image: node:22-alpine
+    container_name: ugov-app
+    working_dir: /app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm install --no-audit --no-fund && npm run dev"
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+    volumes:
+      - .:/app
+      - ugov_node_modules:/app/node_modules
+      - ugov_app_storage:/data/ugov
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+      UGOV_DATA_DIR: /data/ugov
+      UGOV_STORAGE_TYPE: local
+      UGOV_STORAGE_MODE: ephemeral-demo
+      SESSION_SECRET: ${SESSION_SECRET:-local_dev_session_secret_replace_me}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ugov_dev}:${POSTGRES_PASSWORD:-change_me_local_dev_only}@postgres:5432/${POSTGRES_DB:-ugov}
+      FIREBASE_AUTH_EMULATOR_HOST: ${FIREBASE_AUTH_EMULATOR_HOST:-host.docker.internal:9099}
+      FIRESTORE_EMULATOR_HOST: ${FIRESTORE_EMULATOR_HOST:-host.docker.internal:8080}
+      FIREBASE_STORAGE_EMULATOR_HOST: ${FIREBASE_STORAGE_EMULATOR_HOST:-host.docker.internal:9199}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/api/v1/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    networks:
+      - ugov_edge
+      - ugov_data_net
+
+networks:
+  ugov_edge:
+    driver: bridge
+  ugov_data_net:
+    driver: bridge
+
+volumes:
+  ugov_postgres_data:
+    driver: local
+  ugov_app_storage:
+    driver: local
+  ugov_node_modules:
+    driver: local
